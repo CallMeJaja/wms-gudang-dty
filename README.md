@@ -3,6 +3,42 @@
 Aplikasi berbasis web untuk mengelola keluar-masuk bahan baku **POY (Partially Oriented Yarn)**
 dan produk jadi **DTY (Drawn Textured Yarn)** pada pabrik teksturisasi benang.
 
+## Deskripsi Project
+
+Gudang menyimpan bahan baku **POY (Partially Oriented Yarn)** sebagai bahan utama proses
+teksturisasi. Sistem ini mencatat **keluar-masuk bahan baku**, memberikan **notifikasi ketika
+stok menipis**, serta membuat **laporan penggunaan bahan baku terhadap output produksi**.
+
+Project ini merupakan bagian dari rangkaian sistem terintegrasi pabrik tekstil DTY, dengan fokus
+pada pengelolaan persediaan gudang — mulai dari penerimaan barang dari supplier, pengeluaran
+untuk kebutuhan produksi, hingga pemantauan stok dan pelaporannya.
+
+## Tujuan
+
+Mengatur keluar-masuk bahan baku (POY) dan produk jadi (DTY) secara terstruktur, sehingga
+ketersediaan stok dapat dipantau secara akurat dan mendukung kelancaran proses produksi.
+
+## Fitur Utama
+
+- **Autentikasi dan manajemen user** — login multi-role (Admin, Operator Gudang, Manajer).
+- **Pengelolaan master data** — bahan baku (POY), produk jadi (DTY), dan item pendukung lainnya.
+- **Pengelolaan data penerimaan** — bahan baku / barang masuk dari supplier atau pihak produksi.
+- **Pengelolaan data pengeluaran** — barang yang keluar dari gudang untuk kebutuhan produksi.
+- **Pemantauan jumlah stok barang** — stok real-time beserta notifikasi stok menipis.
+- **Laporan lengkap manajemen gudang** — dapat diekspor (PDF/Excel) dan dicetak.
+
+### Alur Bisnis Inti
+
+```
+Supplier ──masuk──▶ [ GUDANG : stok POY naik ]
+                        │
+Produksi ambil POY ◀──keluar── [ stok POY turun ]
+                        │
+Produksi hasilkan DTY ──masuk──▶ [ stok DTY naik ]
+                        │
+DTY keluar untuk dikirim ──keluar──▶ [ stok DTY turun ]
+```
+
 ## Anggota Kelompok
 - Muhammad Apiransyah Ramdhani
 - Reza Asriano Maulana

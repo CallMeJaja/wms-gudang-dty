@@ -9,8 +9,20 @@ dan produk jadi **DTY (Drawn Textured Yarn)** pada pabrik teksturisasi benang.
 - Dhafi
 
 ## Tech Stack
-- Laravel 13 (PHP) + MySQL
-- Bootstrap / AdminLTE
+
+| Lapisan | Teknologi | Versi | Keterangan |
+|---------|-----------|-------|------------|
+| Backend | Laravel (PHP) | **13.35.0** (PHP ≥ 8.3) | Framework utama |
+| Database | MySQL (Laragon) | — | Penyimpanan data + file `.sql` |
+| Akses Data | Eloquent ORM + Migration + Seeder | — | Skema & data default |
+| Frontend CSS | Bootstrap | **5.3.8** | Tampilan UI |
+| Interaktif | JavaScript + Chart.js | **4.5.1** | Grafik dashboard |
+| Autentikasi | Laravel Breeze | **2.4.2** | Login, register, reset password |
+| Hak Akses | Kolom `role` pada tabel `users` | — | Admin / Operator / Manajer |
+| Export Laporan | PDF (`barryvdh/laravel-dompdf`) + Excel (`maatwebsite/excel`) + Cetak (print browser) | — | Sesuai kebutuhan laporan |
+| Build Tool | Vite | bawaan Laravel | Aset frontend |
+
+**Catatan:** PHP minimum **8.3** (wajib untuk Laravel 13). Pastikan PHP di Laragon sudah 8.3+ sebelum `composer install`.
 
 ## Struktur Repository
 - Root — source code aplikasi (Laravel)

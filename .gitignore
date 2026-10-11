@@ -1,0 +1,16 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.idea/
+.vscode/
+*.swp
+
+# Env & secrets (di dalam web/ juga ter-ignore oleh web/.gitignore)
+.env
+.env.backup
+.env.production
+
+# Logs
+*.log

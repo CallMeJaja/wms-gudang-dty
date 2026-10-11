@@ -4,9 +4,9 @@ Aplikasi berbasis web untuk mengelola keluar-masuk bahan baku **POY (Partially O
 dan produk jadi **DTY (Drawn Textured Yarn)** pada pabrik teksturisasi benang.
 
 ## Anggota Kelompok
-- Apiransyah (Piran)
-- Reza
-- Dhafi
+- Muhammad Apiransyah Ramdhani
+- Reza Asriano Maulana
+- Dhafi Ebsan Yurizal
 
 ## Tech Stack
 

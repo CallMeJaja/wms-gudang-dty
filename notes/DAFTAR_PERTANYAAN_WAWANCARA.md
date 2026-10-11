@@ -1,12 +1,14 @@
 # Daftar Pertanyaan Wawancara — WMS Gudang DTY
 
-**Narasumber:** Pak Jamal
-**Tujuan:** Menggali kebutuhan sistem Manajemen Gudang (POY & DTY) agar aplikasi sesuai kondisi nyata di lapangan.
-**Pewawancara:** Muhammad Apiransyah Ramdhani, Reza Asriano Maulana, Dhafi Ebsan Yurizal
-**Tanggal:** ________________
+| | |
+|---|---|
+| **Narasumber** | Pak Jamal |
+| **Tujuan** | Menggali kebutuhan sistem Manajemen Gudang (POY & DTY) agar aplikasi sesuai kondisi nyata di lapangan |
+| **Pewawancara** | Muhammad Apiransyah Ramdhani, Reza Asriano Maulana, Dhafi Ebsan Yurizal |
+| **Tanggal** | ________________ |
 
-> **Tips:** Rekam/minta izin untuk merekam, siapkan buku catatan, dan jangan lupa dokumentasikan
-> dalam bentuk foto/bukti. Tandai jawaban yang nanti memengaruhi desain database.
+> **Tips:** Rekam / minta izin untuk merekam, siapkan buku catatan, dan dokumentasikan
+> dalam bentuk foto/bukti. Tandai jawaban yang memengaruhi desain database.
 
 ---
 
@@ -75,9 +77,9 @@
 
 32. Siapa saja yang akan memakai aplikasi ini? Sebutkan **peran/jabatan** masing-masing.
 33. Untuk tiap peran, apa yang boleh dan tidak boleh dilakukan?
-   - Admin:
-   - Operator Gudang:
-   - Manajer/atasan:
+    - **Admin:** ________________
+    - **Operator Gudang:** ________________
+    - **Manajer / atasan:** ________________
 34. Apakah setiap transaksi perlu tercatat **siapa yang menginput** (log aktivitas)?
 35. Apakah ada kebutuhan **approval berjenjang** untuk transaksi tertentu?
 

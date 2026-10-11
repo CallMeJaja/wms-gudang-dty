@@ -9,22 +9,34 @@ dan produk jadi **DTY (Drawn Textured Yarn)** pada pabrik teksturisasi benang.
 - Dhafi
 
 ## Tech Stack
-- Laravel (PHP) + MySQL
+- Laravel 13 (PHP) + MySQL
 - Bootstrap / AdminLTE
 
 ## Struktur Repository
-- `web/` — source code aplikasi (Laravel)
-- `database/` — file database `.sql`
+- Root — source code aplikasi (Laravel)
+- `public/` — document root aplikasi
+- `database_backup/` — file database `.sql`
 - `notes/` — panduan penggunaan aplikasi
 
-## Cara Menjalankan (Development)
-1. Clone repo ini
-2. Masuk ke folder `web/`, jalankan `composer install`
-3. Copy `.env.example` menjadi `.env`, lalu atur koneksi database
-4. Import file `database/wms_gudang_dty.sql`
-5. Jalankan `php artisan key:generate` bila perlu
-6. Jalankan `php artisan serve`
-7. Buka `http://127.0.0.1:8000`
+## Cara Menjalankan
+
+### Cara 1 — Laragon (Windows)
+1. Clone repo ini ke folder Laragon, mis. `C:\laragon\www\wms-gudang-dty`
+2. Jalankan Laragon (Apache/Nginx + MySQL)
+3. Ubah **document root** virtual host ke:
+   `C:\laragon\www\wms-gudang-dty\public`
+4. Buka terminal di root project, lalu jalankan `composer install`
+5. Copy `.env.example` → `.env`, atur koneksi database
+6. Import `database_backup/wms_gudang_dty.sql` lewat phpMyAdmin/HeidiSQL
+7. Buka `http://wms-gudang-dty.test` (atau sesuai domain Laragon)
+
+### Cara 2 — Artisan Serve (semua OS)
+1. `composer install`
+2. `cp .env.example .env` lalu atur koneksi DB
+3. Import `database_backup/wms_gudang_dty.sql`
+4. `php artisan key:generate` (bila perlu)
+5. `php artisan serve`
+6. Buka `http://127.0.0.1:8000`
 
 ## Akun Default
 | Role | Username | Password |

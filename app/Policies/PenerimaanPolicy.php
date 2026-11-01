@@ -81,14 +81,15 @@ class PenerimaanPolicy
     }
 
     /**
-     * Void (POSTED -> VOID) — hanya Admin (PRD §2). Dipakai F2C/void lanjutan.
+     * Void (POSTED/ISSUED -> VOID) — hanya Admin (PRD §2, §7.6).
+     * Dipakai tombol "Batalkan (Void)" ketiga controller inbound (F6).
      */
     public function void(User $user, TransaksiMasuk $transaksi, $jenisMasuk = null): bool
     {
         return $user->is_active
             && $user->canManage()
             && $this->jenisCocok($transaksi, $jenisMasuk)
-            && $transaksi->status === StatusDokumen::Posted;
+            && in_array($transaksi->status, [StatusDokumen::Posted, StatusDokumen::Issued], true);
     }
 
     /*

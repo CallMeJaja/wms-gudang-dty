@@ -1,0 +1,133 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\Barang;
+use App\Models\KategoriBarang;
+use App\Models\Satuan;
+use Illuminate\Database\Seeder;
+
+/**
+ * Master barang sesuai PRD §3.1.
+ *
+ * Catatan penting:
+ * - POY & DTY memakai satuan dasar KG (single source of truth, A1).
+ * - Item pendukung memakai PCS / ROLL / KG sesuai satuan dasarnya.
+ * - is_merge_minggu hanya untuk POY yang dipakai produksi hari Minggu (A11).
+ *   Barang master bersifat generik (per merge dibuat saat transaksi),
+ *   sehingga nilai default seeder adalah false. Penandaan merge Minggu
+ *   dilakukan lewat CRUD master data di F1.
+ */
+class BarangSeeder extends Seeder
+{
+    public function run(): void
+    {
+        $kategori = KategoriBarang::pluck('id', 'kode');
+        $satuan = Satuan::pluck('id', 'kode');
+
+        $daftar = [
+            // ---------------- POY ----------------
+            [
+                'kode_barang' => 'POY-250-48',
+                'nama_barang' => 'POY 250/48',
+                'kategori' => KategoriBarang::POY,
+                'denier' => '250',
+                'filament' => '48',
+                'satuan' => 'KG',
+                'stok_minimum' => null,
+            ],
+
+            // ---------------- DTY ----------------
+            [
+                'kode_barang' => 'DTY-150-48-1',
+                'nama_barang' => 'DTY 150/48',
+                'kategori' => KategoriBarang::DTY,
+                'denier' => '150',
+                'filament' => '48',
+                'satuan' => 'KG',
+                'stok_minimum' => null,
+            ],
+
+            // ---------------- Item Pendukung ----------------
+            [
+                'kode_barang' => 'PPR TUB DTY, BULLNOSE',
+                'nama_barang' => 'Paper Tube DTY Bullnose 212-222GM',
+                'kategori' => KategoriBarang::PENDUKUNG,
+                'denier' => null,
+                'filament' => null,
+                'satuan' => 'PCS',
+                'stok_minimum' => config('wms.ambang_pendukung.PAPER_TUBE'),
+            ],
+            [
+                'kode_barang' => 'CARTON BOX DTY 675x444x278MM, KRAFT 200',
+                'nama_barang' => 'Carton Box DTY 675x444x278mm Kraft 200',
+                'kategori' => KategoriBarang::PENDUKUNG,
+                'denier' => null,
+                'filament' => null,
+                'satuan' => 'PCS',
+                'stok_minimum' => config('wms.ambang_pendukung.CARTON_BOX'),
+            ],
+            [
+                'kode_barang' => 'STRETCH FILM 12MC',
+                'nama_barang' => 'Stretch Film 12MC',
+                'kategori' => KategoriBarang::PENDUKUNG,
+                'denier' => null,
+                'filament' => null,
+                'satuan' => 'ROLL',
+                'stok_minimum' => null,
+            ],
+            [
+                'kode_barang' => 'PALLET DTY SMALL BOX 1370x1150x140MM',
+                'nama_barang' => 'Pallet DTY Small Box 1370x1150x140mm',
+                'kategori' => KategoriBarang::PENDUKUNG,
+                'denier' => null,
+                'filament' => null,
+                'satuan' => 'PCS',
+                'stok_minimum' => null,
+            ],
+            [
+                'kode_barang' => 'TAPE 250MX3IN, VISTAC TRANSPARENT',
+                'nama_barang' => 'Tape 250m x 3in Vistac Transparent',
+                'kategori' => KategoriBarang::PENDUKUNG,
+                'denier' => null,
+                'filament' => null,
+                'satuan' => 'ROLL',
+                'stok_minimum' => null,
+            ],
+            [
+                'kode_barang' => 'DTY CONING OIL, TM368 BN',
+                'nama_barang' => 'DTY Coning Oil TM368 BN',
+                'kategori' => KategoriBarang::PENDUKUNG,
+                'denier' => null,
+                'filament' => null,
+                'satuan' => 'KG',
+                'stok_minimum' => config('wms.ambang_pendukung.CONING_OIL'),
+            ],
+            [
+                'kode_barang' => 'DTY PLASTIC BAG HDPE VRGN (4%A) 36/42x55 CM',
+                'nama_barang' => 'DTY Plastic Bag HDPE VRGN (4%A) 36/42x55cm',
+                'kategori' => KategoriBarang::PENDUKUNG,
+                'denier' => null,
+                'filament' => null,
+                'satuan' => 'KG',
+                'stok_minimum' => null,
+            ],
+        ];
+
+        foreach ($daftar as $item) {
+            Barang::updateOrCreate(
+                ['kode_barang' => $item['kode_barang']],
+                [
+                    'kategori_id' => $kategori[$item['kategori']],
+                    'nama_barang' => $item['nama_barang'],
+                    'denier' => $item['denier'],
+                    'filament' => $item['filament'],
+                    'satuan_dasar_id' => $satuan[$item['satuan']],
+                    'stok_minimum' => $item['stok_minimum'],
+                    'is_merge_minggu' => false,
+                    'is_active' => true,
+                ]
+            );
+        }
+    }
+}

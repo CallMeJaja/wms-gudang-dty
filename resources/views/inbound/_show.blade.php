@@ -53,9 +53,67 @@
                     </button>
                 </form>
             @endcan
+        @elseif (in_array($transaksi->status, [App\Enums\StatusDokumen::Posted, App\Enums\StatusDokumen::Issued], true))
+            @can('void', [$transaksi, $jenisMasuk])
+                <button class="btn btn-outline-danger btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#modalVoid">
+                    <i class="bi bi-x-circle me-1"></i> Batalkan (Void)
+                </button>
+            @endcan
         @endif
     </div>
 </div>
+
+@if (in_array($transaksi->status, [App\Enums\StatusDokumen::Posted, App\Enums\StatusDokumen::Issued], true))
+    @can('void', [$transaksi, $jenisMasuk])
+        <div class="modal fade" id="modalVoid" tabindex="-1" aria-labelledby="modalVoidLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <form method="POST" action="{{ route("inbound.{$jenisForm}.void", $transaksi) }}"
+                      data-wms-confirm="Void {{ $transaksi->nomor_transaksi }}? Stok akan dikembalikan dan transaksi tidak dapat dipakai lagi.">
+                    @csrf
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalVoidLabel">Batalkan (Void) {{ $transaksi->nomor_transaksi }}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="alert alert-warning small mb-3">
+                                Stok dari transaksi ini akan dikembalikan. Bila stok sudah terpakai sebagian,
+                                void ditolak agar saldo tidak minus.
+                            </div>
+                            <label for="alasanVoid" class="form-label fw-semibold">Alasan void <span class="text-danger">*</span></label>
+                            <textarea name="alasan_void" id="alasanVoid" rows="3" required minlength="10" maxlength="1000"
+                                      class="form-control @error('alasan_void') is-invalid @enderror"
+                                      placeholder="Minimal 10 karakter, mis. salah input berat timbangan...">{{ old('alasan_void') }}</textarea>
+                            @error('alasan_void')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-danger btn-sm">
+                                <i class="bi bi-x-circle me-1"></i> Ya, Void Sekarang
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    @endcan
+@endif
+
+@if ($transaksi->status === App\Enums\StatusDokumen::Void)
+    <div class="alert alert-danger d-flex align-items-start" role="alert">
+        <i class="bi bi-x-octagon me-2 mt-1"></i>
+        <div>
+            <div class="fw-semibold">Transaksi ini DIBATALKAN (void).</div>
+            <div class="small">Alasan: {{ $transaksi->alasan_void ?? '—' }}</div>
+            <div class="small text-body-secondary">
+                {{ $transaksi->voided_at?->format('d-m-Y H:i') }} oleh {{ $transaksi->pemvoid?->name ?? '—' }}.
+                Audit trail utuh — transaksi tidak dihapus.
+            </div>
+        </div>
+    </div>
+@endif
 
 @if ($transaksi->status === App\Enums\StatusDokumen::Draft)
     <div class="alert alert-secondary d-flex align-items-center" role="alert">

@@ -17,6 +17,7 @@ use App\Services\KonversiSatuanService;
 use App\Services\NomorDokumenService;
 use App\Services\PenerimaanService;
 use App\Services\StokService;
+use App\Services\VoidTransaksiService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -42,6 +43,7 @@ class PenerimaanDtyController extends Controller
         private readonly NomorDokumenService $nomor,
         private readonly KonversiSatuanService $konversi,
         private readonly StokService $stok,
+        private readonly VoidTransaksiService $voidService,
     ) {}
 
     public function index(Request $request): View
@@ -129,7 +131,7 @@ class PenerimaanDtyController extends Controller
     {
         Gate::authorize('view', [$dty, self::JENIS]);
 
-        $dty->load(['detail.barang.kategori', 'detail.grade', 'detail.satuanKemasan', 'pembuat']);
+        $dty->load(['detail.barang.kategori', 'detail.grade', 'detail.satuanKemasan', 'pembuat', 'pemvoid']);
 
         return view('inbound.dty.show', [
             'transaksi' => $dty,
@@ -234,6 +236,28 @@ class PenerimaanDtyController extends Controller
             ->route('inbound.dty.show', $dty)
             ->with('sukses', $pesan)
             ->with('peringatan', $peringatan);
+    }
+
+    /**
+     * Aksi VOID: POSTED -> VOID (balik mutasi stok DTY, hanya Admin) — F6.
+     */
+    public function void(Request $request, TransaksiMasuk $dty): RedirectResponse
+    {
+        Gate::authorize('void', [$dty, self::JENIS]);
+
+        $data = $request->validate([
+            'alasan_void' => ['required', 'string', 'min:'.VoidTransaksiService::MIN_ALASAN, 'max:1000'],
+        ]);
+
+        try {
+            $this->voidService->voidTransaksiMasuk($dty, $data['alasan_void'], $request->user()->id);
+        } catch (AturanBisnisException $e) {
+            return back()->withErrors(['alasan_void' => $e->getMessage()])->withInput();
+        }
+
+        return redirect()
+            ->route('inbound.dty.show', $dty)
+            ->with('sukses', "Penerimaan DTY {$dty->nomor_transaksi} DIBATALKAN (void) — stok dikembalikan.");
     }
 
     /**

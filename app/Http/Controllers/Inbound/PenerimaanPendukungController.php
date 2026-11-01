@@ -13,6 +13,7 @@ use App\Models\TransaksiMasuk;
 use App\Services\KonversiSatuanService;
 use App\Services\NomorDokumenService;
 use App\Services\PenerimaanService;
+use App\Services\VoidTransaksiService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -35,6 +36,7 @@ class PenerimaanPendukungController extends Controller
         private readonly PenerimaanService $penerimaan,
         private readonly NomorDokumenService $nomor,
         private readonly KonversiSatuanService $konversi,
+        private readonly VoidTransaksiService $voidService,
     ) {}
 
     public function index(Request $request): View
@@ -122,7 +124,7 @@ class PenerimaanPendukungController extends Controller
     {
         Gate::authorize('view', [$pendukung, self::JENIS]);
 
-        $pendukung->load(['detail.barang.kategori', 'detail.grade', 'detail.satuanKemasan', 'partner', 'pembuat']);
+        $pendukung->load(['detail.barang.kategori', 'detail.grade', 'detail.satuanKemasan', 'partner', 'pembuat', 'pemvoid']);
 
         return view('inbound.pendukung.show', [
             'transaksi' => $pendukung,
@@ -215,6 +217,29 @@ class PenerimaanPendukungController extends Controller
         return redirect()
             ->route('inbound.pendukung.show', $pendukung)
             ->with('sukses', "Gate Pass {$pendukung->nomor_gate_pass} berhasil DITERBITKAN — stok diperbarui.");
+    }
+
+    /**
+     * Aksi VOID: ISSUED -> VOID (balik mutasi stok, hanya Admin) — F6.
+     * Nomor Gate Pass tetap tersimpan (tidak didaur ulang).
+     */
+    public function void(Request $request, TransaksiMasuk $pendukung): RedirectResponse
+    {
+        Gate::authorize('void', [$pendukung, self::JENIS]);
+
+        $data = $request->validate([
+            'alasan_void' => ['required', 'string', 'min:'.VoidTransaksiService::MIN_ALASAN, 'max:1000'],
+        ]);
+
+        try {
+            $this->voidService->voidTransaksiMasuk($pendukung, $data['alasan_void'], $request->user()->id);
+        } catch (AturanBisnisException $e) {
+            return back()->withErrors(['alasan_void' => $e->getMessage()])->withInput();
+        }
+
+        return redirect()
+            ->route('inbound.pendukung.show', $pendukung)
+            ->with('sukses', "Gate Pass {$pendukung->nomor_gate_pass} DIBATALKAN (void) — stok dikembalikan.");
     }
 
     /*

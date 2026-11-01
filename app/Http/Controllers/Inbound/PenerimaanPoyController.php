@@ -13,6 +13,7 @@ use App\Models\TransaksiMasuk;
 use App\Services\KonversiSatuanService;
 use App\Services\NomorDokumenService;
 use App\Services\PenerimaanService;
+use App\Services\VoidTransaksiService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -35,6 +36,7 @@ class PenerimaanPoyController extends Controller
         private readonly PenerimaanService $penerimaan,
         private readonly NomorDokumenService $nomor,
         private readonly KonversiSatuanService $konversi,
+        private readonly VoidTransaksiService $voidService,
     ) {}
 
     public function index(Request $request): View
@@ -118,7 +120,7 @@ class PenerimaanPoyController extends Controller
     {
         Gate::authorize('view', [$poy, self::JENIS]);
 
-        $poy->load(['detail.barang.kategori', 'detail.grade', 'detail.satuanKemasan', 'partner', 'pembuat', 'alokasiBuffer']);
+        $poy->load(['detail.barang.kategori', 'detail.grade', 'detail.satuanKemasan', 'partner', 'pembuat', 'pemvoid', 'alokasiBuffer']);
 
         return view('inbound.poy.show', [
             'transaksi' => $poy,
@@ -204,6 +206,28 @@ class PenerimaanPoyController extends Controller
         return redirect()
             ->route('inbound.poy.show', $poy)
             ->with('sukses', "Penerimaan POY {$poy->nomor_transaksi} berhasil DIPOSTING — stok aktif diperbarui.");
+    }
+
+    /**
+     * Aksi VOID: POSTED -> VOID (balik mutasi stok, hanya Admin) — F6.
+     */
+    public function void(Request $request, TransaksiMasuk $poy): RedirectResponse
+    {
+        Gate::authorize('void', [$poy, self::JENIS]);
+
+        $data = $request->validate([
+            'alasan_void' => ['required', 'string', 'min:'.VoidTransaksiService::MIN_ALASAN, 'max:1000'],
+        ]);
+
+        try {
+            $this->voidService->voidTransaksiMasuk($poy, $data['alasan_void'], $request->user()->id);
+        } catch (AturanBisnisException $e) {
+            return back()->withErrors(['alasan_void' => $e->getMessage()])->withInput();
+        }
+
+        return redirect()
+            ->route('inbound.poy.show', $poy)
+            ->with('sukses', "Penerimaan POY {$poy->nomor_transaksi} DIBATALKAN (void) — stok dikembalikan.");
     }
 
     /*

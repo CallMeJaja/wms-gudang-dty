@@ -18,9 +18,6 @@ class RingkasanOperasionalWidget extends StatsOverviewWidget
         $stok = DashboardData::stokAktifPoy();
         $buffer = DashboardData::statusBuffer();
 
-        $poyKg = (float) config('wms.pallet.poy_kg');
-        $dtyKg = (float) config('wms.pallet.dty_kg');
-
         return [
             Stat::make(
                 'Stok Aktif POY',
@@ -49,18 +46,6 @@ class RingkasanOperasionalWidget extends StatsOverviewWidget
                     StatusBufferMinggu::TERLAMBAT => 'danger',
                     default => 'warning',
                 }),
-
-            Stat::make(
-                'Acuan Pallet',
-                sprintf(
-                    'POY %s kg · DTY %s kg',
-                    number_format($poyKg, 0, ',', '.'),
-                    number_format($dtyKg, 0, ',', '.')
-                )
-            )
-                ->description('Konversi pallet dari konfigurasi gudang')
-                ->descriptionIcon('heroicon-o-scale')
-                ->color('gray'),
         ];
     }
 }

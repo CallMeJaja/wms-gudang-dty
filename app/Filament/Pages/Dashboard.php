@@ -4,7 +4,6 @@ namespace App\Filament\Pages;
 
 use App\Filament\Widgets\AlertStokWidget;
 use App\Filament\Widgets\GrafikStokWidget;
-use App\Filament\Widgets\RingkasanKategoriWidget;
 use App\Filament\Widgets\RingkasanOperasionalWidget;
 use App\Services\AlokasiBufferService;
 use App\Services\RilisBufferService;
@@ -80,7 +79,6 @@ class Dashboard extends BaseDashboard
         return [
             RingkasanOperasionalWidget::class,
             GrafikStokWidget::class,
-            RingkasanKategoriWidget::class,
             AlertStokWidget::class,
         ];
     }

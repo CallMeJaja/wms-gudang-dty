@@ -48,34 +48,6 @@ final class DashboardData
     }
 
     /**
-     * @return array<int, array{kode: string, label: string, aktifKg: float, bufferKg: float, totalKg: float}>
-     */
-    public static function ringkasanKategori(): array
-    {
-        $hasil = [];
-
-        foreach ([KategoriBarang::POY, KategoriBarang::DTY, KategoriBarang::PENDUKUNG] as $kode) {
-            $query = StokBarang::query()->whereHas('barang', fn ($q) => $q->whereHas(
-                'kategori',
-                fn ($k) => $k->where('kode', $kode)
-            ));
-
-            $aktif = (float) (clone $query)->sum('stok_aktif');
-            $buffer = (float) (clone $query)->sum('stok_buffer');
-
-            $hasil[] = [
-                'kode' => $kode,
-                'label' => $kode === KategoriBarang::PENDUKUNG ? 'Pendukung' : $kode,
-                'aktifKg' => $aktif,
-                'bufferKg' => $buffer,
-                'totalKg' => $aktif + $buffer,
-            ];
-        }
-
-        return $hasil;
-    }
-
-    /**
      * Agregasi mutasi 30 hari terakhir per tanggal: masuk vs keluar
      * POY & DTY (4 garis).
      *

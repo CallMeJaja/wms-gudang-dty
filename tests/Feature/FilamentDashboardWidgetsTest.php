@@ -87,8 +87,7 @@ class FilamentDashboardWidgetsTest extends TestCase
                 ->assertSee('Stok Aktif POY')
                 ->assertSee('Buffer Minggu')
                 ->assertSee('Stok Harian 30 Hari')
-                ->assertSee('Ringkasan per Kategori')
-                ->assertSee('Alert');
+                ->assertSee('Perlu Perhatian');
         }
     }
 

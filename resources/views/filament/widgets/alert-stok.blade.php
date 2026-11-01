@@ -6,7 +6,7 @@
 
 <div style="grid-column: 1 / -1; width: 100%;">
     <x-filament::section
-        heading="Alert"
+        heading="Perlu Perhatian"
         description="Indikator stok aktif, buffer Minggu, dan stok minimum barang."
         icon="heroicon-o-bell-alert"
     >

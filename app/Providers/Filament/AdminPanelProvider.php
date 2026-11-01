@@ -14,7 +14,6 @@ use Filament\PanelProvider;
 use Filament\Support\Assets\Css;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\Width;
-use Filament\View\PanelsRenderHook;
 use Filament\Widgets\AccountWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -38,11 +37,6 @@ class AdminPanelProvider extends PanelProvider
             ->favicon(asset('images/favicon.svg'))
             ->darkMode(true)
             ->userMenu(position: UserMenuPosition::Sidebar)
-            ->sidebarCollapsibleOnDesktop()
-            ->renderHook(
-                PanelsRenderHook::SIDEBAR_NAV_START,
-                fn () => view('filament.sidebar-collapse'),
-            )
             ->navigationGroups([
                 NavigationGroup::make('Data Master'),
                 NavigationGroup::make('Penerimaan'),

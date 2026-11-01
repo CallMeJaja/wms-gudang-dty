@@ -97,12 +97,12 @@ class FilamentBrandingTest extends TestCase
     }
 
     #[Test]
-    public function sidebar_memuat_kontrol_ciutkan_di_atas_navigasi_dan_menu_pengguna(): void
+    public function sidebar_tanpa_kontrol_ciutkan_dan_menu_pengguna_di_sidebar(): void
     {
         $response = $this->actingAs(User::factory()->admin()->create())->get('/admin');
 
         $response->assertOk();
-        $response->assertSee('wms-sidebar-collapse');
+        $response->assertDontSee('wms-sidebar-collapse');
         $response->assertDontSee('wms-sidebar-utility');
 
         $this->assertSame(

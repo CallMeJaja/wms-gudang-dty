@@ -133,11 +133,22 @@ body {
     background: transparent;
     text-align: left;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .wms-chevron {
     margin-left: auto;
     font-size: 0.75rem;
+    line-height: 1;
+    width: 1em;
+    height: 1em;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
     transition: transform 0.2s ease;
 }
 
@@ -175,9 +186,25 @@ body {
 .wms-link i {
     color: var(--bs-secondary);
     font-size: 1rem;
+    line-height: 1;
     width: 1.25rem;
+    height: 1.25rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     text-align: center;
     flex-shrink: 0;
+    overflow: hidden;
+}
+
+/* Pengaman: tidak ada ikon yang boleh meledak melebihi wadahnya,
+   bahkan bila font ikon gagal dimuat. */
+.wms-sidebar i[class*="bi-"],
+.wms-topbar i[class*="bi-"],
+.wms-content i[class*="bi-"] {
+    max-width: 1.5em;
+    max-height: 1.5em;
+    overflow: hidden;
 }
 
 .wms-link:hover {

@@ -73,6 +73,20 @@
             </div>
         </div>
 
+        <div style="display: flex; align-items: flex-start; gap: 0.5rem; border: 1px solid var(--gray-200); background: var(--gray-50); color: var(--gray-600); border-radius: 0.5rem; padding: 0.75rem; font-size: 0.75rem; line-height: 1.5; margin-bottom: 1rem;">
+            <x-filament::icon
+                icon="heroicon-o-information-circle"
+                style="width: 1.1rem; height: 1.1rem; flex-shrink: 0; color: var(--primary-600);"
+            />
+            <div>
+                <div>{{ $disclaimerRingkas }}</div>
+                <details style="margin-top: 0.25rem;">
+                    <summary style="color: var(--primary-600); cursor: pointer;">Selengkapnya</summary>
+                    <div style="margin-top: 0.25rem;">{{ $disclaimerLengkap }}</div>
+                </details>
+            </div>
+        </div>
+
         <h3 style="font-size: 0.9rem; font-weight: 600; margin: 0 0 0.5rem;">Per Merge POY Asal</h3>
 
         <div style="overflow-x: auto; border: 1px solid var(--gray-200); border-radius: 0.5rem;">
@@ -133,8 +147,5 @@
             </table>
         </div>
 
-        <div style="margin-top: 1rem; border: 1px solid var(--gray-200); background: var(--gray-50); color: var(--gray-600); border-radius: 0.5rem; padding: 0.75rem; font-size: 0.75rem; line-height: 1.5;">
-            {{ $disclaimer }}
-        </div>
     </x-filament::section>
 </x-filament-panels::page>

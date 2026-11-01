@@ -292,11 +292,8 @@ return [
     |
     */
     'rendemen' => [
-        'disclaimer' => 'Rendemen dihitung sebagai indikator efisiensi massa, bukan konversi teknis. '
-            .'WIP (work-in-process) diabaikan sehingga hasil dapat sedikit menyimpang dari 100%. '
-            .'Denier POY (mis. 250/48) berbeda dari DTY (mis. 150/48), sehingga perbandingan kg '
-            .'tidak apple-to-apple. Grade C/B berasal dari POY bermasalah (denier/filament tidak cocok) '
-            .'— bukan inefisiensi mesin.',
+        'disclaimer_ringkas' => 'Rendemen adalah indikator efisiensi massa, bukan konversi teknis. WIP diabaikan sehingga hasil bisa sedikit di atas/bawah 100%.',
+        'disclaimer_lengkap' => 'Denier POY (mis. 250/48) berbeda dari DTY (mis. 150/48), sehingga perbandingan kg bersifat indikatif. Grade C/B berasal dari POY bermasalah (denier/filament tidak cocok) — bukan inefisiensi mesin.',
     ],
 
 ];

@@ -79,7 +79,8 @@ class LaporanRendemen extends Page
         return [
             'filter' => $filter,
             'hasil' => app(LaporanService::class)->rendemen($filter['dari'], $filter['sampai']),
-            'disclaimer' => (string) config('wms.rendemen.disclaimer'),
+            'disclaimerRingkas' => (string) config('wms.rendemen.disclaimer_ringkas'),
+            'disclaimerLengkap' => (string) config('wms.rendemen.disclaimer_lengkap'),
         ];
     }
 }

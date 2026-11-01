@@ -65,7 +65,7 @@ class LaporanExportController extends Controller
 
         return Pdf::loadView('laporan.rendemen.pdf', array_merge($filter, [
             'hasil' => $this->laporan->rendemen($filter['dari'], $filter['sampai']),
-            'disclaimer' => (string) config('wms.rendemen.disclaimer'),
+            'disclaimer' => trim(config('wms.rendemen.disclaimer_ringkas').' '.config('wms.rendemen.disclaimer_lengkap')),
         ]))->download('rendemen-poy-dty.pdf');
     }
 

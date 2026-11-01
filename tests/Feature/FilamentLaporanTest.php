@@ -182,7 +182,9 @@ class FilamentLaporanTest extends TestCase
             ->assertSee('95,00%')
             ->assertSee('5,00%')
             ->assertSee('MERGE-A')
-            ->assertSee((string) config('wms.rendemen.disclaimer'));
+            ->assertSee((string) config('wms.rendemen.disclaimer_ringkas'))
+            ->assertSee((string) config('wms.rendemen.disclaimer_lengkap'))
+            ->assertSee('Selengkapnya');
     }
 
     #[Test]

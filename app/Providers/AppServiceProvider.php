@@ -7,6 +7,7 @@ use App\Models\Grade;
 use App\Models\KategoriBarang;
 use App\Models\KonversiSatuan;
 use App\Models\Satuan;
+use App\Models\StokOpname;
 use App\Models\SupplierCustomer;
 use App\Models\TransaksiKeluar;
 use App\Models\TransaksiMasuk;
@@ -17,6 +18,7 @@ use App\Policies\KonversiSatuanPolicy;
 use App\Policies\PenerimaanPolicy;
 use App\Policies\PengeluaranPolicy;
 use App\Policies\SatuanPolicy;
+use App\Policies\StokOpnamePolicy;
 use App\Policies\SupplierCustomerPolicy;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -51,5 +53,8 @@ class AppServiceProvider extends ServiceProvider
         // Transaksi pengeluaran (F3) — satu policy terpusat untuk POY
         // Produksi, Surat Jalan DTY, dan Scrap/Reject DTY.
         Gate::policy(TransaksiKeluar::class, PengeluaranPolicy::class);
+
+        // Stock opname (F6) — hanya Admin (PRD §2, §4.6).
+        Gate::policy(StokOpname::class, StokOpnamePolicy::class);
     }
 }

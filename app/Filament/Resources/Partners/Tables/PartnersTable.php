@@ -4,11 +4,13 @@ namespace App\Filament\Resources\Partners\Tables;
 
 use App\Models\ActivityLog;
 use App\Models\SupplierCustomer;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TrashedFilter;
@@ -65,18 +67,25 @@ class PartnersTable
                 TrashedFilter::make()
                     ->label('Data terhapus'),
             ])
+            ->actionsColumnLabel('Aksi')
             ->recordActions([
-                // Tombol edit/delete otomatis disembunyikan oleh Policy.
-                EditAction::make(),
-                DeleteAction::make()
-                    ->before(function (DeleteAction $action, SupplierCustomer $record): void {
-                        ActivityLog::catat(
-                            'DELETE',
-                            'MASTER_PARTNER',
-                            (int) $record->id,
-                            "Hapus partner (soft delete): {$record->kode}",
-                        );
-                    }),
+                ActionGroup::make([
+                    ViewAction::make(),
+                    // Tombol edit/delete otomatis disembunyikan oleh Policy.
+                    EditAction::make(),
+                    DeleteAction::make()
+                        ->before(function (DeleteAction $action, SupplierCustomer $record): void {
+                            ActivityLog::catat(
+                                'DELETE',
+                                'MASTER_PARTNER',
+                                (int) $record->id,
+                                "Hapus partner (soft delete): {$record->kode}",
+                            );
+                        }),
+                ])
+                    ->label('Aksi')
+                    ->icon('heroicon-o-ellipsis-vertical')
+                    ->iconButton(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

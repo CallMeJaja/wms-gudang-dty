@@ -5,8 +5,10 @@ namespace App\Filament\Resources\KonversiSatuans\Tables;
 use App\Filament\Resources\KonversiSatuans\KonversiSatuanResource;
 use App\Models\ActivityLog;
 use App\Models\KonversiSatuan;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -75,20 +77,27 @@ class KonversiSatuansTable
                     ->searchable()
                     ->preload(),
             ])
+            ->actionsColumnLabel('Aksi')
             ->recordActions([
-                // Tombol edit/delete otomatis disembunyikan oleh Policy.
-                EditAction::make(),
-                DeleteAction::make()
-                    ->before(function (DeleteAction $action, KonversiSatuan $record): void {
-                        $record->load(['barang', 'dariSatuan', 'keSatuan']);
+                ActionGroup::make([
+                    ViewAction::make(),
+                    // Tombol edit/delete otomatis disembunyikan oleh Policy.
+                    EditAction::make(),
+                    DeleteAction::make()
+                        ->before(function (DeleteAction $action, KonversiSatuan $record): void {
+                            $record->load(['barang', 'dariSatuan', 'keSatuan']);
 
-                        ActivityLog::catat(
-                            'DELETE',
-                            'MASTER_KONVERSI',
-                            (int) $record->id,
-                            'Hapus konversi: '.KonversiSatuanResource::ringkas($record),
-                        );
-                    }),
+                            ActivityLog::catat(
+                                'DELETE',
+                                'MASTER_KONVERSI',
+                                (int) $record->id,
+                                'Hapus konversi: '.KonversiSatuanResource::ringkas($record),
+                            );
+                        }),
+                ])
+                    ->label('Aksi')
+                    ->icon('heroicon-o-ellipsis-vertical')
+                    ->iconButton(),
             ])
             ->emptyStateHeading('Belum ada konversi satuan')
             ->emptyStateDescription('Tambahkan aturan konversi untuk barang DTY atau pendukung.')

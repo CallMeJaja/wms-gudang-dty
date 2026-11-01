@@ -5,8 +5,10 @@ namespace App\Filament\Resources\Satuans\Tables;
 use App\Filament\Resources\Satuans\SatuanResource;
 use App\Models\ActivityLog;
 use App\Models\Satuan;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -42,28 +44,35 @@ class SatuansTable
             ->filters([
                 //
             ])
+            ->actionsColumnLabel('Aksi')
             ->recordActions([
-                // Tombol edit/delete otomatis disembunyikan oleh Policy.
-                EditAction::make(),
-                DeleteAction::make()
-                    ->before(function (DeleteAction $action, Satuan $record): void {
-                        if ($alasan = SatuanResource::alasanTidakBisaDihapus($record)) {
-                            Notification::make()
-                                ->danger()
-                                ->title('Satuan tidak dapat dihapus')
-                                ->body($alasan)
-                                ->send();
+                ActionGroup::make([
+                    ViewAction::make(),
+                    // Tombol edit/delete otomatis disembunyikan oleh Policy.
+                    EditAction::make(),
+                    DeleteAction::make()
+                        ->before(function (DeleteAction $action, Satuan $record): void {
+                            if ($alasan = SatuanResource::alasanTidakBisaDihapus($record)) {
+                                Notification::make()
+                                    ->danger()
+                                    ->title('Satuan tidak dapat dihapus')
+                                    ->body($alasan)
+                                    ->send();
 
-                            $action->halt();
-                        }
+                                $action->halt();
+                            }
 
-                        ActivityLog::catat(
-                            'DELETE',
-                            'MASTER_SATUAN',
-                            (int) $record->id,
-                            "Hapus satuan: {$record->kode}",
-                        );
-                    }),
+                            ActivityLog::catat(
+                                'DELETE',
+                                'MASTER_SATUAN',
+                                (int) $record->id,
+                                "Hapus satuan: {$record->kode}",
+                            );
+                        }),
+                ])
+                    ->label('Aksi')
+                    ->icon('heroicon-o-ellipsis-vertical')
+                    ->iconButton(),
             ])
             ->emptyStateHeading('Belum ada satuan')
             ->emptyStateDescription('Tambahkan satuan sebelum membuat master barang.')

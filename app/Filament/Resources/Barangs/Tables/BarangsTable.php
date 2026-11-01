@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\Barangs\Tables;
 
-use App\Models\Barang;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -103,12 +103,18 @@ class BarangsTable
                 TrashedFilter::make()
                     ->label('Data terhapus'),
             ])
+            ->actionsColumnLabel('Aksi')
             ->recordActions([
-                ViewAction::make(),
-                // Tombol edit/delete otomatis disembunyikan oleh Policy
-                // (BarangPolicy::update / ::delete) — Admin saja (PRD §2).
-                EditAction::make(),
-                DeleteAction::make(),
+                ActionGroup::make([
+                    ViewAction::make(),
+                    // Tombol edit/delete otomatis disembunyikan oleh Policy
+                    // (BarangPolicy::update / ::delete) — Admin saja (PRD §2).
+                    EditAction::make(),
+                    DeleteAction::make(),
+                ])
+                    ->label('Aksi')
+                    ->icon('heroicon-o-ellipsis-vertical')
+                    ->iconButton(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

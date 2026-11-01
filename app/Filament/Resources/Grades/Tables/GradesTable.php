@@ -5,8 +5,10 @@ namespace App\Filament\Resources\Grades\Tables;
 use App\Filament\Resources\Grades\GradeResource;
 use App\Models\ActivityLog;
 use App\Models\Grade;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -69,29 +71,36 @@ class GradesTable
                     ->trueLabel('Hanya aktif')
                     ->falseLabel('Hanya nonaktif'),
             ])
+            ->actionsColumnLabel('Aksi')
             ->recordActions([
-                // Tombol edit/delete otomatis disembunyikan oleh Policy.
-                EditAction::make(),
-                DeleteAction::make()
-                    ->hidden(fn (Grade $record): bool => GradeResource::dilindungi($record))
-                    ->before(function (DeleteAction $action, Grade $record): void {
-                        if ($alasan = GradeResource::alasanTidakBisaDihapus($record)) {
-                            Notification::make()
-                                ->danger()
-                                ->title('Grade tidak dapat dihapus')
-                                ->body($alasan)
-                                ->send();
+                ActionGroup::make([
+                    ViewAction::make(),
+                    // Tombol edit/delete otomatis disembunyikan oleh Policy.
+                    EditAction::make(),
+                    DeleteAction::make()
+                        ->hidden(fn (Grade $record): bool => GradeResource::dilindungi($record))
+                        ->before(function (DeleteAction $action, Grade $record): void {
+                            if ($alasan = GradeResource::alasanTidakBisaDihapus($record)) {
+                                Notification::make()
+                                    ->danger()
+                                    ->title('Grade tidak dapat dihapus')
+                                    ->body($alasan)
+                                    ->send();
 
-                            $action->halt();
-                        }
+                                $action->halt();
+                            }
 
-                        ActivityLog::catat(
-                            'DELETE',
-                            'MASTER_GRADE',
-                            (int) $record->id,
-                            "Hapus grade: {$record->kode}",
-                        );
-                    }),
+                            ActivityLog::catat(
+                                'DELETE',
+                                'MASTER_GRADE',
+                                (int) $record->id,
+                                "Hapus grade: {$record->kode}",
+                            );
+                        }),
+                ])
+                    ->label('Aksi')
+                    ->icon('heroicon-o-ellipsis-vertical')
+                    ->iconButton(),
             ])
             ->emptyStateHeading('Belum ada grade')
             ->emptyStateDescription('Tambahkan grade untuk setiap kategori barang.')

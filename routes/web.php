@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\LaporanExportController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Inbound\PenerimaanDtyController;
@@ -269,4 +270,18 @@ Route::middleware(['auth', 'tolak.manajer'])->prefix('satuan')->name('master.sat
     Route::get('{satuan}/edit', [SatuanController::class, 'edit'])->middleware('role:admin')->name('edit');
     Route::put('{satuan}', [SatuanController::class, 'update'])->middleware('role:admin')->name('update');
     Route::delete('{satuan}', [SatuanController::class, 'destroy'])->middleware('role:admin')->name('destroy');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Export laporan (Filament) — endpoint baru, UI legacy tetap ada sampai cutover
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth')->prefix('admin/laporan')->name('admin.laporan.')->group(function () {
+    Route::get('keluar-masuk/excel', [LaporanExportController::class, 'keluarMasukExcel'])->name('keluar-masuk.excel');
+    Route::get('keluar-masuk/pdf', [LaporanExportController::class, 'keluarMasukPdf'])->name('keluar-masuk.pdf');
+    Route::get('kartu-stok/excel', [LaporanExportController::class, 'kartuStokExcel'])->name('kartu-stok.excel');
+    Route::get('kartu-stok/pdf', [LaporanExportController::class, 'kartuStokPdf'])->name('kartu-stok.pdf');
+    Route::get('rendemen/excel', [LaporanExportController::class, 'rendemenExcel'])->name('rendemen.excel');
+    Route::get('rendemen/pdf', [LaporanExportController::class, 'rendemenPdf'])->name('rendemen.pdf');
 });

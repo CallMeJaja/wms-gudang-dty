@@ -27,6 +27,8 @@ trait MembuatDataUji
 
     protected Grade $gradeDtyA;
 
+    protected Grade $gradePendukungStd;
+
     protected Satuan $satuanKg;
 
     protected Satuan $satuanBox;
@@ -53,8 +55,17 @@ trait MembuatDataUji
             'is_active' => true,
         ]);
 
-        $this->satuanKg = Satuan::create(['kode' => Satuan::KG, 'nama' => 'Kilogram']);
-        $this->satuanBox = Satuan::create(['kode' => 'BOX', 'nama' => 'Box']);
+        // Grade netral item pendukung (Gate Pass tidak memuat grade),
+        // tetapi transaksi_masuk_detail.grade_id NOT NULL. Wajib ada di
+        // master karena grade bersifat tertutup (A7).
+        $this->gradePendukungStd = Grade::create([
+            'kode' => (string) config('wms.grade_pendukung_default', 'STD'),
+            'kategori_id' => $this->kategoriPendukung->id,
+            'keterangan' => 'Grade netral item pendukung',
+            'is_active' => true,
+        ]);
+
+        $this->satuanKg = Satuan::create(['kode' => Satuan::KG, 'nama' => 'Kilogram']);        $this->satuanBox = Satuan::create(['kode' => 'BOX', 'nama' => 'Box']);
         $this->satuanBobbin = Satuan::create(['kode' => 'BOBBIN', 'nama' => 'Bobbin']);
     }
 

@@ -19,7 +19,6 @@ use App\Models\TransaksiMasuk;
 use App\Models\User;
 use Filament\Enums\UserMenuPosition;
 use Filament\Facades\Filament;
-use Filament\Support\Icons\Heroicon;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
@@ -44,7 +43,7 @@ class FilamentBrandingTest extends TestCase
     }
 
     #[Test]
-    public function panel_admin_mendaftarkan_enam_grup_navigasi_berikon(): void
+    public function panel_admin_mendaftarkan_enam_grup_navigasi_tanpa_ikon(): void
     {
         $groups = array_values(Filament::getPanel('admin')->getNavigationGroups());
 
@@ -53,14 +52,10 @@ class FilamentBrandingTest extends TestCase
             ['Data Master', 'Penerimaan', 'Pengeluaran', 'Persediaan', 'Laporan', 'Pengaturan'],
             array_map(fn ($group): string|Htmlable => $group->getLabel(), $groups),
         );
-        $this->assertSame([
-            Heroicon::OutlinedRectangleStack,
-            Heroicon::OutlinedArrowDownTray,
-            Heroicon::OutlinedArrowUpTray,
-            Heroicon::OutlinedArchiveBox,
-            Heroicon::OutlinedChartBar,
-            Heroicon::OutlinedCog6Tooth,
-        ], array_map(fn ($group) => $group->getIcon(), $groups));
+        $this->assertSame(
+            [null, null, null, null, null, null],
+            array_map(fn ($group) => $group->getIcon(), $groups),
+        );
     }
 
     #[Test]

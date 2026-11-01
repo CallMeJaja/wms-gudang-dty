@@ -14,7 +14,6 @@ use Filament\PanelProvider;
 use Filament\Support\Assets\Css;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\Width;
-use Filament\Support\Icons\Heroicon;
 use Filament\View\PanelsRenderHook;
 use Filament\Widgets\AccountWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
@@ -45,18 +44,12 @@ class AdminPanelProvider extends PanelProvider
                 fn () => view('filament.sidebar-collapse'),
             )
             ->navigationGroups([
-                NavigationGroup::make('Data Master')
-                    ->icon(Heroicon::OutlinedRectangleStack),
-                NavigationGroup::make('Penerimaan')
-                    ->icon(Heroicon::OutlinedArrowDownTray),
-                NavigationGroup::make('Pengeluaran')
-                    ->icon(Heroicon::OutlinedArrowUpTray),
-                NavigationGroup::make('Persediaan')
-                    ->icon(Heroicon::OutlinedArchiveBox),
-                NavigationGroup::make('Laporan')
-                    ->icon(Heroicon::OutlinedChartBar),
-                NavigationGroup::make('Pengaturan')
-                    ->icon(Heroicon::OutlinedCog6Tooth),
+                NavigationGroup::make('Data Master'),
+                NavigationGroup::make('Penerimaan'),
+                NavigationGroup::make('Pengeluaran'),
+                NavigationGroup::make('Persediaan'),
+                NavigationGroup::make('Laporan'),
+                NavigationGroup::make('Pengaturan'),
             ])
             ->maxContentWidth(Width::SevenExtraLarge)
             ->simplePageMaxContentWidth(Width::Medium)

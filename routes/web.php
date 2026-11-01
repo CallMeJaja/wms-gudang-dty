@@ -53,9 +53,11 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'tolak.manajer'])->prefix('transaksi/masuk')->name('inbound.')->group(function () {
     // Operator & Admin boleh menulis transaksi penerimaan.
     $tulis = ['role:admin,operator'];
+    // Void: HANYA Admin (PRD §2) — F6.
+    $void = ['role:admin'];
 
     // ----- Penerimaan POY dari IPCI (DRAFT -> POSTED) -----
-    Route::prefix('poy')->name('poy.')->group(function () use ($tulis) {
+    Route::prefix('poy')->name('poy.')->group(function () use ($tulis, $void) {
         Route::get('/', [PenerimaanPoyController::class, 'index'])->name('index');
         Route::get('create', [PenerimaanPoyController::class, 'create'])->middleware($tulis)->name('create');
         Route::post('/', [PenerimaanPoyController::class, 'store'])->middleware($tulis)->name('store');
@@ -64,10 +66,11 @@ Route::middleware(['auth', 'tolak.manajer'])->prefix('transaksi/masuk')->name('i
         Route::put('{poy}', [PenerimaanPoyController::class, 'update'])->middleware($tulis)->name('update');
         Route::delete('{poy}', [PenerimaanPoyController::class, 'destroy'])->middleware($tulis)->name('destroy');
         Route::post('{poy}/posting', [PenerimaanPoyController::class, 'posting'])->middleware($tulis)->name('posting');
+        Route::post('{poy}/void', [PenerimaanPoyController::class, 'void'])->middleware($void)->name('void');
     });
 
     // ----- Penerimaan Item Pendukung / Gate Pass (DRAFT -> ISSUED) -----
-    Route::prefix('pendukung')->name('pendukung.')->group(function () use ($tulis) {
+    Route::prefix('pendukung')->name('pendukung.')->group(function () use ($tulis, $void) {
         Route::get('/', [PenerimaanPendukungController::class, 'index'])->name('index');
         Route::get('create', [PenerimaanPendukungController::class, 'create'])->middleware($tulis)->name('create');
         Route::post('/', [PenerimaanPendukungController::class, 'store'])->middleware($tulis)->name('store');
@@ -76,10 +79,11 @@ Route::middleware(['auth', 'tolak.manajer'])->prefix('transaksi/masuk')->name('i
         Route::put('{pendukung}', [PenerimaanPendukungController::class, 'update'])->middleware($tulis)->name('update');
         Route::delete('{pendukung}', [PenerimaanPendukungController::class, 'destroy'])->middleware($tulis)->name('destroy');
         Route::post('{pendukung}/issue', [PenerimaanPendukungController::class, 'issue'])->middleware($tulis)->name('issue');
+        Route::post('{pendukung}/void', [PenerimaanPendukungController::class, 'void'])->middleware($void)->name('void');
     });
 
     // ----- Penerimaan DTY dari Produksi (DRAFT -> POSTED) -----
-    Route::prefix('dty')->name('dty.')->group(function () use ($tulis) {
+    Route::prefix('dty')->name('dty.')->group(function () use ($tulis, $void) {
         // Pratinjau harus dideklarasikan SEBELUM {dty} agar tidak tertangkap
         // sebagai parameter route.
         Route::get('pratinjau/autofill', [PenerimaanDtyController::class, 'pratinjau'])->name('pratinjau');
@@ -93,6 +97,7 @@ Route::middleware(['auth', 'tolak.manajer'])->prefix('transaksi/masuk')->name('i
         Route::put('{dty}', [PenerimaanDtyController::class, 'update'])->middleware($tulis)->name('update');
         Route::delete('{dty}', [PenerimaanDtyController::class, 'destroy'])->middleware($tulis)->name('destroy');
         Route::post('{dty}/posting', [PenerimaanDtyController::class, 'posting'])->middleware($tulis)->name('posting');
+        Route::post('{dty}/void', [PenerimaanDtyController::class, 'void'])->middleware($void)->name('void');
     });
 });
 

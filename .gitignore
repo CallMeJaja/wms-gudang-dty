@@ -42,5 +42,8 @@ Homestead.yaml
 /CLAUDE.md
 /AGENTS.md
 
-# Backup database (lokal saja)
-/database_backup/
+# Backup database (hanya dump siap-impor + panduan yang masuk repo)
+# Lihat DoD F0 di PRD §9.
+/database_backup/*
+!/database_backup/wms_gudang_dty.sql
+!/database_backup/README.md

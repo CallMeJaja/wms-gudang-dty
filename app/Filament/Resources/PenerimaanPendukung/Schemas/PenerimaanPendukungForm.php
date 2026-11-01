@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\PenerimaanPendukung\Schemas;
 
+use App\Enums\JenisMasuk;
 use App\Filament\Support\PenerimaanDetailMapper;
 use App\Filament\Support\PenerimaanForm;
 use App\Models\Barang;
@@ -14,10 +15,12 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Validation\ValidationException;
 
@@ -33,65 +36,88 @@ class PenerimaanPendukungForm
     {
         return $schema
             ->components([
-                Section::make('Identitas Dokumen')
-                    ->description('Dokumen resmi Gate Pass. Nomor dapat diisi manual sesuai dokumen fisik IPCI.')
-                    ->columns(3)
+                Grid::make(3)
                     ->columnSpanFull()
                     ->schema([
-                        TextInput::make('nomor_gate_pass')
-                            ->label('Nomor Gate Pass')
-                            ->maxLength(50)
-                            ->unique(ignoreRecord: true)
-                            ->default(fn () => app(NomorDokumenService::class)->peek('GATE_PASS'))
-                            ->helperText('Kosongkan untuk generate otomatis.'),
+                        Section::make('Identitas Dokumen')
+                            ->description('Dokumen resmi Gate Pass. Nomor dapat diisi manual sesuai dokumen fisik IPCI.')
+                            ->icon(Heroicon::OutlinedDocumentText)
+                            ->columnSpan(2)
+                            ->columns(2)
+                            ->schema([
+                                TextInput::make('nomor_gate_pass')
+                                    ->label('Nomor Gate Pass')
+                                    ->maxLength(50)
+                                    ->unique(ignoreRecord: true)
+                                    ->default(fn () => app(NomorDokumenService::class)->peek('GATE_PASS'))
+                                    ->helperText('Kosongkan untuk generate otomatis.'),
 
-                        TextInput::make('nomor_transaksi')
-                            ->label('Nomor Transaksi')
-                            ->disabled()
-                            ->dehydrated(false)
-                            ->helperText('Digenerate otomatis saat disimpan.'),
+                                TextInput::make('nomor_transaksi')
+                                    ->label('Nomor Transaksi')
+                                    ->disabled()
+                                    ->dehydrated(false)
+                                    ->helperText('Digenerate otomatis saat disimpan.'),
 
-                        DatePicker::make('tanggal')
-                            ->label('Tanggal Terima')
-                            ->required()
-                            ->default(now())
-                            ->native(false)
-                            ->displayFormat('d/m/Y'),
+                                DatePicker::make('tanggal')
+                                    ->label('Tanggal Terima')
+                                    ->required()
+                                    ->default(now())
+                                    ->native(false)
+                                    ->displayFormat('d/m/Y'),
 
-                        Select::make('partner_id')
-                            ->label('Supplier / Partner')
-                            ->relationship(
-                                name: 'partner',
-                                titleAttribute: 'nama',
-                                modifyQueryUsing: fn (Builder $query) => $query->orderBy('nama'),
-                            )
-                            ->searchable()
-                            ->preload(),
+                                Select::make('partner_id')
+                                    ->label('Supplier / Partner')
+                                    ->relationship(
+                                        name: 'partner',
+                                        titleAttribute: 'nama',
+                                        modifyQueryUsing: fn (Builder $query) => $query->orderBy('nama'),
+                                    )
+                                    ->searchable()
+                                    ->preload(),
 
-                        Select::make('shift')
-                            ->label('Shift')
-                            ->options(PenerimaanForm::opsiShift())
-                            ->native(false),
+                                Select::make('shift')
+                                    ->label('Shift')
+                                    ->options(PenerimaanForm::opsiShift())
+                                    ->native(false),
 
-                        TextInput::make('operator_nama')
-                            ->label('Nama Operator')
-                            ->maxLength(100),
+                                TextInput::make('operator_nama')
+                                    ->label('Nama Operator')
+                                    ->maxLength(100),
 
-                        TextInput::make('ref_dokumen')
-                            ->label('Ref. Dokumen')
-                            ->maxLength(100),
+                                TextInput::make('ref_dokumen')
+                                    ->label('Ref. Dokumen')
+                                    ->maxLength(100),
 
-                        TextInput::make('pengirim')
-                            ->label('Pengirim')
-                            ->maxLength(100),
+                                TextInput::make('pengirim')
+                                    ->label('Pengirim')
+                                    ->maxLength(100),
 
-                        TextInput::make('penerima')
-                            ->label('Penerima')
-                            ->maxLength(100),
+                                TextInput::make('penerima')
+                                    ->label('Penerima')
+                                    ->maxLength(100),
+                            ]),
+                        Section::make('Ringkasan')
+                            ->icon(Heroicon::OutlinedInformationCircle)
+                            ->columnSpan(1)
+                            ->schema([
+                                Placeholder::make('jenis_dokumen')
+                                    ->label('Jenis Dokumen')
+                                    ->content(JenisMasuk::PendukungGatepass->label()),
+                                Placeholder::make('status_dokumen')
+                                    ->label('Status')
+                                    ->content('Draf'),
+                                Placeholder::make('total_berat')
+                                    ->label('Total Berat')
+                                    ->content(fn (Get $get): string => number_format(PenerimaanForm::totalBerat($get('detail')), 2, ',', '.').' kg'),
+                                Placeholder::make('alur_stok')
+                                    ->label('Alur Stok')
+                                    ->content('Stok belum berubah. Stok bertambah setelah Terbitkan.'),
+                            ]),
                     ]),
 
                 Section::make('Rincian Item')
                     ->description('Qty x satuan kemasan otomatis dikonversi ke KG oleh sistem.')
+                    ->icon(Heroicon::OutlinedTableCells)
                     ->columnSpanFull()
                     ->schema([
                         Repeater::make('detail')
@@ -180,13 +206,10 @@ class PenerimaanPendukungForm
                                     ->maxLength(255)
                                     ->placeholder('GRN-VELVET'),
                             ]),
-
-                        Placeholder::make('total_berat_kg')
-                            ->label('Total Berat Masuk')
-                            ->content(fn (Get $get): string => number_format(PenerimaanForm::totalBerat($get('detail')), 2, ',', '.').' kg'),
                     ]),
 
                 Section::make('Catatan')
+                    ->icon(Heroicon::OutlinedChatBubbleLeftRight)
                     ->columnSpanFull()
                     ->collapsed()
                     ->schema([

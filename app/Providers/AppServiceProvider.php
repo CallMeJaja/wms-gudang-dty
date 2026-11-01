@@ -20,6 +20,7 @@ use App\Policies\PengeluaranPolicy;
 use App\Policies\SatuanPolicy;
 use App\Policies\StokOpnamePolicy;
 use App\Policies\SupplierCustomerPolicy;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -38,6 +39,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Pagination memakai markup Bootstrap 5 (bukan Tailwind).
+        Paginator::useBootstrapFive();
+
         // Pemetaan Policy master data (PRD §2 & F1).
         Gate::policy(Barang::class, BarangPolicy::class);
         Gate::policy(SupplierCustomer::class, SupplierCustomerPolicy::class);

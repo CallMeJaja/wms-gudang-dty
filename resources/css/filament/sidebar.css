@@ -92,4 +92,12 @@ html { scroll-behavior: smooth; }
     background-color: color-mix(in srgb, var(--gray-900) 90%, white) !important;
 }
 
-.fi-sidebar .fi-global-search-ctn { width: 100%; }
+.fi-sidebar .fi-global-search-ctn {
+    width: calc(100% - 2.625rem) !important;
+    margin-inline: 1rem 1.625rem !important;
+}
+
+.fi-sidebar .fi-global-search,
+.fi-sidebar .fi-global-search-field {
+    width: 100%;
+}

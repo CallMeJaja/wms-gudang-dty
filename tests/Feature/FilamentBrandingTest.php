@@ -89,6 +89,15 @@ class FilamentBrandingTest extends TestCase
     }
 
     #[Test]
+    public function panel_memuat_asset_gaya_sidebar(): void
+    {
+        $response = $this->actingAs(User::factory()->admin()->create())->get('/admin');
+
+        $response->assertOk();
+        $response->assertSee('wms-sidebar.css');
+    }
+
+    #[Test]
     public function badge_navigasi_penerimaan_poy_menghitung_draf(): void
     {
         $this->assertNull(PenerimaanPoyResource::getNavigationBadge());

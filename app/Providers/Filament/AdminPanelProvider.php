@@ -11,6 +11,7 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Navigation\NavigationGroup;
 use Filament\Panel;
 use Filament\PanelProvider;
+use Filament\Support\Assets\Css;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\Width;
 use Filament\Support\Icons\Heroicon;
@@ -61,6 +62,10 @@ class AdminPanelProvider extends PanelProvider
             ->simplePageMaxContentWidth(Width::Medium)
             ->colors([
                 'primary' => Color::Blue,
+            ])
+            ->assets([
+                Css::make('wms-sidebar', resource_path('css/filament/sidebar.css'))
+                    ->relativePublicPath('css/filament/app/wms-sidebar.css'),
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')

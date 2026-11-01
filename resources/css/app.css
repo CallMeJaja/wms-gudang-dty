@@ -69,6 +69,24 @@ body {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
+    overflow: hidden;
+}
+
+@media (min-width: 992px) {
+    .wms-sidebar {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        max-height: 100vh;
+        overflow: hidden;
+        align-self: flex-start;
+    }
+
+    .wms-nav {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+    }
 }
 
 .wms-brand {
@@ -79,6 +97,7 @@ body {
     padding: 0.25rem 0.5rem 1rem;
     border-bottom: 1px solid var(--bs-border-color);
     margin-bottom: 0.75rem;
+    flex-shrink: 0;
 }
 
 .wms-brand-icon {
@@ -99,6 +118,33 @@ body {
     flex-direction: column;
     gap: 0.125rem;
     overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+}
+
+.wms-group-toggle {
+    width: 100%;
+    border: 0;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+}
+
+.wms-chevron {
+    margin-left: auto;
+    font-size: 0.75rem;
+    transition: transform 0.2s ease;
+}
+
+.wms-group-toggle[aria-expanded="true"] .wms-chevron {
+    transform: rotate(180deg);
+}
+
+.wms-submenu {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    padding-left: 0.5rem;
 }
 
 .wms-label {

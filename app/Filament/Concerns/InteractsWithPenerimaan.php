@@ -9,6 +9,7 @@ use App\Models\TransaksiMasuk;
 use App\Services\PenerimaanService;
 use App\Services\VoidTransaksiService;
 use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Textarea;
@@ -246,21 +247,27 @@ trait InteractsWithPenerimaan
     }
 
     /**
-     * @return array<int, Action>
+     * @return array<int, Action|ActionGroup>
      */
     public static function aksiPenerimaan(): array
     {
         $aksi = [
-            static::aksiLihat(),
-            static::aksiUbah(),
             static::aksiPosting(),
             static::aksiVoid(),
-            static::aksiHapus(),
         ];
 
         if (static::jenisMasuk() === JenisMasuk::PendukungGatepass) {
             $aksi[] = static::aksiCetak();
         }
+
+        $aksi[] = ActionGroup::make([
+            static::aksiLihat(),
+            static::aksiUbah(),
+            static::aksiHapus(),
+        ])
+            ->label('Aksi')
+            ->icon('heroicon-o-ellipsis-vertical')
+            ->iconButton();
 
         return $aksi;
     }

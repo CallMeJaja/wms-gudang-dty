@@ -9,6 +9,7 @@ use App\Models\TransaksiKeluar;
 use App\Services\PengeluaranService;
 use App\Services\VoidTransaksiService;
 use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
@@ -264,18 +265,29 @@ trait InteractsWithPengeluaran
     }
 
     /**
-     * @return array<int, Action>
+     * @return array<int, Action|ActionGroup>
      */
     public static function aksiPengeluaran(): array
     {
-        return array_values(array_filter([
+        $aksi = [
+            static::aksiPosting(),
+            static::aksiVoid(),
+        ];
+
+        if (static::jenisKeluar() === JenisKeluar::DtySuratJalan) {
+            $aksi[] = static::aksiCetak();
+        }
+
+        $aksi[] = ActionGroup::make([
             static::aksiLihat(),
             static::aksiUbah(),
-            static::aksiPosting(),
-            static::jenisKeluar() === JenisKeluar::DtySuratJalan ? static::aksiCetak() : null,
-            static::aksiVoid(),
             static::aksiHapus(),
-        ]));
+        ])
+            ->label('Aksi')
+            ->icon('heroicon-o-ellipsis-vertical')
+            ->iconButton();
+
+        return $aksi;
     }
 
     /**

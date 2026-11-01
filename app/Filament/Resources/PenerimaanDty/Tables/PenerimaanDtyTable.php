@@ -95,6 +95,7 @@ class PenerimaanDtyTable
                         ->when($data['dari'] ?? null, fn (Builder $q, $d) => $q->whereDate('tanggal', '>=', $d))
                         ->when($data['sampai'] ?? null, fn (Builder $q, $d) => $q->whereDate('tanggal', '<=', $d))),
             ])
+            ->actionsColumnLabel('Aksi')
             ->recordActions(PenerimaanDtyResource::aksiPenerimaan())
             ->emptyStateHeading('Belum ada penerimaan DTY')
             ->emptyStateDescription('Catat hasil produksi DTY agar stok produk jadi bertambah.')

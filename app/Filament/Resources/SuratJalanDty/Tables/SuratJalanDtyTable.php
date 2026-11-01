@@ -97,6 +97,7 @@ class SuratJalanDtyTable
 
                 SuratJalanDtyResource::filterTanggal(),
             ])
+            ->actionsColumnLabel('Aksi')
             ->recordActions(SuratJalanDtyResource::aksiPengeluaran())
             ->emptyStateHeading('Belum ada Surat Jalan DTY')
             ->emptyStateDescription('Buat Surat Jalan DTY, lalu Terbitkan untuk mengurangi stok dan mencetak dokumen.')

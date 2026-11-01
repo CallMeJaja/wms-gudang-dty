@@ -86,6 +86,7 @@ class PenerimaanPendukungTable
                         ->when($data['dari'] ?? null, fn (Builder $q, $d) => $q->whereDate('tanggal', '>=', $d))
                         ->when($data['sampai'] ?? null, fn (Builder $q, $d) => $q->whereDate('tanggal', '<=', $d))),
             ])
+            ->actionsColumnLabel('Aksi')
             ->recordActions(PenerimaanPendukungResource::aksiPenerimaan())
             ->emptyStateHeading('Belum ada Gate Pass')
             ->emptyStateDescription('Catat penerimaan item pendukung dari Store IPCI melalui dokumen Gate Pass.')

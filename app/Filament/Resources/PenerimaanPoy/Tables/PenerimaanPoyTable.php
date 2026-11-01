@@ -96,6 +96,7 @@ class PenerimaanPoyTable
                         ->when($data['dari'] ?? null, fn (Builder $q, $d) => $q->whereDate('tanggal', '>=', $d))
                         ->when($data['sampai'] ?? null, fn (Builder $q, $d) => $q->whereDate('tanggal', '<=', $d))),
             ])
+            ->actionsColumnLabel('Aksi')
             ->recordActions(PenerimaanPoyResource::aksiPenerimaan())
             ->emptyStateHeading('Belum ada penerimaan POY')
             ->emptyStateDescription('Buat transaksi penerimaan POY dari IPCI untuk menambah stok bahan baku.')

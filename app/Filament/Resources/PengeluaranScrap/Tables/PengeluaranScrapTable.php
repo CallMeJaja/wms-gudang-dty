@@ -68,6 +68,7 @@ class PengeluaranScrapTable
 
                 PengeluaranScrapResource::filterTanggal(),
             ])
+            ->actionsColumnLabel('Aksi')
             ->recordActions(PengeluaranScrapResource::aksiPengeluaran())
             ->emptyStateHeading('Belum ada pengeluaran scrap')
             ->emptyStateDescription('Catat scrap/reject DTY beserta tujuan atau penerimanya.')

@@ -75,6 +75,7 @@ class PengeluaranPoyTable
 
                 PengeluaranPoyResource::filterTanggal(),
             ])
+            ->actionsColumnLabel('Aksi')
             ->recordActions(PengeluaranPoyResource::aksiPengeluaran())
             ->emptyStateHeading('Belum ada pengeluaran POY')
             ->emptyStateDescription('Buat transaksi pengeluaran POY ke produksi. Stok berkurang saat diposting.')

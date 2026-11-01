@@ -132,7 +132,7 @@ login pertama.
 ## Testing & QA
 
 ```bash
-php artisan test       # seluruh test (191 test lulus)
+php artisan test       # seluruh test (197 test lulus)
 vendor/bin/pint        # perbaiki format kode PHP
 npm run build          # build aset frontend
 ```

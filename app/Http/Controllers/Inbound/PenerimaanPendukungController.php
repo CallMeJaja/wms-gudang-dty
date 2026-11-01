@@ -10,6 +10,7 @@ use App\Http\Controllers\Inbound\Concerns\MenulisDetailPenerimaan;
 use App\Http\Requests\Inbound\StorePenerimaanPendukungRequest;
 use App\Models\ActivityLog;
 use App\Models\TransaksiMasuk;
+use App\Models\TransaksiMasukDetail;
 use App\Services\KonversiSatuanService;
 use App\Services\NomorDokumenService;
 use App\Services\PenerimaanService;
@@ -130,6 +131,22 @@ class PenerimaanPendukungController extends Controller
             'transaksi' => $pendukung,
             'totalKg' => PenerimaanService::totalKg($pendukung),
         ]);
+    }
+
+    /**
+     * Halaman cetak Gate Pass (format fisik PRD §3.4-D, F5).
+     */
+    public function cetak(TransaksiMasuk $pendukung): View
+    {
+        Gate::authorize('view', [$pendukung, self::JENIS]);
+
+        $pendukung->load(['detail.barang.kategori', 'detail.barang.satuanDasar', 'detail.grade', 'detail.satuanKemasan', 'partner']);
+
+        $pendukung->detail->each(function (TransaksiMasukDetail $detail): void {
+            $detail->setAttribute('batch', $this->batchDariKeterangan($detail->keterangan));
+        });
+
+        return view('inbound.pendukung.cetak', ['transaksi' => $pendukung]);
     }
 
     public function edit(TransaksiMasuk $pendukung): View

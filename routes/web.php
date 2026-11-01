@@ -5,6 +5,9 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Inbound\PenerimaanDtyController;
 use App\Http\Controllers\Inbound\PenerimaanPendukungController;
 use App\Http\Controllers\Inbound\PenerimaanPoyController;
+use App\Http\Controllers\Laporan\KartuStokController;
+use App\Http\Controllers\Laporan\KeluarMasukController;
+use App\Http\Controllers\Laporan\RendemenController;
 use App\Http\Controllers\Master\BarangController;
 use App\Http\Controllers\Master\GradeController;
 use App\Http\Controllers\Master\KategoriController;
@@ -160,6 +163,31 @@ Route::middleware(['auth', 'tolak.manajer'])->prefix('transaksi/keluar')->name('
         Route::post('{scrap}/void', [ScrapController::class, 'void'])->middleware($void)->name('void');
     });
 });
+
+/*
+|--------------------------------------------------------------------------
+| Laporan & Cetak (F5) — semua role boleh baca (GET saja, tanpa tolak.manajer)
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth')->prefix('laporan')->name('laporan.')->group(function () {
+    Route::get('keluar-masuk', [KeluarMasukController::class, 'index'])->name('keluar-masuk.index');
+    Route::get('keluar-masuk/excel', [KeluarMasukController::class, 'excel'])->name('keluar-masuk.excel');
+    Route::get('keluar-masuk/pdf', [KeluarMasukController::class, 'pdf'])->name('keluar-masuk.pdf');
+
+    Route::get('kartu-stok', [KartuStokController::class, 'index'])->name('kartu-stok.index');
+    Route::get('kartu-stok/excel', [KartuStokController::class, 'excel'])->name('kartu-stok.excel');
+    Route::get('kartu-stok/pdf', [KartuStokController::class, 'pdf'])->name('kartu-stok.pdf');
+
+    Route::get('rendemen', [RendemenController::class, 'index'])->name('rendemen.index');
+    Route::get('rendemen/excel', [RendemenController::class, 'excel'])->name('rendemen.excel');
+    Route::get('rendemen/pdf', [RendemenController::class, 'pdf'])->name('rendemen.pdf');
+});
+
+// Cetak Gate Pass: halaman cetak format fisik, semua role boleh (GET).
+Route::middleware('auth')->get(
+    'transaksi/masuk/pendukung/{pendukung}/cetak',
+    [PenerimaanPendukungController::class, 'cetak']
+)->name('inbound.pendukung.cetak');
 
 /*
 |--------------------------------------------------------------------------

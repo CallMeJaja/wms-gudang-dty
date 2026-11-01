@@ -205,6 +205,14 @@ class FilamentBrandingTest extends TestCase
         $this->assertFileExists(public_path('images/favicon.svg'));
     }
 
+    #[Test]
+    public function halaman_login_menampilkan_brand_logo(): void
+    {
+        $this->get('/admin/login')
+            ->assertOk()
+            ->assertSee('brand-logo.svg');
+    }
+
     private function buatDrafPenerimaan(): TransaksiMasuk
     {
         return $this->buatTransaksiMasuk([

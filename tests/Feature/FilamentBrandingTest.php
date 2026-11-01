@@ -16,6 +16,7 @@ use App\Models\SupplierCustomer;
 use App\Models\TransaksiKeluar;
 use App\Models\TransaksiMasuk;
 use App\Models\User;
+use Filament\Enums\UserMenuPosition;
 use Filament\Facades\Filament;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Contracts\Support\Htmlable;
@@ -71,6 +72,20 @@ class FilamentBrandingTest extends TestCase
         foreach (['Master Data', 'Transaksi Masuk', 'Transaksi Keluar', 'Stok', 'Laporan', 'Pengaturan'] as $label) {
             $response->assertSee($label);
         }
+    }
+
+    #[Test]
+    public function sidebar_memuat_kontrol_ciutkan_dan_menu_pengguna(): void
+    {
+        $response = $this->actingAs(User::factory()->admin()->create())->get('/admin');
+
+        $response->assertOk();
+        $response->assertSee('Ciutkan');
+
+        $this->assertSame(
+            UserMenuPosition::Sidebar,
+            Filament::getPanel('admin')->getUserMenuPosition(),
+        );
     }
 
     #[Test]

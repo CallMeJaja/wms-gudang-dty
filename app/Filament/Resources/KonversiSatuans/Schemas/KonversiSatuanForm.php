@@ -53,7 +53,7 @@ class KonversiSatuanForm
                                             ->preload()
                                             ->nullable()
                                             ->placeholder('Global (semua barang)')
-                                            ->helperText('Barang kategori POY tidak boleh dikonversi (A1b).')
+                                            ->helperText('Barang kategori POY tidak boleh dikonversi.')
                                             ->rules([
                                                 fn (): \Closure => function (string $attribute, mixed $value, \Closure $fail): void {
                                                     if (! $value) {
@@ -64,7 +64,7 @@ class KonversiSatuanForm
 
                                                     if ($barang?->kategori?->kode === KategoriBarang::POY) {
                                                         $fail('POY tidak boleh memiliki konversi satuan. Saldo POY wajib dihitung dari '
-                                                            .'berat timbangan (Kg), bukan konversi bobbin/box (A1b).');
+                                                            .'berat timbangan (Kg), bukan konversi bobbin/box.');
                                                     }
                                                 },
                                             ]),

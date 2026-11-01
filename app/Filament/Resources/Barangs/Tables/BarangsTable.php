@@ -70,7 +70,7 @@ class BarangsTable
                     ->formatStateUsing(fn (bool $state): string => $state ? 'Buffer' : '—')
                     ->color(fn (bool $state): string => $state ? 'success' : 'gray')
                     ->alignCenter()
-                    ->tooltip('Penanda buffer Minggu (khusus POY, A11)'),
+                    ->tooltip('Penanda buffer Minggu (khusus POY)'),
 
                 TextColumn::make('is_active')
                     ->label('Status')

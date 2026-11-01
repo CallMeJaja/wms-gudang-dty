@@ -164,7 +164,7 @@ class PenerimaanPendukungForm
                                     ->required()
                                     ->maxLength(50)
                                     ->placeholder('GRN-VELVET')
-                                    ->helperText('Dipakai sebagai identitas baris stok (A6).'),
+                                    ->helperText('Dipakai sebagai identitas baris stok.'),
 
                                 TextInput::make('jumlah_kemasan')
                                     ->label('Qty')

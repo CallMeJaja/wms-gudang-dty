@@ -67,7 +67,7 @@ class PenerimaanPoyForm
                                     ->label('Nama Operator')
                                     ->required()
                                     ->maxLength(100)
-                                    ->helperText('Akun dipakai bersama per shift (A16).'),
+                                    ->helperText('Akun dipakai bersama per shift.'),
 
                                 Select::make('partner_id')
                                     ->label('Pemasok / Mitra')

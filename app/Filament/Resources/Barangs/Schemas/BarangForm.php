@@ -113,7 +113,7 @@ class BarangForm
 
                                 Toggle::make('is_merge_minggu')
                                     ->label('Merge Minggu (Buffer)')
-                                    ->helperText('Hanya untuk kategori POY. Buffer Minggu tidak berlaku untuk DTY/pendukung (A11).')
+                                    ->helperText('Hanya untuk kategori POY. Buffer Minggu tidak berlaku untuk DTY/pendukung.')
                                     ->disabled(fn (Get $get) => self::kodeKategori($get('kategori_id')) !== KategoriBarang::POY)
                                     ->dehydrated()
                                     // Jangan pernah simpan true untuk barang non-POY.
@@ -131,7 +131,7 @@ class BarangForm
                                             $kode = self::kodeKategori($get('kategori_id'));
 
                                             if ($kode !== null && $kode !== KategoriBarang::POY) {
-                                                $fail("Penandaan \"Merge Minggu\" hanya berlaku untuk barang berkategori POY. Barang kategori {$kode} tidak boleh disisihkan ke buffer Minggu (A11).");
+                                                $fail("Penandaan \"Merge Minggu\" hanya berlaku untuk barang berkategori POY. Barang kategori {$kode} tidak boleh disisihkan ke buffer Minggu.");
                                             }
                                         },
                                     ]),

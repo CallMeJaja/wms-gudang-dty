@@ -72,7 +72,7 @@ class PenerimaanDtyForm
                                     ->label('Nama Operator')
                                     ->required()
                                     ->maxLength(100)
-                                    ->helperText('Akun dipakai bersama per shift (A16).'),
+                                    ->helperText('Akun dipakai bersama per shift.'),
 
                                 TextInput::make('sumber_internal')
                                     ->label('Sumber Internal')

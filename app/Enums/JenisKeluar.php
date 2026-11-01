@@ -25,7 +25,7 @@ enum JenisKeluar: string
     }
 
     /**
-     * DTY_SCRAP_REJECT wajib mengisi catatan (PRD §7.3 no.12).
+     * Pengeluaran scrap/reject DTY wajib disertai catatan.
      */
     public function requiresCatatan(): bool
     {
@@ -33,7 +33,7 @@ enum JenisKeluar: string
     }
 
     /**
-     * Hanya pengeluaran POY yang memotong stok AKTIF (A3).
+     * Hanya pengeluaran POY yang memotong stok AKTIF; buffer tidak tersentuh.
      */
     public function memotongStokAktif(): bool
     {

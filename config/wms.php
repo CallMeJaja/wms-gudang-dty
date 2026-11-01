@@ -4,14 +4,15 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | PRINSIP DASAR: KG = SINGLE SOURCE OF TRUTH
+    | Prinsip Dasar: Kg = Single Source of Truth
     |--------------------------------------------------------------------------
     |
     | Box / Bobbin / Pallet HANYA satuan kemasan fisik (input & display).
     | Saldo stok & mutasi MUTLAK dihitung dari Net Weight (Kg) hasil
     | timbangan nyata / Surat Jalan / Gate Pass.
     |
-    | Berkas ini adalah SATU-SATUNYA sumber konstanta bisnis (PRD §3.3).
+    | Berkas ini adalah SATU-SATUNYA sumber konstanta bisnis.
+    | Nilai bisnis bersumber dari dokumen kebutuhan operasional gudang.
     | Tidak boleh ada angka hardcode di kode aplikasi.
     |
     */
@@ -19,7 +20,7 @@ return [
     'satuan' => [
 
         /*
-        | ---------------- POY (250/48) — TERVERIFIKASI LOGBOOK ----------------
+        | ---------------- POY (250/48) — Terverifikasi Logbook ----------------
         |
         | Bukti: logbook "DATA POY DIKIRIM DARI IPCI KE PEI"
         |   7 pallet   = 252 bobbin = 4.032 kg -> 36 bobbin/pallet, 16 kg/bobbin
@@ -44,7 +45,7 @@ return [
         'dty_box_gross_kg' => 35.74,    // AKTUAL Surat Jalan (2.144,4/60)
 
         /*
-        | --- Toleransi gross per box PER GRADE (konfirmasi PIC 30-10-2026) ---
+        | --- Toleransi Gross per Box per Grade (konfirmasi PIC 30-10-2026) ---
         |
         | Rentang grade A/B jauh lebih lebar: menerima bobbin sisa/putus.
         | Catatan: AE adalah nilai estimasi lapangan (asumsi terkontrol).
@@ -60,14 +61,14 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | PALLET — POY vs DTY BERATNYA SANGAT BERBEDA
+    | Pallet — POY vs DTY Beratnya Sangat Berbeda
     |--------------------------------------------------------------------------
     |
     |   POY :  36 bobbin/pallet ->    576 kg/pallet
     |   DTY : ~209 bobbin/pallet -> ~1.149 kg/pallet (turunan SJ 244)
     |
     | Nilai di bawah HANYA untuk threshold visual.
-    | JANGAN dipakai menambah/mengurangi stok (lihat A1/A2).
+    | JANGAN dipakai menambah/mengurangi stok; stok selalu dihitung dari kg.
     |
     */
     'pallet' => [
@@ -77,11 +78,11 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | SHIFT KERJA (TERKONFIRMASI PIC 30-10-2026)
+    | Shift Kerja (Terkonfirmasi PIC 30-10-2026)
     |--------------------------------------------------------------------------
     |
     | Shift 3 melintasi tengah malam. Perhitungan tanggal bisnis harus
-    | memperhatikan hal ini (lihat A10).
+    | memperhatikan shift yang sedang berjalan.
     |
     */
     'shift' => [
@@ -92,7 +93,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | PARAMETER OPERASIONAL
+    | Parameter Operasional
     |--------------------------------------------------------------------------
     |
     | Mesin beroperasi 24/7. POY masuk Senin–Sabtu (Minggu libur kirim).
@@ -109,7 +110,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | AMBANG POY — DUA INDIKATOR TERPISAH (PRD §5.2.3)
+    | Ambang POY — Dua Indikator Terpisah
     |--------------------------------------------------------------------------
     |
     |   A. Kecukupan stok AKTIF -> konsumsi 1 hari kerja
@@ -129,7 +130,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | AMBANG ITEM PENDUKUNG
+    | Ambang Item Pendukung
     |--------------------------------------------------------------------------
     |
     | Nilai default saat seeding ke barang.stok_minimum.
@@ -144,7 +145,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | INBOUND — SUMBER INTERNAL DEFAULT (PRD §4.4)
+    | Inbound — Sumber Internal Default
     |--------------------------------------------------------------------------
     |
     | Penerimaan DTY hasil produksi berasal dari partner internal system,
@@ -158,7 +159,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | GRADE NETRAL ITEM PENDUKUNG
+    | Grade Netral Item Pendukung
     |--------------------------------------------------------------------------
     |
     | Dokumen Gate Pass tidak memuat grade (No / Material Code / Description /
@@ -171,7 +172,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | STATUS DOKUMEN & TRANSAKSI (PRD §7.6)
+    | Status Dokumen & Transaksi
     |--------------------------------------------------------------------------
     |
     | Satu enum `status` dipakai bersama, tetapi kombinasi yang legal
@@ -203,7 +204,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | PENOMORAN DOKUMEN
+    | Penomoran Dokumen
     |--------------------------------------------------------------------------
     |
     | Format Surat Jalan: [No_Urut]/DTY/PEI/[Bulan_Romawi]/[Tahun]
@@ -234,12 +235,12 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | GRED DEFAULT (untuk seeder)
+    | Grade Default (untuk Seeder)
     |--------------------------------------------------------------------------
     |
     | Grade C SENGAJA tetap ada & aktif. Data riil logbook tidak memuatnya,
-    | tetapi PIC mengonfirmasi scrap grade C PERNAH keluar dan dicatat
-    | (jawaban no. 5, PRD §3.5). Jangan hapus dari master.
+    | tetapi PIC mengonfirmasi scrap grade C PERNAH keluar dan dicatat.
+    | Jangan hapus dari master.
     |
     */
     'grade_default' => [
@@ -256,7 +257,8 @@ return [
         ],
         // Item pendukung tidak punya grade pada dokumen Gate Pass, tetapi
         // transaksi_masuk_detail.grade_id NOT NULL. Dipakai satu grade
-        // netral per kategori PENDUKUNG agar master grade tetap tertutup (A7).
+        // netral per kategori PENDUKUNG agar master grade tetap tertutup
+        // tanpa menambah kode baru.
         'PENDUKUNG' => [
             ['kode' => 'STD', 'keterangan' => 'Grade netral item pendukung (tanpa grade pada Gate Pass)'],
         ],
@@ -264,7 +266,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | KATEGORI & SATUAN DEFAULT (untuk seeder)
+    | Kategori & Satuan Default (untuk Seeder)
     |--------------------------------------------------------------------------
     */
     'kategori_default' => [
@@ -284,10 +286,10 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | RENDERMEN — DISCLAIMER OTOMATIS (PRD §6.3)
+    | Rendemen — Disclaimer Otomatis
     |--------------------------------------------------------------------------
     |
-    | WIP diabaikan (A4) dan denier POY != DTY (A5), sehingga rendemen
+    | WIP diabaikan dan denier POY berbeda dari DTY, sehingga rendemen
     | adalah indikator efisiensi massa, bukan konversi teknis.
     |
     */

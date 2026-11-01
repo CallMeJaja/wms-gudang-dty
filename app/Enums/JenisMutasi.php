@@ -27,7 +27,7 @@ enum JenisMutasi: string
 
     /**
      * Alokasi & rilis buffer selalu menghasilkan DUA baris mutasi
-     * (satu keluar dari pos asal, satu masuk ke pos tujuan) — PRD §7.4.
+     * (satu keluar dari pos asal, satu masuk ke pos tujuan).
      */
     public function isPerpindahanPos(): bool
     {

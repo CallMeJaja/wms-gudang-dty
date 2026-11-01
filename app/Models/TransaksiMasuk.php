@@ -84,7 +84,7 @@ class TransaksiMasuk extends Model
 
     /**
      * Hanya transaksi yang benar-benar mempengaruhi stok.
-     * DRAFT tidak mengubah saldo (PRD §4.1).
+     * Draft tidak mengubah saldo.
      */
     public function scopeMempengaruhiStok(Builder $query): Builder
     {

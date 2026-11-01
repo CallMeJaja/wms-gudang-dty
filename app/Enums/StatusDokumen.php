@@ -3,7 +3,7 @@
 namespace App\Enums;
 
 /**
- * Status terpadu untuk transaksi & dokumen (PRD §7.6).
+ * Status terpadu untuk transaksi internal dan dokumen resmi.
  *
  * Dua lifecycle berbagi satu enum:
  *  - Internal gudang : DRAFT -> POSTED -> VOID

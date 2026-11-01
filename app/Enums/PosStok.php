@@ -4,7 +4,7 @@ namespace App\Enums;
 
 /**
  * Pos stok: AKTIF (bebas dipakai) vs BUFFER (dikunci untuk hari Minggu).
- * Lihat PRD §5.2.1 & A3.
+ * Hanya pengeluaran POY yang memotong stok AKTIF.
  */
 enum PosStok: string
 {

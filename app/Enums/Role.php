@@ -18,7 +18,7 @@ enum Role: string
     }
 
     /**
-     * Role yang boleh melakukan operasi tulis (PRD §2).
+     * Role yang boleh melakukan operasi tulis.
      */
     public function canWrite(): bool
     {
@@ -29,7 +29,7 @@ enum Role: string
     }
 
     /**
-     * Hanya Admin yang boleh void transaksi / ubah master data (PRD §2).
+     * Hanya Admin yang boleh void transaksi / ubah master data.
      */
     public function canManage(): bool
     {

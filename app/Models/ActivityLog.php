@@ -11,7 +11,7 @@ use Illuminate\Support\Str;
  * Log audit sistem — append-only / immutable.
  *
  * Hanya menulis created_at. Tidak ada updated_at sehingga model
- * dikonfigurasi $timestamps = false (PRD §7.4 no.17).
+ * dikonfigurasi $timestamps = false.
  */
 class ActivityLog extends Model
 {

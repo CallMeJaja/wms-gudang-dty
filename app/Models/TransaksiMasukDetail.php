@@ -55,10 +55,9 @@ class TransaksiMasukDetail extends Model
     | Penanda Gross pada Keterangan (DTY)
     |--------------------------------------------------------------------------
     |
-    | Skema `transaksi_masuk_detail` (migrasi F0, tidak diubah pada F2B) hanya
-    | memiliki `berat_kg`; kolom `berat_gross_kg` ada di detail keluar. Agar
-    | gross DTY tetap tercatat & bisa divalidasi ulang tanpa mengubah skema,
-    | nilai disimpan di kolom `keterangan` dengan penanda:
+    | Detail masuk hanya memiliki `berat_kg`, sedangkan `berat_gross_kg` ada
+    | di detail keluar. Agar gross DTY tetap tercatat & bisa divalidasi ulang
+    | tanpa mengubah skema, nilai disimpan di kolom `keterangan` dengan penanda:
     |
     |     [GROSS=35.74] batch / catatan bebas
     |

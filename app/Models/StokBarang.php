@@ -65,7 +65,7 @@ class StokBarang extends Model
     }
 
     /**
-     * Konversi stok ke jumlah pallet (threshold visual saja, PRD A2).
+     * Konversi stok ke jumlah pallet (threshold visual saja).
      * POY memakai pallet.poy_kg, DTY memakai pallet.dty_kg.
      */
     protected function stokPallet(): Attribute

@@ -79,7 +79,7 @@ class User extends Authenticatable implements FilamentUser
     }
 
     /**
-     * Manajer bersifat read-only (PRD §2).
+     * Manajer bersifat read-only.
      */
     public function canWrite(): bool
     {

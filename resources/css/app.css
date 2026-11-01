@@ -1,9 +1,61 @@
-@import 'tailwindcss';
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import 'bootstrap-icons/font/bootstrap-icons.css';
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
+/*
+|--------------------------------------------------------------------------
+| Gaya Khusus WMS Gudang DTY
+|--------------------------------------------------------------------------
+| Semua angka berasal dari config('wms.php'). Tidak ada nilai hardcode
+| di berkas ini untuk konstanta bisnis (lihat PRD §3.3).
+*/
 
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+:root {
+    --wms-sidebar-width: 240px;
+    --wms-sidebar-bg: #1f2937;
+    --wms-header-height: 56px;
+}
+
+body {
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.9rem;
+}
+
+/* Tabel angka: rata kanan & monospace agar mudah dibandingkan */
+.wms-num {
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+/* Kartu ringkasan dashboard */
+.wms-stat {
+    border-left: 4px solid var(--bs-secondary);
+}
+
+.wms-stat--ok {
+    border-left-color: var(--bs-success);
+}
+
+.wms-stat--warn {
+    border-left-color: var(--bs-warning);
+}
+
+.wms-stat--danger {
+    border-left-color: var(--bs-danger);
+}
+
+/* Tampilan cetak: sembunyikan navigasi (Surat Jalan & Gate Pass) */
+@media print {
+    .wms-no-print {
+        display: none !important;
+    }
+
+    body {
+        font-size: 11pt;
+    }
+
+    .wms-print-page {
+        box-shadow: none !important;
+        border: 0 !important;
+    }
 }

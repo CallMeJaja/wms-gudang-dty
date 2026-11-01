@@ -8,8 +8,8 @@ use App\Enums\PosStok;
  * Saldo stok pada pos tertentu tidak mencukupi untuk operasi keluar.
  *
  * Dilempar oleh App\Services\StokService::kurangiStok() dan
- * rilisBuffer() sehingga pemanggil (controller F2C/F3) dapat
- * mengembalikan respons 422 tanpa menebak pesan (PRD §7.5).
+ * rilisBuffer() sehingga pemanggil (controller) dapat
+ * mengembalikan respons 422 tanpa menebak pesan.
  */
 class StokTidakCukupException extends AturanBisnisException
 {

@@ -10,7 +10,7 @@ use DateTimeInterface;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Rilis buffer Minggu ke stok aktif (PRD §5.2.1, F4).
+ * Rilis buffer Minggu ke stok aktif.
  *
  * Hanya untuk barang POY bertanda is_merge_minggu. Setiap baris stok
  * yang buffer-nya > 0 dipindahkan seluruhnya BUFFER -> AKTIF lewat

@@ -9,7 +9,7 @@ use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 
 /**
- * Export Excel kartu stok (§6.2) — satu baris per mutasi + saldo berjalan.
+ * Export Excel kartu stok — satu baris per mutasi + saldo berjalan.
  */
 class KartuStokExport implements FromCollection, WithHeadings
 {

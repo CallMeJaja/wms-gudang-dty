@@ -13,11 +13,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
 /**
- * Agregasi baca-saja untuk laporan F5 (PRD §6).
+ * Agregasi baca-saja untuk laporan gudang.
  *
- * Keluar-masuk & kartu stok membaca `mutasi_stok` (otomatis hanya berisi
- * transaksi POSTED/ISSUED + baris VOID bertipe VOID). Rendemen membaca
- * detail transaksi langsung sesuai rumus PRD §6.3.
+ * Laporan keluar-masuk & kartu stok membaca `mutasi_stok` (otomatis hanya
+ * berisi transaksi POSTED/ISSUED + baris VOID bertipe VOID). Rendemen
+ * membaca detail transaksi langsung dan membandingkan POY keluar produksi
+ * dengan DTY yang masuk.
  */
 class LaporanService
 {
@@ -46,7 +47,7 @@ class LaporanService
 
     /*
     |--------------------------------------------------------------------------
-    | A. Keluar-masuk (§6.1)
+    | A. Laporan Keluar-Masuk
     |--------------------------------------------------------------------------
     */
 
@@ -97,7 +98,7 @@ class LaporanService
 
     /*
     |--------------------------------------------------------------------------
-    | B. Kartu stok (§6.2)
+    | B. Kartu Stok
     |--------------------------------------------------------------------------
     */
 
@@ -137,7 +138,7 @@ class LaporanService
 
     /*
     |--------------------------------------------------------------------------
-    | C. Rekonsiliasi POY vs DTY (§6.3)
+    | C. Rekonsiliasi POY vs DTY
     |--------------------------------------------------------------------------
     */
 

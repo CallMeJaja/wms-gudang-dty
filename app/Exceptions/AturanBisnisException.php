@@ -5,7 +5,7 @@ namespace App\Exceptions;
 use RuntimeException;
 
 /**
- * Pelanggaran aturan bisnis yang terdefinisi di PRD.
+ * Pelanggaran aturan bisnis gudang.
  *
  * Dipakai service layer untuk menolak operasi yang secara teknis valid
  * tetapi melanggar aturan gudang (mis. konversi berat POY, grade lintas
@@ -15,12 +15,12 @@ use RuntimeException;
 class AturanBisnisException extends RuntimeException
 {
     /**
-     * Pesan persis sesuai PRD A1b: POY tidak boleh dikonversi dari kemasan.
+     * Pesan baku: POY tidak boleh dikonversi dari kemasan.
      */
     public const PESAN_POY_WAJIB_KG = 'Berat Netto (Kg) wajib diisi untuk POY — konversi otomatis tidak tersedia.';
 
     /**
-     * Pesan persis sesuai PRD §5.2.2: buffer tidak boleh dipakai hari kerja.
+     * Pesan baku: buffer tidak boleh dipakai hari kerja.
      */
     public const PESAN_BUFFER_TIDAK_BOLEH_DIPAKAI = 'Stok aktif tidak cukup. Stok cadangan (untuk hari Minggu) tidak dapat digunakan hari ini.';
 
@@ -33,7 +33,7 @@ class AturanBisnisException extends RuntimeException
     }
 
     /**
-     * Helper: grade tidak se-kategori dengan barang (PRD §7.5).
+     * Helper: grade tidak se-kategori dengan barang.
      */
     public static function gradeTidakSesuaiKategori(string $kodeBarang): self
     {

@@ -3,9 +3,9 @@
 namespace App\Services;
 
 /**
- * Status kesiapan buffer Minggu (PRD §5.2.3 poin B).
+ * Status kesiapan buffer Minggu.
  *
- * Objek nilai read-only yang dipakai widget dashboard F4. Nilai level
+ * Objek nilai read-only yang dipakai widget dashboard. Nilai level
  * sengaja berupa string tetap ("SIAP" / "BELUM_SIAP" / "TERLAMBAT")
  * agar widget dapat memetakan warna tanpa logika tambahan.
  */

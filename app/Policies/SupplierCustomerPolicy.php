@@ -6,7 +6,7 @@ use App\Models\SupplierCustomer;
 use App\Models\User;
 
 /**
- * Otorisasi master data Supplier/Customer (PRD §2).
+ * Otorisasi master data Supplier/Customer.
  * Hanya Admin yang boleh mengubah master partner.
  */
 class SupplierCustomerPolicy

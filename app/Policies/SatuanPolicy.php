@@ -6,7 +6,7 @@ use App\Models\Satuan;
 use App\Models\User;
 
 /**
- * Otorisasi master data Satuan (PRD §2).
+ * Otorisasi master data Satuan.
  *
  * Admin   : full akses (create/update/delete).
  * Operator: hanya viewAny/view — melihat stok & master, tidak boleh mengubah.

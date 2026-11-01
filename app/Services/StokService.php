@@ -16,12 +16,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Service stok: satu-satunya pintu perubahan saldo & ledger mutasi (PRD §7.4).
+ * Service stok: satu-satunya pintu perubahan saldo & ledger mutasi.
  *
- * Aturan yang diimplementasikan:
- *  - KG = single source of truth (A1/A1b): qty yang diterima parameter
+ * Aturan yang dijaga:
+ *  - KG = single source of truth: qty yang diterima parameter
  *    adalah kg timbangan, tidak pernah hasil konversi bobbin/box.
- *  - Dua pos stok (A3, §5.2.1): `stok_aktif` & `stok_buffer`.
+ *  - Dua pos stok: `stok_aktif` & `stok_buffer`.
  *    Pemisahan pos HANYA relevan untuk POY; DTY & Pendukung selalu
  *    masuk `stok_aktif` dan `stok_buffer` tetap 0.
  *  - Setiap perubahan saldo menulis satu baris `mutasi_stok` dengan
@@ -30,9 +30,9 @@ use Illuminate\Support\Facades\DB;
  *  - Perpindahan pos (ALOKASI_BUFFER / RILIS_BUFFER) menulis DUA baris
  *    mutasi atomik (keluar dari pos asal, masuk ke pos tujuan).
  *  - Semua operasi tulis berada di DB::transaction() dan mengunci baris
- *    `stok_barang` yang relevan dengan lockForUpdate() (PRD §7.5).
+ *    `stok_barang` yang relevan dengan lockForUpdate().
  *  - Stok tidak boleh negatif: divalidasi service (DB juga punya CHECK).
- *  - Grade wajib se-kategori dengan barang (PRD §7.5).
+ *  - Grade wajib se-kategori dengan barang.
  */
 class StokService
 {
@@ -140,7 +140,7 @@ class StokService
     }
 
     /**
-     * Pindahkan porsi stok AKTIF -> BUFFER (PRD §7.4, ALOKASI_BUFFER).
+     * Pindahkan porsi stok AKTIF -> BUFFER (jenis mutasi ALOKASI_BUFFER).
      *
      * Menulis DUA baris mutasi:
      *   1. pos AKTIF  — keluar_qty = porsi
@@ -195,7 +195,7 @@ class StokService
     }
 
     /**
-     * Pindahkan stok BUFFER -> AKTIF (PRD §7.4, RILIS_BUFFER).
+     * Pindahkan stok BUFFER -> AKTIF (jenis mutasi RILIS_BUFFER).
      *
      * Menulis DUA baris mutasi: BUFFER keluar, AKTIF masuk.
      *
@@ -245,7 +245,7 @@ class StokService
     /**
      * Total stok BUFFER gudang (kg) untuk barang bertanda is_merge_minggu.
      *
-     * Ini akumulasi TOTAL GUDANG lintas semua merge (A12), bukan per merge.
+     * Ini akumulasi TOTAL GUDANG lintas semua merge, bukan per merge.
      * Menjadi dasar penentuan sisa kuota buffer di AlokasiBufferService.
      */
     public function totalBufferMinggu(?int $kecualiBarangId = null): float
@@ -255,7 +255,7 @@ class StokService
     }
 
     /**
-     * Total stok BUFFER gudang dalam satuan pallet POY (threshold visual, A2).
+     * Total stok BUFFER gudang dalam satuan pallet POY untuk ambang visual.
      */
     public function totalBufferMingguPallet(?int $kecualiBarangId = null): float
     {
@@ -381,7 +381,7 @@ class StokService
     }
 
     /**
-     * PRD §7.5: grade yang dipakai wajib milik kategori yang sama dengan barang.
+     * Grade yang dipakai wajib milik kategori yang sama dengan barang.
      */
     private function validasiGrade(Barang $barang, int $gradeId): void
     {
@@ -396,7 +396,7 @@ class StokService
     }
 
     /**
-     * Pemisahan pos buffer hanya untuk POY (A3 / PRD §7.2).
+     * Pemisahan pos buffer hanya untuk POY.
      * DTY & item pendukung tidak boleh punya saldo buffer.
      */
     private function validasiBufferHanyaPoy(Barang $barang, PosStok $pos): void

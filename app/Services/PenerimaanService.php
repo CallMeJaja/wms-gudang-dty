@@ -18,10 +18,10 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Orkestrasi transaksi masuk (F2B): status DRAFT -> POSTED / ISSUED.
+ * Orkestrasi transaksi masuk: status DRAFT -> POSTED / ISSUED.
  *
  * Service ini TIDAK menggantikan StokService / AlokasiBufferService, hanya
- * merangkai keduanya dalam SATU DB transaction sesuai PRD §4.1, §4.2, §4.4:
+ * merangkai keduanya dalam SATU DB transaction:
  *
  *   POSTING (POY_IPCI / DTY_PRODUKSI), target POSTED:
  *     1. tambahStok(detail, PosStok::AKTIF) untuk setiap baris detail
@@ -30,7 +30,7 @@ use Illuminate\Support\Facades\DB;
  *   ISSUE (PENDUKUNG_GATEPASS), target ISSUED:
  *     1. tambahStok(detail, PosStok::AKTIF) untuk setiap baris detail
  *
- * Keamanan double-posting (PRD §7.5):
+ * Keamanan double-posting:
  *  - Seluruh pipeline berjalan di dalam DB::transaction().
  *  - Baris `transaksi_masuk` dikunci dengan lockForUpdate() lalu status
  *    DIPERIKSA ULANG setelah lock didapat. Request kedua yang menunggu lock
@@ -74,7 +74,7 @@ class PenerimaanService
      * Pemetaan jenis_masuk -> kode kategori barang yang boleh dipakai detail.
      *
      * Mencegah silang jenis: POY hanya barang POY, DTY hanya DTY, sedangkan
-     * Gate Pass hanya item pendukung (PRD §3.1 & §4).
+     * Gate Pass hanya item pendukung.
      */
     public static function kodeKategori(JenisMasuk $jenis): string
     {
@@ -172,12 +172,12 @@ class PenerimaanService
             // AlokasiBufferService menghitung "pasokan hari itu" dari SELURUH
             // transaksi berstatus mempengaruhiStok() (POSTED/ISSUED). Bila
             // status transaksi ini masih DRAFT, pasokan hari itu terbaca 0
-            // sehingga alokasi selalu dilewati (A13) — buffer tidak pernah terisi.
+            // sehingga alokasi selalu dilewati — buffer tidak pernah terisi.
             $terkunci->status = $target;
             $terkunci->save();
 
             // Alokasi buffer Minggu hanya untuk penerimaan POY (service sendiri
-            // memfilter barang is_merge_minggu & hari kerja, PRD §5.2.2).
+            // memfilter barang is_merge_minggu & hari kerja).
             // Masih berada di DB transaction yang sama -> atomik dengan stok.
             $this->alokasiBufferService->prosesAlokasiUntukPenerimaan($terkunci, $detailList);
 
@@ -235,7 +235,7 @@ class PenerimaanService
                 ));
             }
 
-            // 2) Grade wajib milik kategori barang yang sama (PRD §7.5).
+            // 2) Grade wajib milik kategori barang yang sama.
             $grade = $detail->grade;
 
             if (! $grade instanceof Grade || (int) $grade->kategori_id !== (int) $barang->kategori_id) {
@@ -255,7 +255,7 @@ class PenerimaanService
                 throw new AturanBisnisException("{$label}: berat kg wajib diisi dan lebih besar dari 0.");
             }
 
-            // 4) POY tidak boleh dikonversi dari bobbin (A1b) — pesan persis PRD.
+            // 4) POY tidak boleh dikonversi dari bobbin — pesan sudah baku.
             if ($transaksi->jenis_masuk === JenisMasuk::PoyIpci) {
                 $this->konversiService->validasiBeratPoy(
                     (float) $detail->berat_kg,
@@ -274,7 +274,7 @@ class PenerimaanService
     /**
      * Gross per box aktual (kg) — null bila box tidak diisi / nol.
      *
-     * Dipakai validasi peringatan DTY (PRD §3.3): gross per box dibandingkan
+     * Dipakai validasi peringatan DTY: gross per box dibandingkan
      * dengan rentang grade, BUKAN diblokir, karena bobbin sisa/putus sah.
      */
     public static function grossPerBox(float $grossKg, ?float $jumlahBox): ?float
@@ -375,7 +375,7 @@ class PenerimaanService
      * Box tidak punya kolom sendiri pada `transaksi_masuk_detail`; yang
      * disimpan adalah `jumlah_kemasan` + `satuan_kemasan_id`. Box hanya
      * dihitung bila satuannya benar-benar BOX (dialokasikan ke stok POY/DTY
-     * sebagai atribut pelengkap, bukan akuntansi — A1).
+     * sebagai atribut pelengkap, bukan akuntansi).
      */
     public function jumlahBoxDariDetail(TransaksiMasukDetail $detail): ?int
     {

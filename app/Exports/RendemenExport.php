@@ -8,7 +8,7 @@ use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 
 /**
- * Export Excel rendemen POY vs DTY (§6.3) — total + per merge POY asal.
+ * Export Excel rendemen POY vs DTY — total + per merge POY asal.
  */
 class RendemenExport implements FromCollection, WithHeadings
 {

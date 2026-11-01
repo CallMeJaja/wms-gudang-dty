@@ -6,9 +6,9 @@ use App\Models\NomorDokumen;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Penomoran dokumen atomik (PRD §7.1 & §7.5).
+ * Penomoran dokumen atomik.
  *
- * Aturan yang diimplementasikan:
+ * Aturan yang dijaga:
  *  - Nomor digenerate di dalam DB::transaction() dengan lockForUpdate()
  *    pada baris `nomor_dokumen` (jenis + periode) sehingga aman untuk
  *    request paralel.
@@ -53,7 +53,7 @@ class NomorDokumenService
     /**
      * Pratinjau nomor berikutnya TANPA menaikkan counter.
      *
-     * Dipakai form (F2C) untuk menampilkan nomor yang akan dipakai.
+     * Dipakai form untuk menampilkan nomor yang akan dipakai.
      * Tidak mengunci baris karena tidak ada penulisan.
      */
     public function peek(string $jenis): string

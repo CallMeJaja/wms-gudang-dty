@@ -6,7 +6,7 @@ use App\Models\StokBarang;
 use App\Models\User;
 
 /**
- * Stok barang bersifat baca-saja di panel (PRD §2).
+ * Stok barang bersifat baca-saja di panel.
  *
  * Semua role aktif boleh melihat posisi stok, tetapi tidak ada yang boleh
  * membuat/mengubah/menghapus baris saldo secara langsung — perubahan hanya

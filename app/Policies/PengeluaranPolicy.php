@@ -7,7 +7,7 @@ use App\Models\TransaksiKeluar;
 use App\Models\User;
 
 /**
- * Otorisasi transaksi pengeluaran / transaksi keluar (F3, PRD §2).
+ * Otorisasi transaksi pengeluaran / transaksi keluar.
  *
  * Cerminan PenerimaanPolicy:
  * - Admin & Operator: boleh input transaksi (create/update/posting/issue/delete

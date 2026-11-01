@@ -8,18 +8,18 @@ use App\Models\KonversiSatuan;
 use App\Models\Satuan;
 
 /**
- * Konversi kemasan -> kilogram (PRD A1 / A1b).
+ * Konversi kemasan -> kilogram.
  *
- * Aturan yang diimplementasikan:
+ * Aturan yang dijaga:
  *  - KG tetap single source of truth. Konversi di sini HANYA membantu
  *    mengisi/validasi silang, saldo stok selalu berasal dari berat
  *    timbangan (Net Weight).
  *  - POY TIDAK BOLEH dikonversi bobbin -> kg. Bila operator hanya
- *    mengisi bobbin tanpa kg, service melempar pesan persis:
+ *    mengisi bobbin tanpa kg, service melempar pesan:
  *    "Berat Netto (Kg) wajib diisi untuk POY — konversi otomatis tidak tersedia."
  *  - DTY boleh di-auto-fill dari box (1 box = dty_box_bobbin bobbin
  *    = dty_box_netto_kg kg), tetap bisa dioverride manual oleh operator.
- *  - Pallet TIDAK dipakai sebagai konversi akuntansi (A2).
+ *  - Pallet TIDAK dipakai sebagai konversi akuntansi.
  */
 class KonversiSatuanService
 {
@@ -37,7 +37,7 @@ class KonversiSatuanService
             return null;
         }
 
-        // POY tidak punya konversi otomatis (A1b).
+        // POY tidak punya konversi otomatis dari kemasan ke kg.
         if ($barang->isPoy()) {
             return null;
         }
@@ -63,7 +63,7 @@ class KonversiSatuanService
     }
 
     /**
-     * Validasi berat kg POY wajib diisi (A1b).
+     * Validasi berat kg POY wajib diisi.
      *
      * Berat kg kosong/nol SELALU ditolak untuk POY — baik bobbin diisi
      * maupun tidak — karena POY tidak boleh dikonversi dari bobbin.

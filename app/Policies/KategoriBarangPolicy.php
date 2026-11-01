@@ -6,7 +6,7 @@ use App\Models\KategoriBarang;
 use App\Models\User;
 
 /**
- * Otorisasi master data Kategori Barang (PRD §2).
+ * Otorisasi master data Kategori Barang.
  *
  * Admin   : full akses (create/update/delete).
  * Operator: hanya viewAny/view — melihat stok & master, tidak boleh mengubah.

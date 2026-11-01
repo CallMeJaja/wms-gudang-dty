@@ -6,7 +6,7 @@ use App\Models\KonversiSatuan;
 use App\Models\User;
 
 /**
- * Otorisasi master data Konversi Satuan (PRD §2).
+ * Otorisasi master data Konversi Satuan.
  */
 class KonversiSatuanPolicy
 {

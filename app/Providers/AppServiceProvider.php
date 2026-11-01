@@ -34,20 +34,14 @@ use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
     public function register(): void
     {
         //
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
-        // Catat login/logout Filament ke activity_logs (legacy controller sudah dihapus).
+        // Catat login/logout Filament ke activity_logs.
         Event::listen(Login::class, function (Login $event) {
             ActivityLog::catat('LOGIN', 'AUTH', $event->user->id, "Login berhasil: {$event->user->username}");
         });
@@ -58,7 +52,7 @@ class AppServiceProvider extends ServiceProvider
             }
         });
 
-        // Pemetaan Policy master data (PRD §2 & F1).
+        // Pemetaan policy master data.
         Gate::policy(Barang::class, BarangPolicy::class);
         Gate::policy(SupplierCustomer::class, SupplierCustomerPolicy::class);
         Gate::policy(Grade::class, GradePolicy::class);
@@ -66,21 +60,19 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(KategoriBarang::class, KategoriBarangPolicy::class);
         Gate::policy(Satuan::class, SatuanPolicy::class);
 
-        // Transaksi penerimaan (F2) — satu policy terpusat untuk POY,
-        // Item Pendukung (Gate Pass), dan DTY hasil produksi.
+        // Satu policy penerimaan untuk POY, Item Pendukung (Gate Pass), dan DTY hasil produksi.
         Gate::policy(TransaksiMasuk::class, PenerimaanPolicy::class);
 
-        // Transaksi pengeluaran (F3) — satu policy terpusat untuk POY
-        // Produksi, Surat Jalan DTY, dan Scrap/Reject DTY.
+        // Satu policy pengeluaran untuk POY Produksi, Surat Jalan DTY, dan Scrap/Reject DTY.
         Gate::policy(TransaksiKeluar::class, PengeluaranPolicy::class);
 
-        // Stock opname (F6) — hanya Admin (PRD §2, §4.6).
+        // Stock opname — hanya Admin.
         Gate::policy(StokOpname::class, StokOpnamePolicy::class);
 
-        // Posisi stok — baca-saja untuk semua role aktif (F4).
+        // Posisi stok — baca-saja untuk semua role aktif.
         Gate::policy(StokBarang::class, StokBarangPolicy::class);
 
-        // Manajemen pengguna & activity log (F5) — hanya Admin.
+        // Manajemen pengguna & activity log — hanya Admin.
         Gate::policy(User::class, UserPolicy::class);
         Gate::policy(ActivityLog::class, ActivityLogPolicy::class);
     }

@@ -18,7 +18,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Orkestrasi transaksi keluar (F3): DRAFT -> POSTED / ISSUED.
+ * Orkestrasi transaksi keluar: DRAFT -> POSTED / ISSUED.
  *
  * Cerminan PenerimaanService untuk sisi keluar:
  *
@@ -30,9 +30,9 @@ use Illuminate\Support\Facades\DB;
  *     1. generate nomor_surat_jalan bila kosong (atomik)
  *     2. sama seperti posting (kurangi stok AKTIF)
  *
- * Aturan kritis (PRD §4.3/A3): berat keluar TIDAK BOLEH melebihi `stok_aktif`
+ * Aturan kritis: berat keluar TIDAK BOLEH melebihi `stok_aktif`
  * per (barang+merge+grade). Buffer tidak boleh terpakai di hari kerja —
- * pesan penolakan memakai kalimat persis AturanBisnisException.
+ * pesan penolakan memakai kalimat baku AturanBisnisException.
  *
  * Pengaman double-posting mengikuti pola posting: DB::transaction +
  * lockForUpdate() baris header + cek ulang status di dalam lock.

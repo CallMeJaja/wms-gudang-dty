@@ -13,41 +13,23 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Pembatalan (void) transaksi yang sudah mempengaruhi stok (PRD §4.6, §7.5, §7.6).
+ * Pembatalan (void) transaksi yang sudah mempengaruhi stok.
  *
  * Prinsip: VOID TIDAK menghapus transaksi (audit trail utuh), hanya membalik
  * mutasi terkait dan mengubah status menjadi VOID beserta alasan wajib.
  *
- * STRATEGI VOID PENERIMAAN (inti desain F6):
- *  - Saat posting, seluruh qty detail ditambahkan ke pos AKTIF lebih dulu,
- *    baru sebagian dipindah ke BUFFER via alokasi (lihat AlokasiBufferService:
- *    "kg penerimaan WAJIB sudah ditambahkan ke AKTIF SEBELUM alokasi").
- *  - Karena itu void TIDAK membalik mutasi per baris (MASUK / ALOKASI_BUFFER /
- *    RILIS_BUFFER satu per satu). Sebaliknya, dua langkah per detail:
- *      1. Bila alokasi buffer transaksi ini BELUM dirilis (buffer > 0),
- *         kembalikan dulu ke AKTIF via RILIS_BUFFER. Void membatalkan
- *         penerimaan PENUH — tidak boleh ditolak hanya karena sebagian
- *         stok sedang dikunci sebagai buffer.
- *      2. Kurangi AKTIF sebesar total qty detail.
- *    Benar pada kedua kondisi buffer:
- *      * Buffer belum dirilis: buffer dikembalikan ke aktif, lalu aktif
- *        dikurangi total qty — saldo akhir nol, tanpa minus di pos mana pun.
- *      * Buffer sudah dirilis: buffer = 0, aktif = total qty — pengurangan
- *        AKTIF sebesar total qty sudah tepat.
- *  - totalBufferMinggu() membaca `stok_buffer`, sehingga setelah rilis
- *    internal ia konsisten (buffer transaksi yang di-void = 0).
- *  - Baris `alokasi_buffer` terkait TIDAK dihapus (jejak kebijakan buffer utuh),
- *    hanya diberi penanda "Dibatalkan via void {nomor}" pada `keterangan` agar
- *    tidak menggantung menunjuk transaksi VOID tanpa penjelasan. Kolom
- *    `jumlah_kg`/`dilewati` dibiarkan apa adanya untuk audit.
- *  - Bila `stok_aktif` tidak cukup (sebagian sudah dipakai produksi /
- *    dikeluarkan), void DITOLAK via StokTidakCukupException dari
- *    StokService::kurangiStok — saldo tidak boleh minus, seluruh transaction
- *    rollback dan status tetap POSTED/ISSUED.
+ * Void penerimaan membalik per detail dalam dua langkah: kembalikan porsi
+ * buffer transaksi ini ke AKTIF (bila belum dirilis), lalu kurangi AKTIF
+ * sebesar total qty detail. Hasilnya benar baik saat buffer masih tersimpan
+ * maupun sudah dirilis. Bila stok AKTIF tidak cukup karena sebagian sudah
+ * dipakai produksi/keluar, void ditolak dan seluruh transaction rollback.
+ * Baris `alokasi_buffer` tidak dihapus; hanya diberi penanda pembatalan pada
+ * `keterangan` agar jejak kebijakan buffer tetap utuh untuk audit.
  *
- * Pengaman konkurensi mengikuti pola posting (PenerimaanService): seluruh
- * pipeline di DB::transaction + lockForUpdate() baris header + cek ulang
- * status di dalam lock, sehingga void ganda hanya lolos satu kali.
+ * Void pengeluaran menambah kembali AKTIF sebesar total netto detail.
+ *
+ * Pengaman konkurensi: DB::transaction + lockForUpdate() baris header +
+ * cek ulang status di dalam lock, sehingga void ganda hanya lolos sekali.
  */
 class VoidTransaksiService
 {
@@ -162,10 +144,9 @@ class VoidTransaksiService
     /**
      * Batalkan transaksi keluar POSTED/ISSUED -> VOID (cerminan penerimaan).
      *
-     * Keluar mengurangi AKTIF saat posting (F3), sehingga void MENAMBAH
+     * Keluar mengurangi AKTIF saat posting, sehingga void MENAMBAH
      * kembali AKTIF sebesar total netto detail. Penambahan tidak pernah gagal
-     * karena kuota, jadi tidak ada penolakan stok di sini. Disiapkan lebih
-     * awal agar F3 memakai kontrak yang sama; F3 tinggal memanggil.
+     * karena kuota, jadi tidak ada penolakan stok di sini.
      *
      * @throws AturanBisnisException bila bukan admin, status bukan
      *                               POSTED/ISSUED, atau alasan tidak valid.

@@ -6,7 +6,7 @@ use App\Models\Barang;
 use App\Models\User;
 
 /**
- * Otorisasi master data Barang (PRD §2).
+ * Otorisasi master data Barang.
  *
  * Admin   : full akses (create/update/delete).
  * Operator: hanya viewAny/view — melihat stok & master, tidak boleh mengubah.

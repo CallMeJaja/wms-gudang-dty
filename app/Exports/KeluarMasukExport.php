@@ -9,7 +9,7 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 
 /**
- * Export Excel laporan keluar-masuk (§6.1).
+ * Export Excel laporan keluar-masuk.
  */
 class KeluarMasukExport implements FromCollection, WithHeadings, WithMapping
 {

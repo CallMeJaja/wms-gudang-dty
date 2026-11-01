@@ -7,16 +7,16 @@ use App\Models\TransaksiMasuk;
 use App\Models\User;
 
 /**
- * Otorisasi resource Penerimaan Filament (transaksi masuk, F2, PRD §2).
+ * Otorisasi resource Penerimaan Filament (transaksi masuk).
  *
  * Dipakai bersama oleh resource Penerimaan POY, Penerimaan Pendukung, dan
  * Penerimaan DTY lewat `Gate::authorize('create', [TransaksiMasuk::class, ...])`.
  *
  * - Admin & Operator : boleh input transaksi (create/update/posting/issue/delete
- *   selama masih DRAFT). Operator memang HARUS bisa input transaksi (PRD §2).
+ *   selama masih DRAFT). Operator memang harus bisa input transaksi.
  * - Manajer          : read-only (viewAny/view saja).
- * - Void transaksi   : hanya Admin (PRD §2) — tidak ada di F2B, guard disiapkan
- *   agar aksi void F2C tidak perlu mengubah policy.
+ * - Void transaksi   : hanya Admin; guard disiapkan agar aksi void tidak perlu
+ *   mengubah policy.
  *
  * Setiap aksi menerima argumen opsional `$jenisMasuk` (JenisMasuk|string|null)
  * sehingga resource dapat memastikan hanya jenis penerimaan yang dikelolanya
@@ -81,8 +81,8 @@ class PenerimaanPolicy
     }
 
     /**
-     * Void (POSTED/ISSUED -> VOID) — hanya Admin (PRD §2, §7.6).
-     * Dipakai tombol "Batalkan (Void)" pada ketiga resource penerimaan (F6).
+     * Void (POSTED/ISSUED -> VOID) — hanya Admin.
+     * Dipakai tombol "Batalkan (Void)" pada ketiga resource penerimaan.
      */
     public function void(User $user, TransaksiMasuk $transaksi, $jenisMasuk = null): bool
     {

@@ -17,8 +17,9 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 /**
  * Endpoint export laporan milik panel Filament.
  *
- * Logika filter, export, dan view PDF dipertahankan agar hasil unduhan
- * tetap identik saat halaman Filament beralih ke route `admin.laporan.*`.
+ * Menyediakan unduhan Excel dan PDF untuk laporan keluar-masuk, kartu stok,
+ * dan rendemen POY vs DTY. Filter dibaca dari query string lalu diteruskan
+ * ke LaporanService atau class export terkait.
  */
 class LaporanExportController extends Controller
 {

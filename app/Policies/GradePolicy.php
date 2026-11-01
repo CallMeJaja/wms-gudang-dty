@@ -6,7 +6,7 @@ use App\Models\Grade;
 use App\Models\User;
 
 /**
- * Otorisasi master data Grade (PRD §2).
+ * Otorisasi master data Grade.
  *
  * Aturan bisnis tambahan (grade C DTY tidak boleh dihapus/nonaktif)
  * TIDAK ditegakkan di sini, melainkan di resource/form (GradeResource)

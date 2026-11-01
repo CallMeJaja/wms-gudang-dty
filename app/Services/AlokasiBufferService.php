@@ -14,9 +14,9 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Alokasi buffer Minggu untuk penerimaan POY (PRD §5.2.2, A11–A13).
+ * Alokasi buffer Minggu untuk penerimaan POY.
  *
- * Aturan yang diimplementasikan PERSIS:
+ * Aturan yang dijaga:
  *  1. Hanya dijalankan saat penerimaan berstatus POSTED (DRAFT tidak
  *     mengubah stok maupun buffer).
  *  2. Hanya untuk barang `is_merge_minggu = true`. Merge lain seluruhnya
@@ -29,13 +29,13 @@ use Illuminate\Support\Facades\DB;
  *  5. Pasokan >= ambang -> sisihkan 1 pallet (`pallet.poy_kg`) ke BUFFER,
  *     sisanya AKTIF — tetapi hanya selama total buffer gudang lintas
  *     SEMUA merge Minggu masih < `ambang_poy.target_buffer_pallet`
- *     pallet (A12: kapasitas TOTAL GUDANG, bukan per merge).
+ *     pallet (kapasitas TOTAL GUDANG, bukan per merge).
  *  6. Tidak pernah menyisihkan lebih dari sisa kuota. Bila sisa kuota
  *     lebih kecil dari satu pallet, hanya sebesar sisa kuota itulah
  *     yang disisihkan (bukan satu pallet penuh).
  *
- * CATATAN PRASYARAT: kg penerimaan detail WAJIB sudah ditambahkan ke pos
- * AKTIF oleh pemanggil (service transaksi) SEBELUM service ini dipanggil.
+ * Prasyarat: kg penerimaan detail WAJIB sudah ditambahkan ke pos AKTIF
+ * oleh pemanggil (service transaksi) SEBELUM service ini dipanggil.
  * Service ini hanya MEMINDAHKAN porsi dari AKTIF ke BUFFER, sehingga
  * total stok (aktif + buffer) tidak pernah berubah di sini.
  */
@@ -79,9 +79,9 @@ class AlokasiBufferService
     }
 
     /**
-     * Info status kesiapan buffer Minggu untuk widget dashboard (F4).
+     * Info status kesiapan buffer Minggu untuk widget dashboard.
      *
-     * Level mengikuti PRD §5.2.3 poin B:
+     * Level yang dipakai:
      *  - Siap      : buffer >= target (>= target pallet)
      *  - Terlambat : buffer < target DAN hari Minggu <= 1 hari lagi
      *  - Belum Siap: selain itu
@@ -146,7 +146,7 @@ class AlokasiBufferService
      * Senin = 6 hari lagi, Jumat = 2, Sabtu = 1, Minggu = 0.
      *
      * Hari dinilai pada zona waktu aplikasi (WIB), bukan UTC, karena
-     * shift 3 melintasi tengah malam (A10). Nilai hari memakai ISO-8601
+     * shift 3 melintasi tengah malam. Nilai hari memakai ISO-8601
      * (format 'N': 1 = Senin ... 7 = Minggu) yang eksplisit dan tidak
      * bergantung pada konstanta/dayOfWeek milik library tanggal.
      */
@@ -340,7 +340,7 @@ class AlokasiBufferService
                     && $barang->kategori?->kode === KategoriBarang::POY
                     && (bool) $barang->is_merge_minggu;
             })
-            // Merge Minggu yang datang lebih dulu mengisi kuota lebih dulu (A12).
+            // Merge yang datang lebih dulu mengisi kuota lebih dulu.
             ->sortBy(fn (TransaksiMasukDetail $detail): string => $detail->merge)
             ->values();
     }
@@ -365,7 +365,7 @@ class AlokasiBufferService
     }
 
     /**
-     * Kg -> pallet memakai acuan POY (threshold visual, A2).
+     * Kg -> pallet memakai acuan POY untuk ambang visual.
      */
     private function kgKePallet(float $kg): float
     {

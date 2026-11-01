@@ -2,10 +2,16 @@
 
 namespace Tests\Feature;
 
+use App\Enums\JenisKeluar;
+use App\Enums\JenisMasuk;
 use App\Enums\JenisMutasi;
 use App\Enums\PosStok;
+use App\Enums\StatusDokumen;
 use App\Filament\Pages\Dashboard;
+use App\Filament\Support\DashboardData;
 use App\Models\StokBarang;
+use App\Models\TransaksiKeluar;
+use App\Models\TransaksiMasuk;
 use App\Models\User;
 use App\Services\StokService;
 use Carbon\Carbon;
@@ -86,9 +92,43 @@ class FilamentDashboardWidgetsTest extends TestCase
                 ->assertOk()
                 ->assertSee('Stok Aktif POY')
                 ->assertSee('Buffer Minggu')
+                ->assertSee('Draf Menunggu Posting')
                 ->assertSee('Stok Harian 30 Hari')
                 ->assertSee('Perlu Perhatian');
         }
+    }
+
+    #[Test]
+    public function draf_menunggu_posting_menghitung_draf_penerimaan_dan_pengeluaran(): void
+    {
+        $this->kunciHariKerja();
+
+        TransaksiMasuk::create([
+            'nomor_transaksi' => 'IN-DRAF-1',
+            'jenis_masuk' => JenisMasuk::PoyIpci,
+            'tanggal' => '2026-10-13',
+            'status' => StatusDokumen::Draft,
+            'created_by' => $this->operator->id,
+        ]);
+
+        TransaksiKeluar::create([
+            'nomor_transaksi' => 'OUT-DRAF-1',
+            'jenis_keluar' => JenisKeluar::PoyProduksi,
+            'tanggal' => '2026-10-13',
+            'status' => StatusDokumen::Draft,
+            'created_by' => $this->operator->id,
+        ]);
+
+        $draf = DashboardData::drafMenungguPosting();
+
+        $this->assertSame(1, $draf['penerimaan']);
+        $this->assertSame(1, $draf['pengeluaran']);
+        $this->assertSame(2, $draf['total']);
+
+        $this->actingAs($this->admin)
+            ->get('/admin')
+            ->assertOk()
+            ->assertSee('Penerimaan 1 · Pengeluaran 1');
     }
 
     #[Test]

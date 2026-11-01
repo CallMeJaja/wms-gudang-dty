@@ -17,6 +17,7 @@ class RingkasanOperasionalWidget extends StatsOverviewWidget
     {
         $stok = DashboardData::stokAktifPoy();
         $buffer = DashboardData::statusBuffer();
+        $draf = DashboardData::drafMenungguPosting();
 
         return [
             Stat::make(
@@ -46,6 +47,13 @@ class RingkasanOperasionalWidget extends StatsOverviewWidget
                     StatusBufferMinggu::TERLAMBAT => 'danger',
                     default => 'warning',
                 }),
+
+            Stat::make('Draf Menunggu Posting', (string) $draf['total'])
+                ->description($draf['total'] > 0
+                    ? sprintf('Penerimaan %d · Pengeluaran %d', $draf['penerimaan'], $draf['pengeluaran'])
+                    : 'Tidak ada draf')
+                ->descriptionIcon('heroicon-o-document-text')
+                ->color($draf['total'] > 0 ? 'warning' : 'success'),
         ];
     }
 }

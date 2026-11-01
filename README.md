@@ -20,12 +20,15 @@ ketersediaan stok dapat dipantau secara akurat dan mendukung kelancaran proses p
 
 ## Fitur Utama
 
-- **Autentikasi dan manajemen user** — login multi-role (Admin, Operator Gudang, Manajer).
-- **Pengelolaan master data** — bahan baku (POY), produk jadi (DTY), dan item pendukung lainnya.
-- **Pengelolaan data penerimaan** — bahan baku / barang masuk dari supplier atau pihak produksi.
-- **Pengelolaan data pengeluaran** — barang yang keluar dari gudang untuk kebutuhan produksi.
-- **Pemantauan jumlah stok barang** — stok real-time beserta notifikasi stok menipis.
-- **Laporan lengkap manajemen gudang** — dapat diekspor (PDF/Excel) dan dicetak.
+- **Dashboard** — ringkasan stok aktif, status buffer Minggu beserta aksi rilis buffer,
+  grafik stok 30 hari, ringkasan per kategori, dan alert stok menipis.
+- **Master data** — Barang, Partner, Grade, Kategori Barang, Satuan, dan Konversi Satuan.
+- **Transaksi masuk** — Penerimaan POY, Gate Pass Pendukung, dan Penerimaan DTY.
+- **Transaksi keluar** — Pengeluaran POY, Surat Jalan DTY, dan Pengeluaran Scrap.
+- **Stok** — Stok Barang dan Stok Opname.
+- **Laporan** — Keluar-Masuk, Kartu Stok, dan Rendemen, dengan ekspor Excel/PDF serta cetak.
+- **Pengguna dan activity log** — manajemen akun dan jejak aktivitas pengguna.
+- **Cetak dokumen** — Gate Pass dan Surat Jalan siap cetak.
 
 ### Alur Bisnis Inti
 
@@ -39,6 +42,14 @@ Produksi hasilkan DTY ──masuk──▶ [ stok DTY naik ]
 DTY keluar untuk dikirim ──keluar──▶ [ stok DTY turun ]
 ```
 
+## Hak Akses (RBAC)
+
+| Role | Kewenangan |
+|------|------------|
+| **Admin Gudang** | Akses penuh: master data, transaksi, void transaksi, stok opname, dan manajemen pengguna. |
+| **Operator Gudang** | Input transaksi masuk/keluar dan operasi gudang sehari-hari. |
+| **Manajer / Supervisor** | Akses baca (read-only) dan laporan. |
+
 ## Anggota Kelompok
 - Muhammad Apiransyah Ramdhani
 - Reza Asriano Maulana
@@ -46,52 +57,87 @@ DTY keluar untuk dikirim ──keluar──▶ [ stok DTY turun ]
 
 ## Tech Stack
 
-| Lapisan | Teknologi | Versi | Keterangan |
-|---------|-----------|-------|------------|
+| Lapisan | Teknologi | Versi Terpasang | Keterangan |
+|---------|-----------|-----------------|------------|
 | Backend | Laravel (PHP) | **13.35.0** (PHP ≥ 8.3) | Framework utama |
-| Database | MySQL (Laragon) | — | Penyimpanan data + file `.sql` |
+| UI / Admin Panel | Filament | **5.11.0** | Seluruh antarmuka aplikasi di `/admin` |
+| Reaktivitas | Livewire | **4.4.8** | Komponen dinamis panel Filament |
+| Database | MySQL | **8** | Penyimpanan data + file `.sql` |
 | Akses Data | Eloquent ORM + Migration + Seeder | — | Skema & data default |
-| Frontend CSS | Bootstrap | **5.3.8** | Tampilan UI |
-| Interaktif | JavaScript + Chart.js | **4.5.1** | Grafik dashboard |
-| Autentikasi | Laravel Breeze | **2.4.2** | Login, register, reset password |
-| Hak Akses | Kolom `role` pada tabel `users` | — | Admin / Operator / Manajer |
-| Export Laporan | PDF (`barryvdh/laravel-dompdf`) + Excel (`maatwebsite/excel`) + Cetak (print browser) | — | Sesuai kebutuhan laporan |
-| Build Tool | Vite | bawaan Laravel | Aset frontend |
+| Hak Akses | Policy + kolom `role` pada tabel `users` | — | Admin / Operator / Manajer |
+| Export Laporan | `barryvdh/laravel-dompdf` | **3.1.2** | Ekspor PDF |
+| Export Laporan | `maatwebsite/excel` | **4.0.6** | Ekspor Excel |
+| Testing | PHPUnit | **12.5.38** | Test otomatis |
+| Code Style | Laravel Pint | **1.32.1** | Formatter PHP |
+| Build Tool | Vite + `laravel-vite-plugin` | **8.3.5** / **3.2.0** | Aset frontend |
 
-**Catatan:** PHP minimum **8.3** (wajib untuk Laravel 13). Pastikan PHP di Laragon sudah 8.3+ sebelum `composer install`.
+**Catatan:** PHP minimum **8.3** (wajib untuk Laravel 13). Grafik dashboard menggunakan widget
+chart bawaan Filament, bukan library chart terpisah.
 
 ## Struktur Repository
-- Root — source code aplikasi (Laravel)
-- `public/` — document root aplikasi
-- `database_backup/` — file database `.sql`
-- `notes/` — panduan penggunaan aplikasi
+
+```
+app/
+├── Filament/          # Seluruh UI panel admin (Resources, Pages, Widgets)
+├── Services/          # Logika bisnis (stok, buffer, penerimaan, pengeluaran, laporan)
+├── Policies/          # Aturan otorisasi per model
+├── Exports/           # Kelas ekspor Excel (Keluar-Masuk, Kartu Stok, Rendemen)
+└── Models/            # Model Eloquent
+database/
+├── migrations/        # Skema database
+└── seeders/           # Data awal (user, master data, demo transaksi)
+database_backup/       # Backup database `.sql` (wms_gudang_dty.sql)
+tests/                 # Test PHPUnit (Feature & Unit)
+```
+
+Folder `notes/` **tidak disertakan** di repository ini. Dokumen PRD tersedia terpisah
+(lokal/backup), bukan bagian dari repo.
 
 ## Cara Menjalankan
 
-### Cara 1 — Laragon (Windows)
-1. Clone repo ini ke folder Laragon, mis. `C:\laragon\www\wms-gudang-dty`
-2. Jalankan Laragon (Apache/Nginx + MySQL)
-3. Ubah **document root** virtual host ke:
-   `C:\laragon\www\wms-gudang-dty\public`
-4. Buka terminal di root project, lalu jalankan `composer install`
-5. Copy `.env.example` → `.env`, atur koneksi database
-6. Import `database_backup/wms_gudang_dty.sql` lewat phpMyAdmin/HeidiSQL
-7. Buka `http://wms-gudang-dty.test` (atau sesuai domain Laragon)
+### Requirement
+- PHP **≥ 8.3** beserta ekstensi umum Laravel (openssl, pdo, mbstring, tokenizer, xml, ctype, json, bcmath)
+- Composer
+- Node.js **20+** dan npm
+- MySQL **8**
 
-### Cara 2 — Artisan Serve (semua OS)
+### Langkah
 1. `composer install`
-2. `cp .env.example .env` lalu atur koneksi DB
-3. Import `database_backup/wms_gudang_dty.sql`
-4. `php artisan key:generate` (bila perlu)
-5. `php artisan serve`
-6. Buka `http://127.0.0.1:8000`
+2. `npm install`
+3. `cp .env.example .env` lalu sesuaikan koneksi database (`DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`)
+4. `php artisan key:generate`
+5. Siapkan database, pilih salah satu:
+   - Import `database_backup/wms_gudang_dty.sql`, **atau**
+   - `php artisan migrate --seed` untuk membuat skema dan data awal dari nol
+6. `npm run build` (produksi) atau `npm run dev` (pengembangan)
+7. `php artisan serve`
+8. Buka `http://127.0.0.1:8000/admin`
+
+Root `/` otomatis redirect ke `/admin`. Rute `/dashboard` dan `/login` juga redirect ke panel
+Filament. Login panel menggunakan **email**.
 
 ## Akun Default
-| Role | Username | Password |
-|------|----------|----------|
-| Admin | admin | admin123 |
-| Operator | operator | operator123 |
-| Manajer | manajer | manajer123 |
+
+Tersedia setelah menjalankan seeder (`php artisan migrate --seed`).
+
+| Role | Email | Password |
+|------|-------|----------|
+| Admin | `admin@wms.local` | `password` |
+| Operator | `operator@wms.local` | `password` |
+| Manajer | `manajer@wms.local` | `password` |
+
+**Catatan keamanan:** ganti password default melalui menu **Pengaturan → Pengguna** setelah
+login pertama.
+
+## Testing & QA
+
+```bash
+php artisan test       # seluruh test (191 test lulus)
+vendor/bin/pint        # perbaiki format kode PHP
+npm run build          # build aset frontend
+```
 
 ## Status
-🚧 Dalam pengerjaan (UAS Project Manufaktur Tekstil)
+
+Implementasi antarmuka Filament **sudah selesai** dan saat ini berada pada tahap
+**finalisasi dan QA** (UAS Project Manufaktur Tekstil).

@@ -7,9 +7,12 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationGroup;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\Support\Enums\Width;
+use Filament\Support\Icons\Heroicon;
 use Filament\Widgets\AccountWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -33,6 +36,22 @@ class AdminPanelProvider extends PanelProvider
             ->favicon(asset('images/favicon.svg'))
             ->darkMode(true)
             ->sidebarCollapsibleOnDesktop()
+            ->navigationGroups([
+                NavigationGroup::make('Master Data')
+                    ->icon(Heroicon::OutlinedRectangleStack),
+                NavigationGroup::make('Transaksi Masuk')
+                    ->icon(Heroicon::OutlinedArrowDownTray),
+                NavigationGroup::make('Transaksi Keluar')
+                    ->icon(Heroicon::OutlinedArrowUpTray),
+                NavigationGroup::make('Stok')
+                    ->icon(Heroicon::OutlinedArchiveBox),
+                NavigationGroup::make('Laporan')
+                    ->icon(Heroicon::OutlinedChartBar),
+                NavigationGroup::make('Pengaturan')
+                    ->icon(Heroicon::OutlinedCog6Tooth),
+            ])
+            ->maxContentWidth(Width::SevenExtraLarge)
+            ->simplePageMaxContentWidth(Width::Medium)
             ->colors([
                 'primary' => Color::Blue,
             ])

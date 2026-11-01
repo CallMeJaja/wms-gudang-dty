@@ -17,6 +17,8 @@ use App\Models\TransaksiKeluar;
 use App\Models\TransaksiMasuk;
 use App\Models\User;
 use Filament\Facades\Filament;
+use Filament\Support\Icons\Heroicon;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\Concerns\MembuatDataUji;
@@ -37,6 +39,38 @@ class FilamentBrandingTest extends TestCase
         $this->siapkanMasterDasar();
 
         Filament::setCurrentPanel(Filament::getPanel('admin'));
+    }
+
+    #[Test]
+    public function panel_admin_mendaftarkan_enam_grup_navigasi_berikon(): void
+    {
+        $groups = array_values(Filament::getPanel('admin')->getNavigationGroups());
+
+        $this->assertCount(6, $groups);
+        $this->assertSame(
+            ['Master Data', 'Transaksi Masuk', 'Transaksi Keluar', 'Stok', 'Laporan', 'Pengaturan'],
+            array_map(fn ($group): string|Htmlable => $group->getLabel(), $groups),
+        );
+        $this->assertSame([
+            Heroicon::OutlinedRectangleStack,
+            Heroicon::OutlinedArrowDownTray,
+            Heroicon::OutlinedArrowUpTray,
+            Heroicon::OutlinedArchiveBox,
+            Heroicon::OutlinedChartBar,
+            Heroicon::OutlinedCog6Tooth,
+        ], array_map(fn ($group) => $group->getIcon(), $groups));
+    }
+
+    #[Test]
+    public function dashboard_admin_menampilkan_label_grup_navigasi(): void
+    {
+        $response = $this->actingAs(User::factory()->admin()->create())->get('/admin');
+
+        $response->assertOk();
+
+        foreach (['Master Data', 'Transaksi Masuk', 'Transaksi Keluar', 'Stok', 'Laporan', 'Pengaturan'] as $label) {
+            $response->assertSee($label);
+        }
     }
 
     #[Test]

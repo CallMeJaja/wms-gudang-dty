@@ -10,7 +10,9 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Notifications\Notification;
+use Filament\Tables\Columns\ColumnGroup;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -22,40 +24,46 @@ class KategorisTable
             ->defaultSort('kode')
             ->modifyQueryUsing(fn (Builder $query) => $query->withCount(['barang', 'grade']))
             ->columns([
-                TextColumn::make('kode')
-                    ->label('Kode')
-                    ->searchable()
-                    ->sortable()
-                    ->weight('semibold')
-                    ->copyable(),
+                ColumnGroup::make('Identitas', [
+                    TextColumn::make('kode')
+                        ->label('Kode')
+                        ->searchable()
+                        ->sortable()
+                        ->weight('semibold')
+                        ->copyable(),
 
-                TextColumn::make('nama')
-                    ->label('Nama')
-                    ->searchable()
-                    ->sortable()
-                    ->wrap(),
+                    TextColumn::make('nama')
+                        ->label('Nama')
+                        ->searchable()
+                        ->sortable()
+                        ->wrap(),
 
-                TextColumn::make('keterangan')
-                    ->label('Keterangan')
-                    ->placeholder('—')
-                    ->wrap()
-                    ->toggleable(),
+                    TextColumn::make('keterangan')
+                        ->label('Keterangan')
+                        ->placeholder('—')
+                        ->wrap()
+                        ->toggleable(),
+                ]),
 
-                TextColumn::make('barang_count')
-                    ->label('Barang')
-                    ->numeric()
-                    ->alignCenter()
-                    ->sortable(),
+                ColumnGroup::make('Relasi', [
+                    TextColumn::make('barang_count')
+                        ->label('Barang')
+                        ->numeric()
+                        ->alignCenter()
+                        ->sortable(),
 
-                TextColumn::make('grade_count')
-                    ->label('Grade')
-                    ->numeric()
-                    ->alignCenter()
-                    ->sortable(),
+                    TextColumn::make('grade_count')
+                        ->label('Grade')
+                        ->numeric()
+                        ->alignCenter()
+                        ->sortable(),
+                ]),
             ])
             ->filters([
                 //
-            ])
+            ], layout: FiltersLayout::AboveContentCollapsible)
+            ->paginationPageOptions([10, 25, 50])
+            ->striped()
             ->actionsColumnLabel('Aksi')
             ->recordActions([
                 ActionGroup::make([

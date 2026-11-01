@@ -11,7 +11,9 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
+use Filament\Tables\Columns\ColumnGroup;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
@@ -24,40 +26,44 @@ class PartnersTable
         return $table
             ->defaultSort('kode')
             ->columns([
-                TextColumn::make('kode')
-                    ->label('Kode')
-                    ->searchable()
-                    ->sortable()
-                    ->weight('semibold')
-                    ->copyable(),
+                ColumnGroup::make('Identitas', [
+                    TextColumn::make('kode')
+                        ->label('Kode')
+                        ->searchable()
+                        ->sortable()
+                        ->weight('semibold')
+                        ->copyable(),
 
-                TextColumn::make('nama')
-                    ->label('Nama')
-                    ->searchable()
-                    ->sortable()
-                    ->wrap(),
+                    TextColumn::make('nama')
+                        ->label('Nama')
+                        ->searchable()
+                        ->sortable()
+                        ->wrap(),
 
-                TextColumn::make('jenis')
-                    ->label('Jenis')
-                    ->badge()
-                    ->color(fn (?string $state): string => match ($state) {
-                        'SUPPLIER' => 'info',
-                        'CUSTOMER' => 'success',
-                        'BOTH' => 'warning',
-                        default => 'gray',
-                    })
-                    ->sortable(),
+                    TextColumn::make('jenis')
+                        ->label('Jenis')
+                        ->badge()
+                        ->color(fn (?string $state): string => match ($state) {
+                            'SUPPLIER' => 'info',
+                            'CUSTOMER' => 'success',
+                            'BOTH' => 'warning',
+                            default => 'gray',
+                        })
+                        ->sortable(),
+                ]),
 
-                TextColumn::make('kontak')
-                    ->label('Kontak')
-                    ->placeholder('—')
-                    ->searchable(),
+                ColumnGroup::make('Kontak', [
+                    TextColumn::make('kontak')
+                        ->label('Kontak')
+                        ->placeholder('—')
+                        ->searchable(),
 
-                TextColumn::make('alamat')
-                    ->label('Alamat')
-                    ->placeholder('—')
-                    ->wrap()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    TextColumn::make('alamat')
+                        ->label('Alamat')
+                        ->placeholder('—')
+                        ->wrap()
+                        ->toggleable(isToggledHiddenByDefault: true),
+                ]),
             ])
             ->filters([
                 SelectFilter::make('jenis')
@@ -66,7 +72,9 @@ class PartnersTable
 
                 TrashedFilter::make()
                     ->label('Data terhapus'),
-            ])
+            ], layout: FiltersLayout::AboveContentCollapsible)
+            ->paginationPageOptions([10, 25, 50])
+            ->striped()
             ->actionsColumnLabel('Aksi')
             ->recordActions([
                 ActionGroup::make([

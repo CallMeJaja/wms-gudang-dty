@@ -146,6 +146,33 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | INBOUND — SUMBER INTERNAL DEFAULT (PRD §4.4)
+    |--------------------------------------------------------------------------
+    |
+    | Penerimaan DTY hasil produksi berasal dari partner internal system,
+    | bukan supplier eksternal. Nilai ini dipakai sebagai nilai awal
+    | `transaksi_masuk.sumber_internal` bila operator tidak mengubahnya.
+    |
+    */
+    'inbound' => [
+        'sumber_internal_dty' => 'AREA PRODUKSI',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | GRADE NETRAL ITEM PENDUKUNG
+    |--------------------------------------------------------------------------
+    |
+    | Dokumen Gate Pass tidak memuat grade (No / Material Code / Description /
+    | UoM / Qty / Batch), tetapi `transaksi_masuk_detail.grade_id` NOT NULL.
+    | Karena itu baris item pendukung memakai satu grade netral per kategori
+    | PENDUKUNG dengan kode berikut (bukan angka konversi, aman dikonfigurasi).
+    |
+    */
+    'grade_pendukung_default' => 'STD',
+
+    /*
+    |--------------------------------------------------------------------------
     | STATUS DOKUMEN & TRANSAKSI (PRD §7.6)
     |--------------------------------------------------------------------------
     |
@@ -228,6 +255,12 @@ return [
             ['kode' => 'A', 'keterangan' => 'DTY standar 1'],
             ['kode' => 'B', 'keterangan' => 'DTY segregasi / turun grade'],
             ['kode' => 'C', 'keterangan' => 'DTY reject / knitting (scrap)'],
+        ],
+        // Item pendukung tidak punya grade pada dokumen Gate Pass, tetapi
+        // transaksi_masuk_detail.grade_id NOT NULL. Dipakai satu grade
+        // netral per kategori PENDUKUNG agar master grade tetap tertutup (A7).
+        'PENDUKUNG' => [
+            ['kode' => 'STD', 'keterangan' => 'Grade netral item pendukung (tanpa grade pada Gate Pass)'],
         ],
     ],
 

@@ -63,15 +63,29 @@ class GrafikStokWidget extends ChartWidget
 
     protected function getOptions(): array
     {
+        $font = ['family' => 'Inter Variable, Inter, ui-sans-serif, system-ui, sans-serif'];
+
         return [
+            'font' => $font,
             'plugins' => [
                 'legend' => [
                     'position' => 'bottom',
+                    'labels' => [
+                        'font' => $font,
+                    ],
                 ],
             ],
             'scales' => [
+                'x' => [
+                    'ticks' => [
+                        'font' => $font,
+                    ],
+                ],
                 'y' => [
                     'beginAtZero' => true,
+                    'ticks' => [
+                        'font' => $font,
+                    ],
                 ],
             ],
         ];

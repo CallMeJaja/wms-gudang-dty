@@ -72,3 +72,9 @@ html { scroll-behavior: smooth; }
 .dark * { scrollbar-color: var(--gray-600) transparent; }
 .dark ::-webkit-scrollbar-thumb { background-color: var(--gray-600); }
 .fi-sidebar-nav { scroll-behavior: smooth; }
+
+/* Angka tabel dan input memakai tabular numerals agar kolom rapi */
+.fi-ta-text,
+.fi-fo-field-wrp input {
+    font-variant-numeric: tabular-nums;
+}

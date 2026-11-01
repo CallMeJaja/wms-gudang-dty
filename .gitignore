@@ -37,9 +37,8 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 
-# Dokumentasi lokal — hanya PRD.md yang masuk repo
+# Dokumentasi lokal — tidak masuk repo
 /notes/*
-!/notes/PRD.md
 
 # Catatan asisten AI (lokal saja)
 /CLAUDE.md

@@ -28,9 +28,8 @@ use Tests\TestCase;
 /**
  * Uji service transaksi masuk F2 (posting/issue, buffer, penomoran, gross DTY).
  *
- * UI/controller legacy sudah dihapus; cakupan bisnis dipertahankan dengan
- * memanggil PenerimaanService langsung. Draf dibangun lewat model seperti
- * yang sebelumnya ditulis controller.
+ * UI legacy sudah dihapus; cakupan bisnis diuji lewat PenerimaanService
+ * langsung. Draf dibangun lewat model seperti alur backend.
  *
  * DB: SQLite :memory: (phpunit.xml) — MySQL dev TIDAK tersentuh.
  */

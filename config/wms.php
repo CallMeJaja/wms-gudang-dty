@@ -12,7 +12,7 @@ return [
     | timbangan nyata / Surat Jalan / Gate Pass.
     |
     | Berkas ini adalah SATU-SATUNYA sumber konstanta bisnis (PRD §3.3).
-    | Tidak boleh ada angka hardcode di view/controller/service.
+    | Tidak boleh ada angka hardcode di kode aplikasi.
     |
     */
 
@@ -55,8 +55,6 @@ return [
             'A' => ['min' => 29.90, 'max' => 36.25],
             'B' => ['min' => 29.90, 'max' => 36.25],
         ],
-
-        // 'dty_box_gross_ref' => 35.64, // coretan "coating" (referensi lama)
 
     ],
 

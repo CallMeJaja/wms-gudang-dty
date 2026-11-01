@@ -9,8 +9,8 @@ use App\Models\User;
  * Otorisasi master data Grade (PRD §2).
  *
  * Aturan bisnis tambahan (grade C DTY tidak boleh dihapus/nonaktif)
- * TIDAK ditegakkan di sini, melainkan di Form Request & controller agar
- * pesan validasi bisa tampil per-field.
+ * TIDAK ditegakkan di sini, melainkan di resource/form (GradeResource)
+ * agar pesan validasi tampil per-field.
  */
 class GradePolicy
 {

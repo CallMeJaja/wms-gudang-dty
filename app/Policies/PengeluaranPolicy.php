@@ -15,7 +15,7 @@ use App\Models\User;
  * - Manajer: read-only (viewAny/view saja).
  * - Void: hanya Admin & status POSTED/ISSUED.
  *
- * Setiap aksi menerima argumen opsional `$jenisKeluar` sehingga controller
+ * Setiap aksi menerima argumen opsional `$jenisKeluar` sehingga resource
  * dapat memastikan hanya jenis yang dikelolanya yang boleh disentuh.
  */
 class PengeluaranPolicy

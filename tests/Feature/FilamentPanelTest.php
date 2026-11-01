@@ -2,20 +2,20 @@
 
 namespace Tests\Feature;
 
-use App\Enums\Role;
 use App\Models\Barang;
 use App\Models\KategoriBarang;
 use App\Models\Satuan;
 use App\Models\User;
+use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 /**
- * Uji panel Filament (PoC rewrite UI).
+ * Uji panel Filament.
  *
- * Tujuan: memastikan penulisan ulang UI ke Filament TIDAK mengubah
- * aturan bisnis & RBAC yang sudah diuji di MasterDataRbacTest.
+ * Tujuan: memastikan UI Filament TIDAK mengubah aturan bisnis & RBAC
+ * yang sudah diuji pada test service/policy terkait.
  */
 class FilamentPanelTest extends TestCase
 {
@@ -73,7 +73,7 @@ class FilamentPanelTest extends TestCase
     {
         $user = User::factory()->admin()->create(['is_active' => false]);
 
-        $this->assertFalse($user->canAccessPanel(\Filament\Facades\Filament::getPanel('admin')));
+        $this->assertFalse($user->canAccessPanel(Filament::getPanel('admin')));
     }
 
     #[Test]

@@ -22,7 +22,7 @@ use Tests\TestCase;
 /**
  * Uji alokasi buffer Minggu (PRD §5.2.2 / A11–A13).
  *
- * Prasyarat yang disimulasikan sama seperti controller F2C:
+ * Prasyarat yang disimulasikan sama seperti alur posting penerimaan:
  *   1. stok AKTIF sudah ditambah dari berat kg detail (StokService::tambahStok)
  *   2. AlokasiBufferService memindahkan porsi buffer AKTIF -> BUFFER.
  *

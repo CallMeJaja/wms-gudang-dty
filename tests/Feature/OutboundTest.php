@@ -27,8 +27,8 @@ use Tests\TestCase;
 /**
  * Uji service transaksi keluar F3 (posting/issue, policy, void).
  *
- * UI/controller legacy sudah dihapus; cakupan bisnis dipertahankan dengan
- * memanggil PengeluaranService/VoidTransaksiService dan Gate policy langsung.
+ * UI legacy sudah dihapus; cakupan bisnis diuji lewat
+ * PengeluaranService/VoidTransaksiService dan Gate policy langsung.
  *
  * DB: SQLite :memory: (phpunit.xml) — MySQL dev TIDAK tersentuh.
  */

@@ -25,9 +25,9 @@ use Tests\TestCase;
 /**
  * Uji matematika laporan F5 (PRD §6).
  *
- * Route index legacy sudah dihapus; cakupan bisnis dipindahkan ke
- * LaporanService. UI Filament diuji oleh FilamentLaporanTest dan endpoint
- * export oleh LaporanExportTest.
+ * UI legacy sudah dihapus; cakupan bisnis diuji lewat LaporanService.
+ * UI Filament diuji oleh FilamentLaporanTest dan endpoint export oleh
+ * LaporanExportTest.
  *
  * DB: SQLite :memory: (phpunit.xml) — MySQL dev TIDAK tersentuh.
  */

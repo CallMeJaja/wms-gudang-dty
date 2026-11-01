@@ -32,8 +32,8 @@ use Tests\TestCase;
 /**
  * Uji void transaksi masuk (F6): POY / Gate Pass / DTY + cerminan keluar.
  *
- * UI/controller legacy sudah dihapus; void dipanggil langsung lewat
- * VoidTransaksiService dan otorisasi diperiksa lewat Gate policy.
+ * UI legacy sudah dihapus; void diuji lewat VoidTransaksiService dan
+ * otorisasi diperiksa lewat Gate policy.
  *
  * DB: SQLite :memory: (phpunit.xml) — MySQL dev TIDAK tersentuh.
  */

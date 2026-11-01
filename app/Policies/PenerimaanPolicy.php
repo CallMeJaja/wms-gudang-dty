@@ -82,7 +82,7 @@ class PenerimaanPolicy
 
     /**
      * Void (POSTED/ISSUED -> VOID) — hanya Admin (PRD §2, §7.6).
-     * Dipakai tombol "Batalkan (Void)" ketiga controller inbound (F6).
+     * Dipakai tombol "Batalkan (Void)" pada ketiga resource penerimaan (F6).
      */
     public function void(User $user, TransaksiMasuk $transaksi, $jenisMasuk = null): bool
     {

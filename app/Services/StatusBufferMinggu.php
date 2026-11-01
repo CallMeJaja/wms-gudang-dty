@@ -7,7 +7,7 @@ namespace App\Services;
  *
  * Objek nilai read-only yang dipakai widget dashboard F4. Nilai level
  * sengaja berupa string tetap ("SIAP" / "BELUM_SIAP" / "TERLAMBAT")
- * agar view dapat memetakan warna tanpa logika tambahan.
+ * agar widget dapat memetakan warna tanpa logika tambahan.
  */
 final readonly class StatusBufferMinggu
 {
@@ -28,7 +28,5 @@ final readonly class StatusBufferMinggu
         public string $label,
         public string $pesan,
         public string $warna,
-    ) {
-        //
-    }
+    ) {}
 }

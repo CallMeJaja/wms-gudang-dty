@@ -34,8 +34,8 @@ use Illuminate\Support\Facades\DB;
  *     lebih kecil dari satu pallet, hanya sebesar sisa kuota itulah
  *     yang disisihkan (bukan satu pallet penuh).
  *
- * CATATAN PRASYAD: kg penerimaan detail WAJIB sudah ditambahkan ke pos
- * AKTIF oleh pemanggil (controller F2C) SEBELUM service ini dipanggil.
+ * CATATAN PRASYARAT: kg penerimaan detail WAJIB sudah ditambahkan ke pos
+ * AKTIF oleh pemanggil (service transaksi) SEBELUM service ini dipanggil.
  * Service ini hanya MEMINDAHKAN porsi dari AKTIF ke BUFFER, sehingga
  * total stok (aktif + buffer) tidak pernah berubah di sini.
  */

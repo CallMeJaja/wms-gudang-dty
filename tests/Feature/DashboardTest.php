@@ -21,9 +21,9 @@ use Tests\TestCase;
 /**
  * Uji service buffer Minggu (F4, PRD §5.2.3–§5.2.4).
  *
- * UI dashboard sudah dipindahkan ke Filament dan diuji oleh
- * FilamentDashboardWidgetsTest; file ini mempertahankan cakupan service
- * (status buffer, rilis service, perintah terjadwal).
+ * UI dashboard diuji oleh FilamentDashboardWidgetsTest; file ini
+ * mempertahankan cakupan service (status buffer, rilis service, perintah
+ * terjadwal).
  *
  * DB: SQLite :memory: (phpunit.xml) — MySQL dev TIDAK tersentuh.
  */

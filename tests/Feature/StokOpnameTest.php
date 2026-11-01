@@ -21,9 +21,8 @@ use Tests\TestCase;
 /**
  * Uji service stock opname (F6).
  *
- * UI/controller legacy sudah dihapus; cakupan bisnis dipertahankan dengan
- * memanggil StokOpnameService langsung. UI Filament diuji terpisah oleh
- * FilamentStokOpnameTest.
+ * UI legacy sudah dihapus; cakupan bisnis diuji lewat StokOpnameService
+ * langsung. UI Filament diuji terpisah oleh FilamentStokOpnameTest.
  */
 class StokOpnameTest extends TestCase
 {

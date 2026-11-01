@@ -162,5 +162,7 @@ operasional.
 Proyek ini dilisensikan di bawah **GNU General Public License v3.0 (GPL-3.0)**.
 Lihat [LICENSE](LICENSE) untuk teks lengkap dan [AUTHORS](AUTHORS) untuk pemegang hak cipta.
 
+Author / pemegang hak cipta: **Reza Asriano Maulana**. Lihat [AUTHORS](AUTHORS) untuk daftar kontributor.
+
 Kode boleh digunakan, dimodifikasi, dan didistribusikan sesuai ketentuan GPLv3.
 Karya turunan yang didistribusikan harus tetap open-source dengan lisensi yang sama.

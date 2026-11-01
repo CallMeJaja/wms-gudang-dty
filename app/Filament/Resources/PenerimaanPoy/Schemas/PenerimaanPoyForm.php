@@ -20,7 +20,6 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
@@ -40,7 +39,6 @@ class PenerimaanPoyForm
                     ->schema([
                         Section::make('Identitas Dokumen')
                             ->description('Penerimaan bahan baku POY dari IPCI. Nomor transaksi dibuat otomatis.')
-                            ->icon(Heroicon::OutlinedDocumentText)
                             ->columnSpan(2)
                             ->columns(2)
                             ->schema([
@@ -94,7 +92,6 @@ class PenerimaanPoyForm
                                     ->maxLength(100),
                             ]),
                         Section::make('Ringkasan')
-                            ->icon(Heroicon::OutlinedInformationCircle)
                             ->columnSpan(1)
                             ->schema([
                                 Placeholder::make('jenis_dokumen')
@@ -114,7 +111,6 @@ class PenerimaanPoyForm
 
                 Section::make('Rincian Barang')
                     ->description('Satu baris = satu kombinasi barang + merge + grade. Total KG dihitung otomatis.')
-                    ->icon(Heroicon::OutlinedTableCells)
                     ->columnSpanFull()
                     ->schema([
                         Repeater::make('detail')
@@ -204,7 +200,6 @@ class PenerimaanPoyForm
                     ]),
 
                 Section::make('Catatan')
-                    ->icon(Heroicon::OutlinedChatBubbleLeftRight)
                     ->columnSpanFull()
                     ->collapsed()
                     ->schema([

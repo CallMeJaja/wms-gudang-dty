@@ -8,7 +8,6 @@ use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 
 class PartnerForm
 {
@@ -24,7 +23,6 @@ class PartnerForm
                             ->schema([
                                 Section::make('Identitas Mitra')
                                     ->description('Pemasok, pelanggan, atau mitra internal yang dipakai pada transaksi.')
-                                    ->icon(Heroicon::OutlinedIdentification)
                                     ->columns(2)
                                     ->schema([
                                         TextInput::make('kode')
@@ -53,7 +51,6 @@ class PartnerForm
                             ]),
 
                         Section::make('Klasifikasi')
-                            ->icon(Heroicon::OutlinedUserGroup)
                             ->columnSpan(1)
                             ->schema([
                                 Select::make('jenis')

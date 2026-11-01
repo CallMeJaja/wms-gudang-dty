@@ -14,7 +14,6 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
@@ -34,7 +33,6 @@ class SuratJalanDtyForm
                     ->schema([
                         Section::make('Identitas Dokumen')
                             ->description('Pengiriman DTY ke pelanggan. Stok berkurang saat dokumen diterbitkan.')
-                            ->icon(Heroicon::OutlinedDocumentText)
                             ->columnSpan(2)
                             ->columns(2)
                             ->schema([
@@ -95,7 +93,6 @@ class SuratJalanDtyForm
                             ]),
 
                         Section::make('Ringkasan')
-                            ->icon(Heroicon::OutlinedInformationCircle)
                             ->columnSpan(1)
                             ->schema([
                                 Placeholder::make('jenis_dokumen')
@@ -118,14 +115,12 @@ class SuratJalanDtyForm
 
                 Section::make('Rincian Barang')
                     ->description('Satu baris = satu kombinasi barang + merge + grade.')
-                    ->icon(Heroicon::OutlinedTableCells)
                     ->columnSpanFull()
                     ->schema([
                         PengeluaranForm::detailRepeater(JenisKeluar::DtySuratJalan),
                     ]),
 
                 Section::make('Catatan')
-                    ->icon(Heroicon::OutlinedChatBubbleLeftRight)
                     ->columnSpanFull()
                     ->collapsed()
                     ->schema([

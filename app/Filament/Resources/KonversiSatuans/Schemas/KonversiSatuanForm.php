@@ -13,7 +13,6 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
@@ -36,7 +35,6 @@ class KonversiSatuanForm
                             ->schema([
                                 Section::make('Aturan Konversi')
                                     ->description('Kosongkan barang untuk konversi global yang berlaku pada semua barang non-POY.')
-                                    ->icon(Heroicon::OutlinedArrowsRightLeft)
                                     ->columns(2)
                                     ->schema([
                                         Select::make('barang_id')
@@ -142,7 +140,6 @@ class KonversiSatuanForm
                             ]),
 
                         Section::make('Default')
-                            ->icon(Heroicon::OutlinedCheckCircle)
                             ->columnSpan(1)
                             ->schema([
                                 Toggle::make('is_default')

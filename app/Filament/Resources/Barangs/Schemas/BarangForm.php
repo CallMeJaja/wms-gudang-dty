@@ -11,7 +11,6 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
@@ -27,8 +26,6 @@ class BarangForm
         return $schema
             ->components([
                 Section::make('Identitas Barang')
-                    ->description('Kode dan nama barang sesuai master gudang.')
-                    ->icon(Heroicon::OutlinedCube)
                     ->columnSpanFull()
                     ->columns(2)
                     ->schema([
@@ -77,7 +74,6 @@ class BarangForm
 
                 Section::make('Spesifikasi Benang')
                     ->description('Denier dan filament hanya relevan untuk POY/DTY.')
-                    ->icon(Heroicon::OutlinedScale)
                     ->columnSpanFull()
                     ->columns(2)
                     ->schema([
@@ -96,7 +92,6 @@ class BarangForm
                     ->columnSpanFull()
                     ->schema([
                         Section::make('Nilai Stok')
-                            ->icon(Heroicon::OutlinedChartBar)
                             ->columnSpan(2)
                             ->columns(1)
                             ->schema([
@@ -109,7 +104,6 @@ class BarangForm
                             ]),
 
                         Section::make('Status & Buffer')
-                            ->icon(Heroicon::OutlinedCheckCircle)
                             ->columnSpan(1)
                             ->schema([
                                 Toggle::make('is_active')

@@ -14,7 +14,6 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 
 /**
  * Form pengeluaran POY ke lantai produksi (PRD §4.3).
@@ -33,7 +32,6 @@ class PengeluaranPoyForm
                     ->schema([
                         Section::make('Identitas Dokumen')
                             ->description('Pengeluaran bahan baku POY ke lantai produksi. Nomor transaksi dibuat otomatis.')
-                            ->icon(Heroicon::OutlinedDocumentText)
                             ->columnSpan(2)
                             ->columns(2)
                             ->schema([
@@ -65,7 +63,6 @@ class PengeluaranPoyForm
                             ]),
 
                         Section::make('Ringkasan')
-                            ->icon(Heroicon::OutlinedInformationCircle)
                             ->columnSpan(1)
                             ->schema([
                                 Placeholder::make('jenis_dokumen')
@@ -85,14 +82,12 @@ class PengeluaranPoyForm
 
                 Section::make('Rincian Barang')
                     ->description('Satu baris = satu kombinasi barang + merge + grade.')
-                    ->icon(Heroicon::OutlinedTableCells)
                     ->columnSpanFull()
                     ->schema([
                         PengeluaranForm::detailRepeater(JenisKeluar::PoyProduksi),
                     ]),
 
                 Section::make('Catatan')
-                    ->icon(Heroicon::OutlinedChatBubbleLeftRight)
                     ->columnSpanFull()
                     ->collapsed()
                     ->schema([

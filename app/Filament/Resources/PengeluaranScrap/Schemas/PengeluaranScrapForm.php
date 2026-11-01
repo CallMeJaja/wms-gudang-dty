@@ -13,7 +13,6 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 
 /**
  * Form pengeluaran Scrap / Reject DTY (PRD §7.3 no.12).
@@ -31,7 +30,6 @@ class PengeluaranScrapForm
                     ->schema([
                         Section::make('Identitas Dokumen')
                             ->description('Pengeluaran scrap/reject DTY. Catatan wajib menyebut tujuan atau penerima.')
-                            ->icon(Heroicon::OutlinedDocumentText)
                             ->columnSpan(2)
                             ->columns(2)
                             ->schema([
@@ -51,7 +49,6 @@ class PengeluaranScrapForm
                             ]),
 
                         Section::make('Ringkasan')
-                            ->icon(Heroicon::OutlinedInformationCircle)
                             ->columnSpan(1)
                             ->schema([
                                 Placeholder::make('jenis_dokumen')
@@ -71,14 +68,12 @@ class PengeluaranScrapForm
 
                 Section::make('Rincian Barang')
                     ->description('Satu baris = satu kombinasi barang + merge + grade.')
-                    ->icon(Heroicon::OutlinedTableCells)
                     ->columnSpanFull()
                     ->schema([
                         PengeluaranForm::detailRepeater(JenisKeluar::DtyScrapReject),
                     ]),
 
                 Section::make('Catatan')
-                    ->icon(Heroicon::OutlinedChatBubbleLeftRight)
                     ->columnSpanFull()
                     ->schema([
                         Textarea::make('catatan')

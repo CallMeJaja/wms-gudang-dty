@@ -12,7 +12,6 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 
 /**
  * Form opname stok (F6).
@@ -34,8 +33,6 @@ class StokOpnameForm
                             ->columnSpan(2)
                             ->schema([
                                 Section::make('Posisi Stok')
-                                    ->description('Pilih barang, merge, dan grade yang dihitung fisik.')
-                                    ->icon(Heroicon::OutlinedCube)
                                     ->columns(2)
                                     ->schema([
                                         Select::make('barang_id')
@@ -79,7 +76,6 @@ class StokOpnameForm
 
                                 Section::make('Hasil Hitung')
                                     ->description('Masukkan jumlah fisik dan tanggal opname.')
-                                    ->icon(Heroicon::OutlinedCalculator)
                                     ->columns(2)
                                     ->schema([
                                         TextInput::make('stok_fisik_qty')
@@ -100,7 +96,6 @@ class StokOpnameForm
                             ]),
 
                         Section::make('Catatan')
-                            ->icon(Heroicon::OutlinedChatBubbleLeftRight)
                             ->columnSpan(1)
                             ->schema([
                                 TextInput::make('keterangan')

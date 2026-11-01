@@ -20,7 +20,6 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Validation\ValidationException;
 
@@ -41,7 +40,6 @@ class PenerimaanPendukungForm
                     ->schema([
                         Section::make('Identitas Dokumen')
                             ->description('Dokumen resmi Gate Pass. Nomor dapat diisi manual sesuai dokumen fisik IPCI.')
-                            ->icon(Heroicon::OutlinedDocumentText)
                             ->columnSpan(2)
                             ->columns(2)
                             ->schema([
@@ -97,7 +95,6 @@ class PenerimaanPendukungForm
                                     ->maxLength(100),
                             ]),
                         Section::make('Ringkasan')
-                            ->icon(Heroicon::OutlinedInformationCircle)
                             ->columnSpan(1)
                             ->schema([
                                 Placeholder::make('jenis_dokumen')
@@ -117,7 +114,6 @@ class PenerimaanPendukungForm
 
                 Section::make('Rincian Item')
                     ->description('Qty x satuan kemasan otomatis dikonversi ke KG oleh sistem.')
-                    ->icon(Heroicon::OutlinedTableCells)
                     ->columnSpanFull()
                     ->schema([
                         Repeater::make('detail')
@@ -209,7 +205,6 @@ class PenerimaanPendukungForm
                     ]),
 
                 Section::make('Catatan')
-                    ->icon(Heroicon::OutlinedChatBubbleLeftRight)
                     ->columnSpanFull()
                     ->collapsed()
                     ->schema([

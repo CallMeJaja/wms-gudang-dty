@@ -11,7 +11,6 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Validation\Rules\Unique;
 
@@ -37,7 +36,6 @@ class GradeForm
                             ->schema([
                                 Section::make('Identitas Grade')
                                     ->description('Kode grade unik di dalam satu kategori.')
-                                    ->icon(Heroicon::OutlinedTag)
                                     ->columns(2)
                                     ->schema([
                                         TextInput::make('kode')
@@ -79,7 +77,6 @@ class GradeForm
 
                         Section::make('Status')
                             ->description('Grade C kategori DTY adalah grade scrap dan tidak dapat diubah.')
-                            ->icon(Heroicon::OutlinedCheckCircle)
                             ->columnSpan(1)
                             ->schema([
                                 Toggle::make('is_active')

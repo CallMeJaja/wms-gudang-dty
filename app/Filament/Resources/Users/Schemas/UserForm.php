@@ -10,7 +10,6 @@ use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Facades\Auth;
 
 class UserForm
@@ -27,7 +26,6 @@ class UserForm
                             ->schema([
                                 Section::make('Identitas Pengguna')
                                     ->description('Akun untuk mengakses panel administrasi gudang.')
-                                    ->icon(Heroicon::OutlinedUserCircle)
                                     ->columns(2)
                                     ->schema([
                                         TextInput::make('name')
@@ -62,7 +60,6 @@ class UserForm
                                     ]),
 
                                 Section::make('Keamanan Akun')
-                                    ->icon(Heroicon::OutlinedShieldCheck)
                                     ->columns(2)
                                     ->schema([
                                         TextInput::make('password')
@@ -90,7 +87,6 @@ class UserForm
 
                         Section::make('Status Akun')
                             ->description('Kontrol akses akun ke panel dan aplikasi.')
-                            ->icon(Heroicon::OutlinedCheckCircle)
                             ->columnSpan(1)
                             ->schema([
                                 Toggle::make('is_active')

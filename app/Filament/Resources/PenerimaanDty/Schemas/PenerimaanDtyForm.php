@@ -23,7 +23,6 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
@@ -45,7 +44,6 @@ class PenerimaanDtyForm
                     ->schema([
                         Section::make('Identitas Dokumen')
                             ->description('Penerimaan DTY hasil produksi. Shift, operator, dan merge POY asal wajib untuk rendemen.')
-                            ->icon(Heroicon::OutlinedDocumentText)
                             ->columnSpan(2)
                             ->columns(2)
                             ->schema([
@@ -89,7 +87,6 @@ class PenerimaanDtyForm
                                     ->helperText('Wajib untuk laporan rendemen POY vs DTY.'),
                             ]),
                         Section::make('Ringkasan')
-                            ->icon(Heroicon::OutlinedInformationCircle)
                             ->columnSpan(1)
                             ->schema([
                                 Placeholder::make('jenis_dokumen')
@@ -109,7 +106,6 @@ class PenerimaanDtyForm
 
                 Section::make('Rincian Barang')
                     ->description('Satu baris = satu kombinasi barang + merge + grade. Isi Box untuk mengisi bobbin/netto/gross otomatis.')
-                    ->icon(Heroicon::OutlinedTableCells)
                     ->columnSpanFull()
                     ->schema([
                         Repeater::make('detail')
@@ -235,7 +231,6 @@ class PenerimaanDtyForm
                     ]),
 
                 Section::make('Catatan')
-                    ->icon(Heroicon::OutlinedChatBubbleLeftRight)
                     ->columnSpanFull()
                     ->collapsed()
                     ->schema([

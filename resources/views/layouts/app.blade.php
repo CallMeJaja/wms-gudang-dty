@@ -88,6 +88,33 @@
                     </li>
 
                     <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle {{ request()->routeIs('laporan.*') ? 'active' : '' }}"
+                           href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-file-bar-graph me-1"></i> Laporan
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item {{ request()->routeIs('laporan.keluar-masuk.*') ? 'active' : '' }}"
+                                   href="{{ route('laporan.keluar-masuk.index') }}">
+                                    <i class="bi bi-arrow-left-right me-1"></i> Keluar-Masuk
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item {{ request()->routeIs('laporan.kartu-stok.*') ? 'active' : '' }}"
+                                   href="{{ route('laporan.kartu-stok.index') }}">
+                                    <i class="bi bi-journal-text me-1"></i> Kartu Stok
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item {{ request()->routeIs('laporan.rendemen.*') ? 'active' : '' }}"
+                                   href="{{ route('laporan.rendemen.index') }}">
+                                    <i class="bi bi-pie-chart me-1"></i> Rendemen POY vs DTY
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle {{ request()->routeIs('master.*') ? 'active' : '' }}"
                            href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="bi bi-database me-1"></i> Master Data

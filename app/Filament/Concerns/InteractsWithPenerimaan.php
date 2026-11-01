@@ -116,8 +116,6 @@ trait InteractsWithPenerimaan
     {
         return Action::make('lihat')
             ->label('Lihat')
-            ->iconButton()
-            ->tooltip('Lihat ringkasan')
             ->icon('heroicon-o-eye')
             ->color('gray')
             ->modalHeading(fn (TransaksiMasuk $record): string => (string) $record->nomor_transaksi)
@@ -141,8 +139,6 @@ trait InteractsWithPenerimaan
     public static function aksiUbah(): EditAction
     {
         return EditAction::make()
-            ->iconButton()
-            ->tooltip('Ubah draf')
             ->visible(fn (TransaksiMasuk $record): bool => static::canEdit($record));
     }
 
@@ -227,8 +223,6 @@ trait InteractsWithPenerimaan
     public static function aksiHapus(): DeleteAction
     {
         return DeleteAction::make()
-            ->iconButton()
-            ->tooltip('Hapus draf')
             ->visible(fn (TransaksiMasuk $record): bool => static::canDelete($record));
     }
 
@@ -265,7 +259,7 @@ trait InteractsWithPenerimaan
             static::aksiUbah(),
             static::aksiHapus(),
         ])
-            ->label('Aksi')
+            ->label('Aksi lainnya')
             ->icon('heroicon-o-ellipsis-vertical')
             ->iconButton();
 

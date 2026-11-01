@@ -14,6 +14,7 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
+use Filament\Support\Enums\Alignment;
 
 /**
  * Form pengeluaran POY ke lantai produksi (PRD §4.3).
@@ -84,7 +85,8 @@ class PengeluaranPoyForm
                     ->description('Satu baris = satu kombinasi barang + merge + grade.')
                     ->columnSpanFull()
                     ->schema([
-                        PengeluaranForm::detailRepeater(JenisKeluar::PoyProduksi),
+                        PengeluaranForm::detailRepeater(JenisKeluar::PoyProduksi)
+                            ->addActionAlignment(Alignment::End),
                     ]),
 
                 Section::make('Catatan')

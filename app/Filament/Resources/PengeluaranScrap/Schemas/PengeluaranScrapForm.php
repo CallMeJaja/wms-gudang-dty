@@ -13,6 +13,7 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
+use Filament\Support\Enums\Alignment;
 
 /**
  * Form pengeluaran Scrap / Reject DTY (PRD §7.3 no.12).
@@ -70,7 +71,8 @@ class PengeluaranScrapForm
                     ->description('Satu baris = satu kombinasi barang + merge + grade.')
                     ->columnSpanFull()
                     ->schema([
-                        PengeluaranForm::detailRepeater(JenisKeluar::DtyScrapReject),
+                        PengeluaranForm::detailRepeater(JenisKeluar::DtyScrapReject)
+                            ->addActionAlignment(Alignment::End),
                     ]),
 
                 Section::make('Catatan')

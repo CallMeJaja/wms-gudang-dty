@@ -23,6 +23,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
+use Filament\Support\Enums\Alignment;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
@@ -112,6 +113,7 @@ class PenerimaanDtyForm
                             ->relationship()
                             ->label('')
                             ->addActionLabel('Tambah baris')
+                            ->addActionAlignment(Alignment::End)
                             ->defaultItems(1)
                             ->minItems(1)
                             ->collapsible()

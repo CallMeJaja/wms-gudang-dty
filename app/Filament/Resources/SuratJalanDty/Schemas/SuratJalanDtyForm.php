@@ -14,6 +14,7 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
+use Filament\Support\Enums\Alignment;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
@@ -117,7 +118,8 @@ class SuratJalanDtyForm
                     ->description('Satu baris = satu kombinasi barang + merge + grade.')
                     ->columnSpanFull()
                     ->schema([
-                        PengeluaranForm::detailRepeater(JenisKeluar::DtySuratJalan),
+                        PengeluaranForm::detailRepeater(JenisKeluar::DtySuratJalan)
+                            ->addActionAlignment(Alignment::End),
                     ]),
 
                 Section::make('Catatan')

@@ -20,5 +20,9 @@ class DatabaseSeeder extends Seeder
             KonversiSatuanSeeder::class,  // konversi_satuan (butuh barang + satuan)
             NomorDokumenSeeder::class,    // nomor_dokumen periode berjalan
         ]);
+
+        if (app()->environment('local')) {
+            $this->call([DemoTransaksiSeeder::class]);
+        }
     }
 }

@@ -65,7 +65,8 @@ trait MembuatDataUji
             'is_active' => true,
         ]);
 
-        $this->satuanKg = Satuan::create(['kode' => Satuan::KG, 'nama' => 'Kilogram']);        $this->satuanBox = Satuan::create(['kode' => 'BOX', 'nama' => 'Box']);
+        $this->satuanKg = Satuan::create(['kode' => Satuan::KG, 'nama' => 'Kilogram']);
+        $this->satuanBox = Satuan::create(['kode' => 'BOX', 'nama' => 'Box']);
         $this->satuanBobbin = Satuan::create(['kode' => 'BOBBIN', 'nama' => 'Bobbin']);
     }
 

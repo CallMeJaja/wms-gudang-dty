@@ -4,6 +4,7 @@ namespace App\Providers\Filament;
 
 use App\Filament\Pages\Dashboard;
 use Filament\Enums\DatabaseNotificationsPosition;
+use Filament\Enums\GlobalSearchPosition;
 use Filament\Enums\UserMenuPosition;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -14,8 +15,8 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Assets\Css;
 use Filament\Support\Colors\Color;
+use Filament\Support\Enums\Platform;
 use Filament\Support\Enums\Width;
-use Filament\View\PanelsRenderHook;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
@@ -39,7 +40,13 @@ class AdminPanelProvider extends PanelProvider
             ->darkMode(true)
             ->userMenu(position: UserMenuPosition::Sidebar)
             ->databaseNotifications(position: DatabaseNotificationsPosition::Sidebar)
-            ->globalSearch(false)
+            ->globalSearch(position: GlobalSearchPosition::Sidebar)
+            ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
+            ->globalSearchFieldSuffix(fn (): ?string => match (Platform::detect()) {
+                Platform::Windows, Platform::Linux => 'CTRL+K',
+                Platform::Mac => '⌘K',
+                default => null,
+            })
             ->navigationGroups([
                 NavigationGroup::make('Data Induk'),
                 NavigationGroup::make('Penerimaan'),
@@ -50,7 +57,6 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->maxContentWidth(Width::SevenExtraLarge)
             ->simplePageMaxContentWidth(Width::Medium)
-            ->renderHook(PanelsRenderHook::SIDEBAR_NAV_START, fn () => view('filament.sidebar-search'))
             ->colors([
                 'primary' => Color::Blue,
             ])

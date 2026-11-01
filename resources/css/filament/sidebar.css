@@ -78,3 +78,16 @@ html { scroll-behavior: smooth; }
 .fi-fo-field-wrp input {
     font-variant-numeric: tabular-nums;
 }
+
+.wms-report-table {
+    font-variant-numeric: tabular-nums;
+}
+.wms-report-table tbody tr {
+    transition: background-color 75ms;
+}
+.wms-report-table tbody tr:hover {
+    background-color: var(--gray-50) !important;
+}
+.dark .wms-report-table tbody tr:hover {
+    background-color: color-mix(in srgb, var(--gray-900) 90%, white) !important;
+}

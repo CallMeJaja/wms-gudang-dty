@@ -100,7 +100,7 @@
             </div>
 
             <div style="overflow-x: auto; border: 1px solid var(--gray-200); border-radius: 0.5rem;">
-                <table style="width: 100%; border-collapse: collapse; font-size: 0.8rem;">
+                <table class="wms-report-table" style="width: 100%; border-collapse: collapse; font-size: 0.8rem;">
                     <thead style="background: var(--gray-50); color: var(--gray-500); text-align: left;">
                         <tr>
                             <th style="padding: 0.5rem 0.625rem;">Tanggal</th>

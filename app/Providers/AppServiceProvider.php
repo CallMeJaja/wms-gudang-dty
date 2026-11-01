@@ -8,12 +8,14 @@ use App\Models\KategoriBarang;
 use App\Models\KonversiSatuan;
 use App\Models\Satuan;
 use App\Models\SupplierCustomer;
+use App\Models\TransaksiKeluar;
 use App\Models\TransaksiMasuk;
 use App\Policies\BarangPolicy;
 use App\Policies\GradePolicy;
 use App\Policies\KategoriBarangPolicy;
 use App\Policies\KonversiSatuanPolicy;
 use App\Policies\PenerimaanPolicy;
+use App\Policies\PengeluaranPolicy;
 use App\Policies\SatuanPolicy;
 use App\Policies\SupplierCustomerPolicy;
 use Illuminate\Support\Facades\Gate;
@@ -45,5 +47,9 @@ class AppServiceProvider extends ServiceProvider
         // Transaksi penerimaan (F2) — satu policy terpusat untuk POY,
         // Item Pendukung (Gate Pass), dan DTY hasil produksi.
         Gate::policy(TransaksiMasuk::class, PenerimaanPolicy::class);
+
+        // Transaksi pengeluaran (F3) — satu policy terpusat untuk POY
+        // Produksi, Surat Jalan DTY, dan Scrap/Reject DTY.
+        Gate::policy(TransaksiKeluar::class, PengeluaranPolicy::class);
     }
 }

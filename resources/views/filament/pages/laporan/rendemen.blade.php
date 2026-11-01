@@ -3,7 +3,10 @@
         Rendemen = (DTY masuk ÷ POY keluar) × 100.
     </p>
 
-    <x-filament::section>
+    <x-filament::section
+        icon="heroicon-o-funnel"
+        description="Sesuaikan periode dan parameter laporan."
+    >
         <x-slot name="heading">Filter</x-slot>
 
         <form method="GET" action="{{ url()->current() }}">
@@ -35,7 +38,11 @@
         </form>
     </x-filament::section>
 
-    <x-filament::section>
+    <x-filament::section
+        heading="Ringkasan Rendemen"
+        description="Perbandingan total POY keluar dan DTY masuk pada periode terpilih."
+        icon="heroicon-o-chart-bar"
+    >
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 0.75rem; margin-bottom: 1rem;">
             <div style="border: 1px solid var(--gray-200); border-radius: 0.5rem; padding: 0.75rem;">
                 <div style="font-size: 0.75rem; color: var(--gray-500);">Total POY Keluar</div>

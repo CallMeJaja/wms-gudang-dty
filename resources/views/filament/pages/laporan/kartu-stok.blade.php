@@ -3,7 +3,10 @@
         Saldo awal + saldo berjalan per baris, beserta kolom pos.
     </p>
 
-    <x-filament::section>
+    <x-filament::section
+        icon="heroicon-o-funnel"
+        description="Sesuaikan periode dan parameter laporan."
+    >
         <x-slot name="heading">Filter</x-slot>
 
         <form method="GET" action="{{ url()->current() }}">
@@ -81,7 +84,11 @@
         </form>
     </x-filament::section>
 
-    <x-filament::section>
+    <x-filament::section
+        heading="Kartu Stok"
+        description="Saldo awal dan saldo berjalan per baris mutasi."
+        icon="heroicon-o-document-chart-bar"
+    >
         @if (! $lengkap)
             <p style="font-size: 0.85rem; color: var(--gray-500); margin: 0;">
                 Pilih barang dan isi merge untuk menampilkan kartu stok.

@@ -3,7 +3,10 @@
         Sumber: mutasi stok (hanya transaksi posted/issued).
     </p>
 
-    <x-filament::section>
+    <x-filament::section
+        icon="heroicon-o-funnel"
+        description="Sesuaikan periode dan parameter laporan."
+    >
         <x-slot name="heading">Filter</x-slot>
 
         <form method="GET" action="{{ url()->current() }}">
@@ -68,7 +71,11 @@
         </form>
     </x-filament::section>
 
-    <x-filament::section>
+    <x-filament::section
+        heading="Data Mutasi Stok"
+        description="Rincian mutasi masuk dan keluar pada periode terpilih."
+        icon="heroicon-o-table-cells"
+    >
         <div style="overflow-x: auto; border: 1px solid var(--gray-200); border-radius: 0.5rem;">
             <table style="width: 100%; border-collapse: collapse; font-size: 0.8rem;">
                 <thead style="background: var(--gray-50); color: var(--gray-500); text-align: left;">

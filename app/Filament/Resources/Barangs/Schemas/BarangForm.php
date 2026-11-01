@@ -26,87 +26,86 @@ class BarangForm
     {
         return $schema
             ->components([
+                Section::make('Identitas Barang')
+                    ->description('Kode dan nama barang sesuai master gudang.')
+                    ->icon(Heroicon::OutlinedCube)
+                    ->columnSpanFull()
+                    ->columns(2)
+                    ->schema([
+                        TextInput::make('kode_barang')
+                            ->label('Kode Barang')
+                            ->required()
+                            ->maxLength(50)
+                            ->unique(ignoreRecord: true)
+                            ->prefixIcon('heroicon-o-qr-code')
+                            ->helperText('Unik. Contoh: POY-150-48, DTY-150-48.'),
+
+                        TextInput::make('nama_barang')
+                            ->label('Nama Barang')
+                            ->required()
+                            ->maxLength(150),
+
+                        Select::make('kategori_id')
+                            ->label('Kategori')
+                            ->relationship(
+                                name: 'kategori',
+                                titleAttribute: 'nama',
+                                modifyQueryUsing: fn (Builder $query) => $query->orderBy('kode'),
+                            )
+                            ->getOptionLabelFromRecordUsing(
+                                fn (KategoriBarang $record) => "{$record->kode} — {$record->nama}"
+                            )
+                            ->searchable()
+                            ->preload()
+                            ->required()
+                            ->live(),
+
+                        Select::make('satuan_dasar_id')
+                            ->label('Satuan Dasar')
+                            ->relationship(
+                                name: 'satuanDasar',
+                                titleAttribute: 'nama',
+                                modifyQueryUsing: fn (Builder $query) => $query->orderBy('kode'),
+                            )
+                            ->getOptionLabelFromRecordUsing(
+                                fn ($record) => "{$record->kode} — {$record->nama}"
+                            )
+                            ->searchable()
+                            ->preload()
+                            ->required(),
+                    ]),
+
+                Section::make('Spesifikasi Benang')
+                    ->description('Denier dan filament hanya relevan untuk POY/DTY.')
+                    ->icon(Heroicon::OutlinedScale)
+                    ->columnSpanFull()
+                    ->columns(2)
+                    ->schema([
+                        TextInput::make('denier')
+                            ->label('Denier')
+                            ->maxLength(20)
+                            ->placeholder('150'),
+
+                        TextInput::make('filament')
+                            ->label('Filament')
+                            ->maxLength(20)
+                            ->placeholder('48'),
+                    ]),
+
                 Grid::make(3)
                     ->columnSpanFull()
                     ->schema([
-                        Grid::make(1)
+                        Section::make('Nilai Stok')
+                            ->icon(Heroicon::OutlinedChartBar)
                             ->columnSpan(2)
+                            ->columns(1)
                             ->schema([
-                                Section::make('Identitas Barang')
-                                    ->description('Kode dan nama barang sesuai master gudang.')
-                                    ->icon(Heroicon::OutlinedCube)
-                                    ->columns(2)
-                                    ->schema([
-                                        TextInput::make('kode_barang')
-                                            ->label('Kode Barang')
-                                            ->required()
-                                            ->maxLength(50)
-                                            ->unique(ignoreRecord: true)
-                                            ->prefixIcon('heroicon-o-qr-code')
-                                            ->helperText('Unik. Contoh: POY-150-48, DTY-150-48.'),
-
-                                        TextInput::make('nama_barang')
-                                            ->label('Nama Barang')
-                                            ->required()
-                                            ->maxLength(150),
-
-                                        Select::make('kategori_id')
-                                            ->label('Kategori')
-                                            ->relationship(
-                                                name: 'kategori',
-                                                titleAttribute: 'nama',
-                                                modifyQueryUsing: fn (Builder $query) => $query->orderBy('kode'),
-                                            )
-                                            ->getOptionLabelFromRecordUsing(
-                                                fn (KategoriBarang $record) => "{$record->kode} — {$record->nama}"
-                                            )
-                                            ->searchable()
-                                            ->preload()
-                                            ->required()
-                                            ->live(),
-
-                                        Select::make('satuan_dasar_id')
-                                            ->label('Satuan Dasar')
-                                            ->relationship(
-                                                name: 'satuanDasar',
-                                                titleAttribute: 'nama',
-                                                modifyQueryUsing: fn (Builder $query) => $query->orderBy('kode'),
-                                            )
-                                            ->getOptionLabelFromRecordUsing(
-                                                fn ($record) => "{$record->kode} — {$record->nama}"
-                                            )
-                                            ->searchable()
-                                            ->preload()
-                                            ->required(),
-                                    ]),
-
-                                Section::make('Spesifikasi Benang')
-                                    ->description('Denier dan filament hanya relevan untuk POY/DTY.')
-                                    ->icon(Heroicon::OutlinedScale)
-                                    ->columns(2)
-                                    ->schema([
-                                        TextInput::make('denier')
-                                            ->label('Denier')
-                                            ->maxLength(20)
-                                            ->placeholder('150'),
-
-                                        TextInput::make('filament')
-                                            ->label('Filament')
-                                            ->maxLength(20)
-                                            ->placeholder('48'),
-                                    ]),
-
-                                Section::make('Nilai Stok')
-                                    ->icon(Heroicon::OutlinedChartBar)
-                                    ->columns(2)
-                                    ->schema([
-                                        TextInput::make('stok_minimum')
-                                            ->label('Stok Minimum')
-                                            ->numeric()
-                                            ->minValue(0)
-                                            ->suffix(fn (Get $get) => self::kodeSatuan($get('satuan_dasar_id')))
-                                            ->helperText('Dipakai untuk notifikasi stok menipis.'),
-                                    ]),
+                                TextInput::make('stok_minimum')
+                                    ->label('Stok Minimum')
+                                    ->numeric()
+                                    ->minValue(0)
+                                    ->suffix(fn (Get $get) => self::kodeSatuan($get('satuan_dasar_id')))
+                                    ->helperText('Dipakai untuk notifikasi stok menipis.'),
                             ]),
 
                         Section::make('Status & Buffer')

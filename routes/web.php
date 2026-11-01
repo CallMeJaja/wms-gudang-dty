@@ -11,6 +11,9 @@ use App\Http\Controllers\Master\KategoriController;
 use App\Http\Controllers\Master\KonversiController;
 use App\Http\Controllers\Master\PartnerController;
 use App\Http\Controllers\Master\SatuanController;
+use App\Http\Controllers\Outbound\PengeluaranPoyController;
+use App\Http\Controllers\Outbound\ScrapController;
+use App\Http\Controllers\Outbound\SuratJalanController;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/dashboard');
@@ -98,6 +101,60 @@ Route::middleware(['auth', 'tolak.manajer'])->prefix('transaksi/masuk')->name('i
         Route::delete('{dty}', [PenerimaanDtyController::class, 'destroy'])->middleware($tulis)->name('destroy');
         Route::post('{dty}/posting', [PenerimaanDtyController::class, 'posting'])->middleware($tulis)->name('posting');
         Route::post('{dty}/void', [PenerimaanDtyController::class, 'void'])->middleware($void)->name('void');
+    });
+});
+
+/*
+|--------------------------------------------------------------------------
+| Transaksi Keluar / Outbound (F3) — RBAC
+|--------------------------------------------------------------------------
+|
+| Sama seperti inbound: Operator HARUS bisa input transaksi pengeluaran,
+| route tulis memakai `role:admin,operator`. Void HANYA Admin.
+|
+*/
+Route::middleware(['auth', 'tolak.manajer'])->prefix('transaksi/keluar')->name('outbound.')->group(function () {
+    $tulis = ['role:admin,operator'];
+    $void = ['role:admin'];
+
+    // ----- Pengeluaran POY ke Produksi (DRAFT -> POSTED) -----
+    Route::prefix('poy')->name('poy.')->group(function () use ($tulis, $void) {
+        Route::get('/', [PengeluaranPoyController::class, 'index'])->name('index');
+        Route::get('create', [PengeluaranPoyController::class, 'create'])->middleware($tulis)->name('create');
+        Route::post('/', [PengeluaranPoyController::class, 'store'])->middleware($tulis)->name('store');
+        Route::get('{poy}', [PengeluaranPoyController::class, 'show'])->name('show');
+        Route::get('{poy}/edit', [PengeluaranPoyController::class, 'edit'])->middleware($tulis)->name('edit');
+        Route::put('{poy}', [PengeluaranPoyController::class, 'update'])->middleware($tulis)->name('update');
+        Route::delete('{poy}', [PengeluaranPoyController::class, 'destroy'])->middleware($tulis)->name('destroy');
+        Route::post('{poy}/posting', [PengeluaranPoyController::class, 'posting'])->middleware($tulis)->name('posting');
+        Route::post('{poy}/void', [PengeluaranPoyController::class, 'void'])->middleware($void)->name('void');
+    });
+
+    // ----- Surat Jalan DTY (DRAFT -> ISSUED + cetak) -----
+    Route::prefix('surat-jalan')->name('surat-jalan.')->group(function () use ($tulis, $void) {
+        Route::get('/', [SuratJalanController::class, 'index'])->name('index');
+        Route::get('create', [SuratJalanController::class, 'create'])->middleware($tulis)->name('create');
+        Route::post('/', [SuratJalanController::class, 'store'])->middleware($tulis)->name('store');
+        Route::get('{suratJalan}', [SuratJalanController::class, 'show'])->name('show');
+        Route::get('{suratJalan}/cetak', [SuratJalanController::class, 'cetak'])->name('cetak');
+        Route::get('{suratJalan}/edit', [SuratJalanController::class, 'edit'])->middleware($tulis)->name('edit');
+        Route::put('{suratJalan}', [SuratJalanController::class, 'update'])->middleware($tulis)->name('update');
+        Route::delete('{suratJalan}', [SuratJalanController::class, 'destroy'])->middleware($tulis)->name('destroy');
+        Route::post('{suratJalan}/issue', [SuratJalanController::class, 'issue'])->middleware($tulis)->name('issue');
+        Route::post('{suratJalan}/void', [SuratJalanController::class, 'void'])->middleware($void)->name('void');
+    });
+
+    // ----- Pengeluaran DTY Scrap/Reject (DRAFT -> POSTED) -----
+    Route::prefix('scrap')->name('scrap.')->group(function () use ($tulis, $void) {
+        Route::get('/', [ScrapController::class, 'index'])->name('index');
+        Route::get('create', [ScrapController::class, 'create'])->middleware($tulis)->name('create');
+        Route::post('/', [ScrapController::class, 'store'])->middleware($tulis)->name('store');
+        Route::get('{scrap}', [ScrapController::class, 'show'])->name('show');
+        Route::get('{scrap}/edit', [ScrapController::class, 'edit'])->middleware($tulis)->name('edit');
+        Route::put('{scrap}', [ScrapController::class, 'update'])->middleware($tulis)->name('update');
+        Route::delete('{scrap}', [ScrapController::class, 'destroy'])->middleware($tulis)->name('destroy');
+        Route::post('{scrap}/posting', [ScrapController::class, 'posting'])->middleware($tulis)->name('posting');
+        Route::post('{scrap}/void', [ScrapController::class, 'void'])->middleware($void)->name('void');
     });
 });
 

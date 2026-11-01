@@ -61,6 +61,33 @@
                     </li>
 
                     <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle {{ request()->routeIs('outbound.*') ? 'active' : '' }}"
+                           href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-box-arrow-up me-1"></i> Transaksi Keluar
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item {{ request()->routeIs('outbound.poy.*') ? 'active' : '' }}"
+                                   href="{{ route('outbound.poy.index') }}">
+                                    <i class="bi bi-boxes me-1"></i> POY ke Produksi
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item {{ request()->routeIs('outbound.surat-jalan.*') ? 'active' : '' }}"
+                                   href="{{ route('outbound.surat-jalan.index') }}">
+                                    <i class="bi bi-truck me-1"></i> Surat Jalan DTY
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item {{ request()->routeIs('outbound.scrap.*') ? 'active' : '' }}"
+                                   href="{{ route('outbound.scrap.index') }}">
+                                    <i class="bi bi-trash3 me-1"></i> Scrap / Reject
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle {{ request()->routeIs('master.*') ? 'active' : '' }}"
                            href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="bi bi-database me-1"></i> Master Data

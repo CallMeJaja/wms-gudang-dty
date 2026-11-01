@@ -36,6 +36,9 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::post('/dashboard/rilis-buffer', [DashboardController::class, 'rilis'])
+        ->middleware('role:admin,operator')
+        ->name('dashboard.rilis-buffer');
 });
 
 /*

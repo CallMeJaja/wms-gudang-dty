@@ -13,27 +13,26 @@
 
 /* Item navigasi aktif */
 .fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
-    background-color: color-mix(in srgb, var(--primary-500) 12%, transparent);
-    color: var(--primary-700);
+    background-color: transparent !important;
+    box-shadow: none !important;
+    color: var(--primary-600);
     font-weight: 600;
-    border-radius: 0.5rem;
-    box-shadow: inset 3px 0 0 var(--primary-500);
 }
 
 .fi-sidebar-item.fi-active > .fi-sidebar-item-btn .fi-sidebar-item-label,
 .fi-sidebar-item.fi-active > .fi-sidebar-item-btn .fi-icon {
-    color: var(--primary-700);
+    color: var(--primary-600);
 }
 
 .dark .fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
-    background-color: color-mix(in srgb, var(--primary-400) 18%, transparent);
-    color: var(--primary-300);
-    box-shadow: inset 3px 0 0 var(--primary-400);
+    background-color: transparent !important;
+    box-shadow: none !important;
+    color: var(--primary-400);
 }
 
 .dark .fi-sidebar-item.fi-active > .fi-sidebar-item-btn .fi-sidebar-item-label,
 .dark .fi-sidebar-item.fi-active > .fi-sidebar-item-btn .fi-icon {
-    color: var(--primary-300);
+    color: var(--primary-400);
 }
 
 /* Garis penghubung item: hilangkan dot, sisakan garis vertikal yang tersambung */

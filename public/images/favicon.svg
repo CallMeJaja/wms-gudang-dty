@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="WMS Gudang DTY">
+    <rect width="32" height="32" rx="7" fill="#2563EB"/>
+    <g fill="none" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 14 L16 7 L26 14"/>
+        <path d="M9 14 H23 V25 H9 Z"/>
+        <path d="M9 19 H23"/>
+        <path d="M16 19 V25"/>
+    </g>
+</svg>

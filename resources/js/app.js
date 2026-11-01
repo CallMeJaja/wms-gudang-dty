@@ -6,6 +6,7 @@ import './inbound.js';
 
 // Modul Transaksi Keluar (F3): baris detail dinamis form pengeluaran.
 import './outbound.js';
+import './sidebar.js';
 
 /*
 |--------------------------------------------------------------------------

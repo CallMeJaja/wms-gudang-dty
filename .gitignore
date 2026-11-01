@@ -44,6 +44,7 @@ Homestead.yaml
 # Catatan asisten AI (lokal saja)
 /CLAUDE.md
 /AGENTS.md
+/.commandcode/
 
 # Backup database (hanya dump siap-impor + panduan yang masuk repo)
 # Lihat DoD F0 di PRD §9.

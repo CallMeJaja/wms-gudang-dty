@@ -9,10 +9,8 @@ use Filament\Actions\ActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Tables\Columns\ColumnGroup;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
@@ -23,46 +21,42 @@ class KonversiSatuansTable
         return $table
             ->defaultSort('barang_id')
             ->columns([
-                ColumnGroup::make('Relasi', [
-                    TextColumn::make('barang.kode_barang')
-                        ->label('Barang')
-                        ->placeholder('Global')
-                        ->searchable(['kode_barang', 'nama_barang'])
-                        ->sortable()
-                        ->weight('semibold')
-                        ->copyable(),
+                TextColumn::make('barang.kode_barang')
+                    ->label('Barang')
+                    ->placeholder('Global')
+                    ->searchable(['kode_barang', 'nama_barang'])
+                    ->sortable()
+                    ->weight('semibold')
+                    ->copyable(),
 
-                    TextColumn::make('barang.nama_barang')
-                        ->label('Nama Barang')
-                        ->placeholder('Semua barang')
-                        ->wrap()
-                        ->toggleable(),
+                TextColumn::make('barang.nama_barang')
+                    ->label('Nama Barang')
+                    ->placeholder('Semua barang')
+                    ->wrap()
+                    ->toggleable(),
 
-                    TextColumn::make('dariSatuan.kode')
-                        ->label('Dari')
-                        ->badge()
-                        ->color('gray')
-                        ->sortable(),
+                TextColumn::make('dariSatuan.kode')
+                    ->label('Dari')
+                    ->badge()
+                    ->color('gray')
+                    ->sortable(),
 
-                    TextColumn::make('keSatuan.kode')
-                        ->label('Ke')
-                        ->badge()
-                        ->color('info')
-                        ->sortable(),
-                ]),
+                TextColumn::make('keSatuan.kode')
+                    ->label('Ke')
+                    ->badge()
+                    ->color('info')
+                    ->sortable(),
 
-                ColumnGroup::make('Nilai', [
-                    TextColumn::make('faktor')
-                        ->label('Faktor')
-                        ->numeric(decimalPlaces: 4, decimalSeparator: ',', thousandsSeparator: '.')
-                        ->alignEnd()
-                        ->sortable(),
+                TextColumn::make('faktor')
+                    ->label('Faktor')
+                    ->numeric(decimalPlaces: 4, decimalSeparator: ',', thousandsSeparator: '.')
+                    ->alignEnd()
+                    ->sortable(),
 
-                    IconColumn::make('is_default')
-                        ->label('Default')
-                        ->boolean()
-                        ->alignCenter(),
-                ]),
+                IconColumn::make('is_default')
+                    ->label('Default')
+                    ->boolean()
+                    ->alignCenter(),
             ])
             ->filters([
                 SelectFilter::make('barang_id')
@@ -82,9 +76,7 @@ class KonversiSatuansTable
                     ->relationship('keSatuan', 'nama')
                     ->searchable()
                     ->preload(),
-            ], layout: FiltersLayout::AboveContentCollapsible)
-            ->paginationPageOptions([10, 25, 50])
-            ->striped()
+            ])
             ->actionsColumnLabel('Aksi')
             ->recordActions([
                 ActionGroup::make([

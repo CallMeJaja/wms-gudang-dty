@@ -10,10 +10,8 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
-use Filament\Tables\Columns\ColumnGroup;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\TrashedFilter;
@@ -27,55 +25,51 @@ class BarangsTable
         return $table
             ->defaultSort('kode_barang')
             ->columns([
-                ColumnGroup::make('Identitas', [
-                    TextColumn::make('kode_barang')
-                        ->label('Kode')
-                        ->searchable()
-                        ->sortable()
-                        ->weight('semibold')
-                        ->copyable(),
+                TextColumn::make('kode_barang')
+                    ->label('Kode')
+                    ->searchable()
+                    ->sortable()
+                    ->weight('semibold')
+                    ->copyable(),
 
-                    TextColumn::make('nama_barang')
-                        ->label('Nama Barang')
-                        ->searchable()
-                        ->sortable()
-                        ->wrap(),
+                TextColumn::make('nama_barang')
+                    ->label('Nama Barang')
+                    ->searchable()
+                    ->sortable()
+                    ->wrap(),
 
-                    TextColumn::make('kategori.kode')
-                        ->label('Kategori')
-                        ->badge()
-                        ->color(fn (?string $state) => match ($state) {
-                            'POY' => 'warning',
-                            'DTY' => 'success',
-                            default => 'gray',
-                        })
-                        ->sortable(),
+                TextColumn::make('kategori.kode')
+                    ->label('Kategori')
+                    ->badge()
+                    ->color(fn (?string $state) => match ($state) {
+                        'POY' => 'warning',
+                        'DTY' => 'success',
+                        default => 'gray',
+                    })
+                    ->sortable(),
 
-                    TextColumn::make('denier_filament')
-                        ->label('D/F')
-                        ->placeholder('—')
-                        ->alignCenter(),
-                ]),
+                TextColumn::make('denier_filament')
+                    ->label('D/F')
+                    ->placeholder('—')
+                    ->alignCenter(),
 
-                ColumnGroup::make('Stok', [
-                    TextColumn::make('satuanDasar.kode')
-                        ->label('Satuan')
-                        ->badge()
-                        ->color('gray'),
+                TextColumn::make('satuanDasar.kode')
+                    ->label('Satuan')
+                    ->badge()
+                    ->color('gray'),
 
-                    TextColumn::make('stok_minimum')
-                        ->label('Stok Min.')
-                        ->numeric(decimalPlaces: 2)
-                        ->placeholder('—')
-                        ->sortable()
-                        ->alignEnd(),
+                TextColumn::make('stok_minimum')
+                    ->label('Stok Min.')
+                    ->numeric(decimalPlaces: 2)
+                    ->placeholder('—')
+                    ->sortable()
+                    ->alignEnd(),
 
-                    IconColumn::make('is_merge_minggu')
-                        ->label('Merge')
-                        ->boolean()
-                        ->alignCenter()
-                        ->tooltip('Penanda buffer Minggu (khusus POY, A11)'),
-                ]),
+                IconColumn::make('is_merge_minggu')
+                    ->label('Merge')
+                    ->boolean()
+                    ->alignCenter()
+                    ->tooltip('Penanda buffer Minggu (khusus POY, A11)'),
 
                 IconColumn::make('is_active')
                     ->label('Aktif')
@@ -108,9 +102,7 @@ class BarangsTable
 
                 TrashedFilter::make()
                     ->label('Data terhapus'),
-            ], layout: FiltersLayout::AboveContentCollapsible)
-            ->paginationPageOptions([10, 25, 50])
-            ->striped()
+            ])
             ->actionsColumnLabel('Aksi')
             ->recordActions([
                 ActionGroup::make([

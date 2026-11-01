@@ -121,7 +121,7 @@ Gunakan bahasa Indonesia yang ringkas dan imperatif.
 ## Dokumentasi
 
 - Dokumentasi berada di `docs/`.
-- Ikuti struktur Diátaxis: tutorial, how-to, reference, explanation.
+- Perbarui dokumentasi terkait di folder `docs/` saat mengubah perilaku aplikasi.
 - Gunakan tautan relatif.
 - Perbarui `docs/features.md` bila menu atau URL berubah.
 - Perbarui `docs/business-rules.md` bila aturan bisnis berubah.

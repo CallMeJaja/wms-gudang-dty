@@ -111,7 +111,7 @@ vendor/bin/phpunit tests/Feature/InboundTest.php
 5. Uji perilaku dan failure mode penting, bukan detail implementasi.
 6. Jalankan test yang terdampak setelah setiap perubahan.
 
-Contoh kerangka:
+Contoh struktur test:
 
 ```php
 <?php

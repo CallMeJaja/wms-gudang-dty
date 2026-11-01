@@ -1,0 +1,55 @@
+<?php
+
+namespace App\Filament\Concerns;
+
+use App\Enums\StatusDokumen;
+use App\Models\ActivityLog;
+use App\Models\TransaksiKeluar;
+use App\Services\NomorDokumenService;
+use App\Services\PengeluaranService;
+use Filament\Notifications\Notification;
+use Illuminate\Support\Facades\Auth;
+
+/**
+ * Perilaku bersama halaman "Buat" pengeluaran.
+ *
+ * Nomor transaksi selalu digenerate di server (atomik) dan status awal DRAFT
+ * — sama seperti controller legacy. Stok baru berubah saat Posting/Issue.
+ */
+trait CreatesPengeluaranRecord
+{
+    protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        $data['nomor_transaksi'] = app(NomorDokumenService::class)->generate('TRX_KELUAR');
+        $data['jenis_keluar'] = static::getResource()::jenisKeluar();
+        $data['status'] = StatusDokumen::Draft;
+        $data['created_by'] = Auth::id();
+
+        return $data;
+    }
+
+    protected function getRedirectUrl(): string
+    {
+        return static::getResource()::getUrl('edit', ['record' => $this->getRecord()]);
+    }
+
+    protected function afterCreate(): void
+    {
+        /** @var TransaksiKeluar $transaksi */
+        $transaksi = $this->getRecord();
+        $jenis = static::getResource()::jenisKeluar();
+
+        ActivityLog::catat(
+            'CREATE',
+            PengeluaranService::modul($jenis),
+            (int) $transaksi->id,
+            "Buat draf {$jenis->label()} {$transaksi->nomor_transaksi} ({$transaksi->detail()->count()} baris).",
+        );
+
+        Notification::make()
+            ->title('Draf berhasil disimpan')
+            ->body('Stok belum berubah — tekan Posting atau Terbitkan untuk memproses.')
+            ->success()
+            ->send();
+    }
+}

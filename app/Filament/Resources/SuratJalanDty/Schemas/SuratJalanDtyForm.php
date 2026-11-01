@@ -1,0 +1,103 @@
+<?php
+
+namespace App\Filament\Resources\SuratJalanDty\Schemas;
+
+use App\Enums\JenisKeluar;
+use App\Filament\Support\PengeluaranForm;
+use App\Services\NomorDokumenService;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
+use Illuminate\Database\Eloquent\Builder;
+
+/**
+ * Form Surat Jalan DTY (PRD §4.5).
+ *
+ * Nomor Surat Jalan boleh diisi manual sesuai dokumen fisik; bila kosong,
+ * PengeluaranService::issue() akan generate otomatis saat Terbitkan.
+ */
+class SuratJalanDtyForm
+{
+    public static function configure(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                Section::make('Identitas Dokumen')
+                    ->description('Pengiriman DTY ke pelanggan. Stok berkurang saat dokumen diterbitkan.')
+                    ->columns(3)
+                    ->columnSpanFull()
+                    ->schema([
+                        TextInput::make('nomor_transaksi')
+                            ->label('Nomor Transaksi')
+                            ->disabled()
+                            ->dehydrated(false)
+                            ->placeholder(fn () => app(NomorDokumenService::class)->peek('TRX_KELUAR'))
+                            ->helperText('Digenerate otomatis saat disimpan.'),
+
+                        TextInput::make('nomor_surat_jalan')
+                            ->label('Nomor Surat Jalan')
+                            ->maxLength(50)
+                            ->unique(ignoreRecord: true)
+                            ->placeholder(fn () => app(NomorDokumenService::class)->peek('SURAT_JALAN_DTY'))
+                            ->helperText('Kosongkan untuk generate otomatis saat Terbitkan.')
+                            ->dehydrateStateUsing(
+                                fn (?string $state): ?string => filled($state) ? trim($state) : null
+                            ),
+
+                        DatePicker::make('tanggal')
+                            ->label('Tanggal Kirim')
+                            ->required()
+                            ->default(now())
+                            ->native(false)
+                            ->displayFormat('d/m/Y'),
+
+                        Select::make('partner_id')
+                            ->label('Partner / Pelanggan')
+                            ->relationship(
+                                name: 'partner',
+                                titleAttribute: 'nama',
+                                modifyQueryUsing: fn (Builder $query) => $query->orderBy('nama'),
+                            )
+                            ->searchable()
+                            ->preload(),
+
+                        TextInput::make('no_kendaraan')
+                            ->label('No. Kendaraan')
+                            ->required()
+                            ->maxLength(30)
+                            ->placeholder('B 1234 CD'),
+
+                        TextInput::make('nama_sopir')
+                            ->label('Nama Sopir')
+                            ->required()
+                            ->maxLength(100),
+
+                        TextInput::make('pic_pengirim')
+                            ->label('PIC Pengirim')
+                            ->required()
+                            ->maxLength(100),
+
+                        TextInput::make('pic_mengetahui')
+                            ->label('PIC Mengetahui')
+                            ->required()
+                            ->maxLength(100),
+
+                        Textarea::make('catatan')
+                            ->label('Catatan Transaksi')
+                            ->rows(3)
+                            ->maxLength(2000)
+                            ->columnSpanFull(),
+                    ]),
+
+                Section::make('Rincian Barang')
+                    ->description('Satu baris = satu kombinasi barang + merge + grade.')
+                    ->columnSpanFull()
+                    ->schema([
+                        PengeluaranForm::detailRepeater(JenisKeluar::DtySuratJalan),
+                    ]),
+            ]);
+    }
+}

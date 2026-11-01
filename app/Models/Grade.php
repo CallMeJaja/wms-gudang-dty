@@ -12,6 +12,12 @@ class Grade extends Model
 
     protected $fillable = ['kode', 'kategori_id', 'keterangan', 'is_active'];
 
+    /**
+     * Grade scrap/reject. Untuk kategori DTY grade ini WAJIB dipertahankan
+     * (konfirmasi PIC: scrap grade C pernah keluar dan dicatat, PRD §3.5).
+     */
+    public const KODE_SCRAP = 'C';
+
     protected function casts(): array
     {
         return [

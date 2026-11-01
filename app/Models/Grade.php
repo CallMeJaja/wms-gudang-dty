@@ -14,7 +14,7 @@ class Grade extends Model
 
     /**
      * Grade scrap/reject. Untuk kategori DTY grade ini WAJIB dipertahankan
-     * (konfirmasi PIC: scrap grade C pernah keluar dan dicatat).
+     * (scrap/reject tetap dicatat di master).
      */
     public const KODE_SCRAP = 'C';
 

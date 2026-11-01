@@ -22,7 +22,7 @@ return [
         /*
         | ---------------- POY (250/48) — Terverifikasi Logbook ----------------
         |
-        | Bukti: logbook "DATA POY DIKIRIM DARI IPCI KE PEI"
+        | Bukti: logbook penerimaan POY dari IPCI
         |   7 pallet   = 252 bobbin = 4.032 kg -> 36 bobbin/pallet, 16 kg/bobbin
         |   180 bobbin = 2.880 kg              -> 16 kg/bobbin (konsisten)
         */
@@ -31,13 +31,13 @@ return [
         'poy_pallet_kg' => 576.0,       // 4.032 / 7 (acuan resmi ambang)
 
         // Catatan: 16 kg/bobbin hanya VALID untuk POY 250/48 (data yang ada).
-        // Denier lain HARUS dikonfirmasi ulang. Saldo POY tetap dari Kg
+        // Denier lain wajib diverifikasi ulang. Saldo POY tetap dari Kg
         // timbangan, bukan hasil kali bobbin.
 
         /*
         | ---------------- DTY (150/48) ----------------
         |
-        | Bukti: coretan standar packing + Surat Jalan 244/DTY/PEI/X/2026
+        | Bukti: coretan standar packing + dokumen pengiriman DTY
         */
         'dty_bobbin_kg' => 5.5,         // 5.500 gram netto (SJ: 1.980/360 = 5,5)
         'dty_box_bobbin' => 6,          // 1 carton box DTY = 6 bobbin
@@ -45,7 +45,7 @@ return [
         'dty_box_gross_kg' => 35.74,    // AKTUAL Surat Jalan (2.144,4/60)
 
         /*
-        | --- Toleransi Gross per Box per Grade (konfirmasi PIC 30-10-2026) ---
+        | --- Toleransi Gross per Box per Grade ---
         |
         | Rentang grade A/B jauh lebih lebar: menerima bobbin sisa/putus.
         | Catatan: AE adalah nilai estimasi lapangan (asumsi terkontrol).
@@ -65,7 +65,7 @@ return [
     |--------------------------------------------------------------------------
     |
     |   POY :  36 bobbin/pallet ->    576 kg/pallet
-    |   DTY : ~209 bobbin/pallet -> ~1.149 kg/pallet (turunan SJ 244)
+    |   DTY : ~209 bobbin/pallet -> ~1.149 kg/pallet (turunan data pengiriman)
     |
     | Nilai di bawah HANYA untuk threshold visual.
     | JANGAN dipakai menambah/mengurangi stok; stok selalu dihitung dari kg.
@@ -73,12 +73,12 @@ return [
     */
     'pallet' => [
         'poy_kg' => 576.0,      // acuan resmi (logbook 7 pallet = 4.032 kg)
-        'dty_kg' => 1149.0,     // turunan SJ 244 — indikatif
+        'dty_kg' => 1149.0,     // turunan data pengiriman — indikatif
     ],
 
     /*
     |--------------------------------------------------------------------------
-    | Shift Kerja (Terkonfirmasi PIC 30-10-2026)
+    | Shift Kerja
     |--------------------------------------------------------------------------
     |
     | Shift 3 melintasi tengah malam. Perhitungan tanggal bisnis harus
@@ -208,7 +208,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | Format Surat Jalan: [No_Urut]/DTY/PEI/[Bulan_Romawi]/[Tahun]
-    | contoh: 244/DTY/PEI/X/2026
+    | contoh: 001/DTY/PEI/I/2026
     |
     */
     'bulan_romawi' => [
@@ -238,8 +238,8 @@ return [
     | Grade Default (untuk Seeder)
     |--------------------------------------------------------------------------
     |
-    | Grade C SENGAJA tetap ada & aktif. Data riil logbook tidak memuatnya,
-    | tetapi PIC mengonfirmasi scrap grade C PERNAH keluar dan dicatat.
+    | Grade C SENGAJA tetap ada & aktif. Data riil logbook tidak memuatnya.
+    | Grade C tetap disediakan untuk mencatat scrap/reject yang keluar gudang.
     | Jangan hapus dari master.
     |
     */

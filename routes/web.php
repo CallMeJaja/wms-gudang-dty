@@ -17,6 +17,7 @@ use App\Http\Controllers\Master\SatuanController;
 use App\Http\Controllers\Outbound\PengeluaranPoyController;
 use App\Http\Controllers\Outbound\ScrapController;
 use App\Http\Controllers\Outbound\SuratJalanController;
+use App\Http\Controllers\StokOpnameController;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/dashboard');
@@ -181,6 +182,18 @@ Route::middleware('auth')->prefix('laporan')->name('laporan.')->group(function (
     Route::get('rendemen', [RendemenController::class, 'index'])->name('rendemen.index');
     Route::get('rendemen/excel', [RendemenController::class, 'excel'])->name('rendemen.excel');
     Route::get('rendemen/pdf', [RendemenController::class, 'pdf'])->name('rendemen.pdf');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Stock Opname (F6) — HANYA Admin (PRD §2, §4.6)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'role:admin'])->prefix('opname')->name('opname.')->group(function () {
+    Route::get('/', [StokOpnameController::class, 'index'])->name('index');
+    Route::get('create', [StokOpnameController::class, 'create'])->name('create');
+    Route::post('/', [StokOpnameController::class, 'store'])->name('store');
+    Route::get('{opname}', [StokOpnameController::class, 'show'])->name('show');
 });
 
 // Cetak Gate Pass: halaman cetak format fisik, semua role boleh (GET).

@@ -87,6 +87,15 @@
                         </ul>
                     </li>
 
+                    @if (auth()->user()->isAdmin())
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('opname.*') ? 'active' : '' }}"
+                               href="{{ route('opname.index') }}">
+                                <i class="bi bi-clipboard-check me-1"></i> Stock Opname
+                            </a>
+                        </li>
+                    @endif
+
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle {{ request()->routeIs('laporan.*') ? 'active' : '' }}"
                            href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">

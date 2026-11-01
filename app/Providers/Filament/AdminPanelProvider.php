@@ -41,7 +41,7 @@ class AdminPanelProvider extends PanelProvider
             ->userMenu(position: UserMenuPosition::Sidebar)
             ->sidebarCollapsibleOnDesktop()
             ->renderHook(
-                PanelsRenderHook::SIDEBAR_LOGO_AFTER,
+                PanelsRenderHook::SIDEBAR_NAV_START,
                 fn () => view('filament.sidebar-collapse'),
             )
             ->navigationGroups([

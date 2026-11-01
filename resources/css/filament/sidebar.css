@@ -1,6 +1,6 @@
 /*
  * Penyesuaian sidebar panel admin agar terasa seperti sidebar admin pada umumnya:
- * toggle desktop dipindah ke header, item aktif lebih jelas, dan garis grup dirapikan.
+ * toggle desktop dipindah ke atas navigasi sidebar, item aktif lebih jelas, dan garis grup dirapikan.
  */
 
 @media (min-width: 1024px) {
@@ -66,7 +66,18 @@
     padding-block: 0.375rem;
 }
 
-/* Toggle ciutkan/perluas di header sidebar (hanya desktop) */
+/* Toggle ciutkan/perluas di atas navigasi sidebar */
+.wms-sidebar-collapse {
+    display: flex;
+    justify-content: flex-end;
+    padding: 0.25rem 0.5rem 0.5rem;
+}
+
+.fi-sidebar:not(.fi-sidebar-open) .wms-sidebar-collapse {
+    justify-content: center;
+    padding-inline: 0;
+}
+
 @media (max-width: 1023px) {
     .wms-sidebar-collapse {
         display: none;

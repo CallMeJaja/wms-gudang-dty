@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Pages\Dashboard;
+use Filament\Enums\DatabaseNotificationsPosition;
 use Filament\Enums\UserMenuPosition;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -37,6 +38,7 @@ class AdminPanelProvider extends PanelProvider
             ->favicon(asset('images/favicon.svg'))
             ->darkMode(true)
             ->userMenu(position: UserMenuPosition::Sidebar)
+            ->databaseNotifications(position: DatabaseNotificationsPosition::Sidebar)
             ->navigationGroups([
                 NavigationGroup::make('Data Induk'),
                 NavigationGroup::make('Penerimaan'),

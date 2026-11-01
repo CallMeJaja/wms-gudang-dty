@@ -130,6 +130,15 @@ class FilamentBrandingTest extends TestCase
     }
 
     #[Test]
+    public function sidebar_menampilkan_notifikasi_database(): void
+    {
+        $this->actingAs(User::factory()->admin()->create())
+            ->get('/admin')
+            ->assertOk()
+            ->assertSee('fi-sidebar-database-notifications-btn', false);
+    }
+
+    #[Test]
     public function badge_navigasi_penerimaan_poy_menghitung_draf(): void
     {
         $this->assertNull(PenerimaanPoyResource::getNavigationBadge());

@@ -4,6 +4,9 @@ import Chart from 'chart.js/auto';
 // Modul Transaksi Masuk (F2): baris detail dinamis form penerimaan.
 import './inbound.js';
 
+// Modul Transaksi Keluar (F3): baris detail dinamis form pengeluaran.
+import './outbound.js';
+
 /*
 |--------------------------------------------------------------------------
 | Bootstrap JS

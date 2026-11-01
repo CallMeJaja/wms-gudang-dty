@@ -48,5 +48,5 @@ Homestead.yaml
 # Backup database (hanya dump siap-impor + panduan yang masuk repo)
 # Lihat checklist finalisasi proyek.
 /database_backup/*
-!/database_backup/wms_gudang_dty.sql
+!/database_backup/db_wms_gudang_dty.sql
 !/database_backup/README.md

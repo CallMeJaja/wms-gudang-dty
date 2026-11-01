@@ -1,9 +1,10 @@
 # Backup Database — WMS Gudang DTY
 
-`wms_gudang_dty.sql` adalah dump siap-impor untuk aplikasi WMS Gudang DTY.
-Dump memuat **26 tabel**: struktur lengkap, data master, data demo, dan
-notifikasi contoh. Dump sudah menyertakan `CREATE DATABASE` dan `USE
-db_wms_gudang_dty`, sehingga dapat diimpor dalam satu langkah.
+`db_wms_gudang_dty.sql` adalah dump manual siap-impor untuk aplikasi WMS
+Gudang DTY. Dump memuat **26 tabel**: struktur lengkap, data master, data
+demo, dan notifikasi contoh. Dump **tidak** menyertakan `CREATE DATABASE`/
+`USE` dan **tidak** memakai `DROP TABLE`, sehingga database tujuan harus
+dibuat terlebih dahulu dan dalam keadaan kosong.
 
 ## Isi dump
 
@@ -21,16 +22,20 @@ db_wms_gudang_dty`, sehingga dapat diimpor dalam satu langkah.
 - Character set: `utf8mb4`
 - Collation: `utf8mb4_general_ci`
 
-## Import satu langkah
+## Import
 
-Karena dump sudah berisi `CREATE DATABASE` dan `USE`, cukup jalankan:
+Dump dibuat dengan DBX/MariaDB dan kompatibel dengan MySQL 8 maupun MariaDB
+(collation `utf8mb4_general_ci`). Buat database lalu impor:
 
 ```bash
-mysql -u root -p < database_backup/wms_gudang_dty.sql
+mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS db_wms_gudang_dty CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;"
+mysql -u root -p db_wms_gudang_dty < database_backup/db_wms_gudang_dty.sql
 ```
 
-> **Peringatan:** dump memakai `DROP TABLE`. Jangan impor ke database yang
-> berisi data penting. Cadangkan database lama terlebih dahulu bila perlu.
+> **Peringatan:** database tujuan **wajib kosong**. Dump tidak memakai
+> `DROP TABLE`, jadi impor ke database yang sudah memiliki tabel dapat
+> gagal. Jika sudah ada tabel, kosongkan atau buat ulang database terlebih
+> dahulu. Jangan impor ke database berisi data penting tanpa mencadangkannya.
 
 Setelah impor, sesuaikan `.env` aplikasi:
 
@@ -43,20 +48,6 @@ DB_USERNAME=<user-database>
 DB_PASSWORD=<password-database>
 DB_CHARSET=utf8mb4
 DB_COLLATION=utf8mb4_general_ci
-```
-
-## Alternatif: buat database lalu impor
-
-Jika ingin membuat database secara manual:
-
-```sql
-CREATE DATABASE db_wms_gudang_dty
-  CHARACTER SET utf8mb4
-  COLLATE utf8mb4_general_ci;
-```
-
-```bash
-mysql -u root -p db_wms_gudang_dty < database_backup/wms_gudang_dty.sql
 ```
 
 ## Alternatif tanpa dump
@@ -87,8 +78,8 @@ transaksi tetap diisi terpisah.
 
 - MySQL 8 dan MariaDB.
 - InnoDB, `utf8mb4`, dan `CHECK` constraint.
-- Dump dibuat dari MariaDB dan memakai SQL standar agar dapat diimpor ke
-  MySQL 8.
+- Dump dibuat dengan DBX/MariaDB dan memakai SQL standar agar dapat diimpor
+  ke MySQL 8.
 - Bila muncul peringatan collation `uca1400`, pastikan database tujuan
   memakai `utf8mb4_general_ci`.
 

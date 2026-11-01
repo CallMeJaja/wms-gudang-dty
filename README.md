@@ -69,7 +69,8 @@ Sesuaikan koneksi database di `.env`. Lalu pilih salah satu:
 
 ```bash
 # Opsi A — impor dump (sudah berisi data demo)
-mysql -u root -p < database_backup/wms_gudang_dty.sql
+mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS db_wms_gudang_dty CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;"
+mysql -u root -p db_wms_gudang_dty < database_backup/db_wms_gudang_dty.sql
 
 # Opsi B — migrasi dan seeder
 php artisan migrate --seed

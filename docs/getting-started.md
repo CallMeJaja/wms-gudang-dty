@@ -58,13 +58,15 @@ Pilih salah satu jalur berikut.
 
 ### Opsi A — impor dump (paling cepat, termasuk data demo)
 
-Dump sudah memiliki `CREATE DATABASE` dan `USE`:
+Dump manual ini **tidak** membuat database dan **tidak** memakai `DROP TABLE`:
 
 ```bash
-mysql -u root -p < database_backup/wms_gudang_dty.sql
+mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS db_wms_gudang_dty CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;"
+mysql -u root -p db_wms_gudang_dty < database_backup/db_wms_gudang_dty.sql
 ```
 
-> Dump memakai `DROP TABLE`. Jangan impor ke database berisi data penting.
+> Database tujuan **wajib kosong**. Jika sudah memiliki tabel, kosongkan atau
+> buat ulang database terlebih dahulu.
 
 Detail isi dump dan alternatif impor ada di
 [`database_backup/README.md`](../database_backup/README.md).

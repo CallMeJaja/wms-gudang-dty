@@ -224,15 +224,21 @@ Data transaksi dan notifikasi demo hanya dibuat saat `APP_ENV=local`.
 
 ## Dump dan impor
 
-- Dump: `database_backup/wms_gudang_dty.sql`.
-- Dump berisi `CREATE DATABASE` dan `USE db_wms_gudang_dty`.
-- Import satu langkah:
+- Dump: `database_backup/db_wms_gudang_dty.sql`.
+- Dump manual ini **tidak** membuat database dan **tidak** memakai `DROP TABLE`.
+- Import (database tujuan **wajib kosong**):
 
   ```bash
-  mysql -u root -p < database_backup/wms_gudang_dty.sql
+  mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS db_wms_gudang_dty CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;"
+  mysql -u root -p db_wms_gudang_dty < database_backup/db_wms_gudang_dty.sql
   ```
 
-- Dump memakai `DROP TABLE`; jangan impor ke database berisi data penting.
+- Jika database sudah memiliki tabel, kosongkan atau buat ulang terlebih
+  dahulu.
+- Dump memuat 26 tabel dan data demo (3 user, 9 barang, 62 masuk, 41 keluar,
+  156 mutasi, 143 log, 3 notifikasi).
+- Dump dibuat dengan DBX/MariaDB; kompatibel dengan MySQL 8 dan MariaDB,
+  collation `utf8mb4_general_ci`.
 - Alternatif tanpa dump:
 
   ```bash

@@ -72,11 +72,12 @@ Periksa role pada menu Pengguna dan status aktif user.
 
 ## Impor SQL gagal
 
-- Dump sudah memuat `CREATE DATABASE` dan `USE db_wms_gudang_dty`.
-- Dump memakai `DROP TABLE`; jangan impor ke database berisi data penting.
-- Pastikan user MySQL memiliki izin membuat database dan tabel.
-- Bila database dibuat manual, gunakan `utf8mb4` dan
-  `utf8mb4_general_ci`.
+- Dump manual ini **tidak** membuat database dan **tidak** memakai `DROP TABLE`.
+- Buat database terlebih dahulu, lalu impor ke database yang **wajib kosong**.
+- Jika database sudah memiliki tabel, kosongkan atau buat ulang terlebih
+  dahulu.
+- Pastikan user MySQL memiliki izin membuat tabel.
+- Gunakan `utf8mb4` dan `utf8mb4_general_ci`.
 - Bila muncul peringatan collation, buat database dengan collation yang
   diminta sebelum impor.
 - Setelah impor, cocokkan `DB_DATABASE`, `DB_USERNAME`, dan `DB_PASSWORD`
@@ -86,7 +87,8 @@ Periksa role pada menu Pengguna dan status aktif user.
 Perintah import:
 
 ```bash
-mysql -u root -p < database_backup/wms_gudang_dty.sql
+mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS db_wms_gudang_dty CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;"
+mysql -u root -p db_wms_gudang_dty < database_backup/db_wms_gudang_dty.sql
 ```
 
 ## Tabel notifikasi tidak ditemukan

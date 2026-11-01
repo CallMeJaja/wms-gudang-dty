@@ -94,9 +94,10 @@ html { scroll-behavior: smooth; }
 
 /* Pencarian modul di atas menu sidebar */
 .wms-sidebar-search {
-    width: 100%;
+    width: auto;
     box-sizing: border-box;
-    padding: 0 1rem 0.75rem;
+    margin-inline: -0.5rem;
+    padding: 0 0 0.75rem;
     border-bottom: 1px solid var(--gray-200);
     margin-bottom: 0.5rem;
 }

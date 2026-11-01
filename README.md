@@ -157,8 +157,10 @@ operasional.
 - Reza Asriano Maulana
 - Dhafi Ebsan Yurizal
 
-## Catatan akademik dan lisensi
+## Lisensi
 
-Repositori ini dibuat untuk kebutuhan akademik. Tidak ada berkas
-`LICENSE` di repositori, sehingga tidak ada klaim lisensi sumber terbuka
-tertentu. Hak penggunaan mengikuti ketentuan akademik dan pemilik proyek.
+Proyek ini dilisensikan di bawah **GNU General Public License v3.0 (GPL-3.0)**.
+Lihat [LICENSE](LICENSE) untuk teks lengkap dan [AUTHORS](AUTHORS) untuk pemegang hak cipta.
+
+Kode boleh digunakan, dimodifikasi, dan didistribusikan sesuai ketentuan GPLv3.
+Karya turunan yang didistribusikan harus tetap open-source dengan lisensi yang sama.

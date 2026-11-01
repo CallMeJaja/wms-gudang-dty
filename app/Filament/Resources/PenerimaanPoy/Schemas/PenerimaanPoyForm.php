@@ -24,10 +24,10 @@ use Filament\Support\Enums\Alignment;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
- * Form Penerimaan POY dari IPCI (PRD §4.1).
+ * Form Penerimaan POY dari IPCI.
  *
- * POY tidak boleh dikonversi dari bobbin (A1b): Berat Netto KG wajib input
- * manual. Box & bobbin hanya atribut pelengkap.
+ * POY memakai berat timbangan (Kg), bukan konversi bobbin: Berat Netto KG
+ * wajib input manual. Box & bobbin hanya atribut pelengkap.
  */
 class PenerimaanPoyForm
 {

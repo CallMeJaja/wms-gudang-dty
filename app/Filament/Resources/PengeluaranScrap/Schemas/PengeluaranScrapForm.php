@@ -16,7 +16,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Enums\Alignment;
 
 /**
- * Form pengeluaran Scrap / Reject DTY (PRD §7.3 no.12).
+ * Form pengeluaran Scrap / Reject DTY.
  *
  * Catatan wajib karena menjadi satu-satunya jejak tujuan/penerima scrap.
  */

@@ -10,7 +10,7 @@ use Filament\Support\Icons\Heroicon;
 use UnitEnum;
 
 /**
- * Rekonsiliasi POY vs DTY (PRD §6.3) di panel Filament.
+ * Rekonsiliasi POY vs DTY di panel Filament.
  */
 class LaporanRendemen extends Page
 {

@@ -13,7 +13,7 @@ use App\Services\AlokasiBufferService;
 use App\Services\StatusBufferMinggu;
 
 /**
- * Sumber data dashboard Filament (F4).
+ * Sumber data dashboard Filament.
  *
  * Salinan baca-saja dari logika dashboard agar tampilan panel tidak
  * menduplikasi logika mutasi stok.

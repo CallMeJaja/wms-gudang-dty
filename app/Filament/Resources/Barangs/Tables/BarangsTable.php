@@ -110,8 +110,8 @@ class BarangsTable
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make(),
-                    // Tombol edit/delete otomatis disembunyikan oleh Policy
-                    // (BarangPolicy::update / ::delete) — Admin saja (PRD §2).
+                    // Tombol edit/delete disembunyikan oleh BarangPolicy
+                    // (hanya Admin yang boleh mengubah atau menghapus).
                     EditAction::make(),
                     DeleteAction::make(),
                 ])

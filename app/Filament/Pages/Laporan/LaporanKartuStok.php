@@ -12,7 +12,7 @@ use Filament\Support\Icons\Heroicon;
 use UnitEnum;
 
 /**
- * Kartu stok (PRD §6.2) di panel Filament.
+ * Kartu stok di panel Filament.
  *
  * Perhitungan saldo awal & saldo berjalan tetap berasal dari LaporanService;
  * halaman ini hanya menyajikan filter dan tabel.

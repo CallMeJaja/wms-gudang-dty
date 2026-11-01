@@ -18,7 +18,7 @@ use Filament\Support\Enums\Alignment;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
- * Form Surat Jalan DTY (PRD §4.5).
+ * Form Surat Jalan DTY.
  *
  * Nomor Surat Jalan boleh diisi manual sesuai dokumen fisik; bila kosong,
  * PengeluaranService::issue() akan generate otomatis saat Terbitkan.

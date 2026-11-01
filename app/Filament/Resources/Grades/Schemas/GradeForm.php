@@ -17,7 +17,7 @@ use Illuminate\Validation\Rules\Unique;
 /**
  * Form master data Grade.
  *
- * Grade bersifat tertutup dan unik per kategori (A7). Grade C kategori DTY
+ * Grade bersifat tertutup dan unik per kategori. Grade C kategori DTY
  * dikunci: kode, kategori, dan status aktif tidak dapat diubah.
  */
 class GradeForm

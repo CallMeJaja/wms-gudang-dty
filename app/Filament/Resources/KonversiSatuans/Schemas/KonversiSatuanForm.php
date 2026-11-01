@@ -16,7 +16,7 @@ use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
- * Form master data Konversi Satuan (PRD §3.3, A1b).
+ * Form master data Konversi Satuan.
  *
  * POY tidak boleh memiliki konversi: saldo POY wajib berasal dari
  * timbangan Kg, bukan hasil kali bobbin/box.

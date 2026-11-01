@@ -14,10 +14,10 @@ use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
- * Form master data Barang (PRD §3.1, A11).
+ * Form master data Barang.
  *
- * Aturan bisnis yang dipertahankan dari BarangRequest:
- * `is_merge_minggu` hanya boleh aktif untuk kategori POY (A11).
+ * `is_merge_minggu` hanya boleh aktif untuk kategori POY: buffer Minggu
+ * menyisihkan POY, sedangkan DTY dan barang pendukung tidak memakainya.
  */
 class BarangForm
 {
@@ -116,7 +116,7 @@ class BarangForm
                                     ->helperText('Hanya untuk kategori POY. Buffer Minggu tidak berlaku untuk DTY/pendukung (A11).')
                                     ->disabled(fn (Get $get) => self::kodeKategori($get('kategori_id')) !== KategoriBarang::POY)
                                     ->dehydrated()
-                                    // A11: jangan pernah simpan true untuk non-POY.
+                                    // Jangan pernah simpan true untuk barang non-POY.
                                     ->afterStateUpdated(function (Toggle $component, Get $get, ?bool $state) {
                                         if ($state && self::kodeKategori($get('kategori_id')) !== KategoriBarang::POY) {
                                             $component->state(false);

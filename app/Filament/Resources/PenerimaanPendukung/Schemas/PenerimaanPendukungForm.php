@@ -25,7 +25,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Validation\ValidationException;
 
 /**
- * Form Penerimaan Item Pendukung / Gate Pass (PRD §4.2).
+ * Form Penerimaan Item Pendukung / Gate Pass.
  *
  * Item pendukung tidak memakai grade (grade netral STD diisi mapper) dan
  * berat KG dihitung server dari Qty x satuan kemasan.

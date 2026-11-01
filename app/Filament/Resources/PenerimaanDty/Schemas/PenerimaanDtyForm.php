@@ -27,7 +27,7 @@ use Filament\Support\Enums\Alignment;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
- * Form Penerimaan DTY hasil produksi (PRD §4.4).
+ * Form Penerimaan DTY hasil produksi.
  *
  * Box -> bobbin/netto/gross di-auto-fill dari config/wms.php, tetapi tetap
  * dapat dioverride manual. Gross disimpan sebagai penanda [GROSS=..] pada

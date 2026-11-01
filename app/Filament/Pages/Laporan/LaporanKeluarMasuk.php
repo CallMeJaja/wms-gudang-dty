@@ -11,7 +11,7 @@ use Filament\Support\Icons\Heroicon;
 use UnitEnum;
 
 /**
- * Laporan keluar-masuk (PRD §6.1) di panel Filament.
+ * Laporan keluar-masuk di panel Filament.
  *
  * Filter dibaca langsung dari query string agar URL dapat dibagikan dan
  * parameter yang sama dipakai oleh endpoint export.

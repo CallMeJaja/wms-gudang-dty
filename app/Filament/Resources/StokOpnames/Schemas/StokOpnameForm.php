@@ -14,7 +14,7 @@ use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 
 /**
- * Form opname stok (F6).
+ * Form opname stok.
  *
  * `nomor_opname` dan `selisih_qty` TIDAK ada di form karena dibuat oleh
  * service / generated column DB. Penyesuaian stok tetap sepenuhnya

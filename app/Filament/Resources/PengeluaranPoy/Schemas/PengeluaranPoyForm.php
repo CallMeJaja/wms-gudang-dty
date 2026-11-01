@@ -17,7 +17,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Enums\Alignment;
 
 /**
- * Form pengeluaran POY ke lantai produksi (PRD §4.3).
+ * Form pengeluaran POY ke lantai produksi.
  *
  * Detail tidak menampilkan satuan kemasan: pengeluaran hanya mencatat
  * Kemasan/Bobbin sebagai atribut fisik.

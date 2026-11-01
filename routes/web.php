@@ -2,6 +2,9 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Inbound\PenerimaanDtyController;
+use App\Http\Controllers\Inbound\PenerimaanPendukungController;
+use App\Http\Controllers\Inbound\PenerimaanPoyController;
 use App\Http\Controllers\Master\BarangController;
 use App\Http\Controllers\Master\GradeController;
 use App\Http\Controllers\Master\KategoriController;
@@ -30,6 +33,67 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Transaksi Masuk / Inbound (F2) — RBAC
+|--------------------------------------------------------------------------
+|
+| Sesuai PRD §2: Operator HARUS bisa input transaksi penerimaan, sehingga
+| route tulis memakai `role:admin,operator` (BUKAN `role:admin`).
+|
+| - `tolak.manajer` memblokir semua method tulis untuk Manajer (read-only):
+|   create POST/PUT/DELETE + aksi posting/issue. Halaman GET (index/show)
+|   tetap dibuka untuk semua role yang login.
+| - Otorisasi detail (DRAFT-only, jenis transaksi cocok) ada di
+|   PenerimaanPolicy lewat Gate::authorize di controller.
+|
+*/
+Route::middleware(['auth', 'tolak.manajer'])->prefix('transaksi/masuk')->name('inbound.')->group(function () {
+    // Operator & Admin boleh menulis transaksi penerimaan.
+    $tulis = ['role:admin,operator'];
+
+    // ----- Penerimaan POY dari IPCI (DRAFT -> POSTED) -----
+    Route::prefix('poy')->name('poy.')->group(function () use ($tulis) {
+        Route::get('/', [PenerimaanPoyController::class, 'index'])->name('index');
+        Route::get('create', [PenerimaanPoyController::class, 'create'])->middleware($tulis)->name('create');
+        Route::post('/', [PenerimaanPoyController::class, 'store'])->middleware($tulis)->name('store');
+        Route::get('{poy}', [PenerimaanPoyController::class, 'show'])->name('show');
+        Route::get('{poy}/edit', [PenerimaanPoyController::class, 'edit'])->middleware($tulis)->name('edit');
+        Route::put('{poy}', [PenerimaanPoyController::class, 'update'])->middleware($tulis)->name('update');
+        Route::delete('{poy}', [PenerimaanPoyController::class, 'destroy'])->middleware($tulis)->name('destroy');
+        Route::post('{poy}/posting', [PenerimaanPoyController::class, 'posting'])->middleware($tulis)->name('posting');
+    });
+
+    // ----- Penerimaan Item Pendukung / Gate Pass (DRAFT -> ISSUED) -----
+    Route::prefix('pendukung')->name('pendukung.')->group(function () use ($tulis) {
+        Route::get('/', [PenerimaanPendukungController::class, 'index'])->name('index');
+        Route::get('create', [PenerimaanPendukungController::class, 'create'])->middleware($tulis)->name('create');
+        Route::post('/', [PenerimaanPendukungController::class, 'store'])->middleware($tulis)->name('store');
+        Route::get('{pendukung}', [PenerimaanPendukungController::class, 'show'])->name('show');
+        Route::get('{pendukung}/edit', [PenerimaanPendukungController::class, 'edit'])->middleware($tulis)->name('edit');
+        Route::put('{pendukung}', [PenerimaanPendukungController::class, 'update'])->middleware($tulis)->name('update');
+        Route::delete('{pendukung}', [PenerimaanPendukungController::class, 'destroy'])->middleware($tulis)->name('destroy');
+        Route::post('{pendukung}/issue', [PenerimaanPendukungController::class, 'issue'])->middleware($tulis)->name('issue');
+    });
+
+    // ----- Penerimaan DTY dari Produksi (DRAFT -> POSTED) -----
+    Route::prefix('dty')->name('dty.')->group(function () use ($tulis) {
+        // Pratinjau harus dideklarasikan SEBELUM {dty} agar tidak tertangkap
+        // sebagai parameter route.
+        Route::get('pratinjau/autofill', [PenerimaanDtyController::class, 'pratinjau'])->name('pratinjau');
+        Route::get('pratinjau/stok', [PenerimaanDtyController::class, 'stokRingkas'])->name('stok');
+
+        Route::get('/', [PenerimaanDtyController::class, 'index'])->name('index');
+        Route::get('create', [PenerimaanDtyController::class, 'create'])->middleware($tulis)->name('create');
+        Route::post('/', [PenerimaanDtyController::class, 'store'])->middleware($tulis)->name('store');
+        Route::get('{dty}', [PenerimaanDtyController::class, 'show'])->name('show');
+        Route::get('{dty}/edit', [PenerimaanDtyController::class, 'edit'])->middleware($tulis)->name('edit');
+        Route::put('{dty}', [PenerimaanDtyController::class, 'update'])->middleware($tulis)->name('update');
+        Route::delete('{dty}', [PenerimaanDtyController::class, 'destroy'])->middleware($tulis)->name('destroy');
+        Route::post('{dty}/posting', [PenerimaanDtyController::class, 'posting'])->middleware($tulis)->name('posting');
+    });
 });
 
 /*

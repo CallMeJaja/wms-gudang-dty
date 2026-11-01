@@ -1,6 +1,9 @@
 import * as bootstrap from 'bootstrap';
 import Chart from 'chart.js/auto';
 
+// Modul Transaksi Masuk (F2): baris detail dinamis form penerimaan.
+import './inbound.js';
+
 /*
 |--------------------------------------------------------------------------
 | Bootstrap JS

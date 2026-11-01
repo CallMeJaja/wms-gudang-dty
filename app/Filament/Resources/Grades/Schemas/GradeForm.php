@@ -32,46 +32,49 @@ class GradeForm
                 Grid::make(3)
                     ->columnSpanFull()
                     ->schema([
-                        Section::make('Identitas Grade')
-                            ->description('Kode grade unik di dalam satu kategori.')
-                            ->icon(Heroicon::OutlinedTag)
+                        Grid::make(1)
                             ->columnSpan(2)
-                            ->columns(2)
                             ->schema([
-                                TextInput::make('kode')
-                                    ->label('Kode Grade')
-                                    ->required()
-                                    ->maxLength(10)
-                                    ->unique(
-                                        ignoreRecord: true,
-                                        modifyRuleUsing: fn (Unique $rule, Get $get) => $rule
-                                            ->where('kategori_id', $get('kategori_id')),
-                                    )
-                                    ->disabled($dilindungi)
-                                    ->helperText(fn (?Grade $record): string => $dilindungi($record)
-                                        ? 'Grade C kategori DTY adalah grade scrap dan tidak dapat diubah.'
-                                        : 'Contoh: A, B, C, AL.'),
+                                Section::make('Identitas Grade')
+                                    ->description('Kode grade unik di dalam satu kategori.')
+                                    ->icon(Heroicon::OutlinedTag)
+                                    ->columns(2)
+                                    ->schema([
+                                        TextInput::make('kode')
+                                            ->label('Kode Grade')
+                                            ->required()
+                                            ->maxLength(10)
+                                            ->unique(
+                                                ignoreRecord: true,
+                                                modifyRuleUsing: fn (Unique $rule, Get $get) => $rule
+                                                    ->where('kategori_id', $get('kategori_id')),
+                                            )
+                                            ->disabled($dilindungi)
+                                            ->helperText(fn (?Grade $record): string => $dilindungi($record)
+                                                ? 'Grade C kategori DTY adalah grade scrap dan tidak dapat diubah.'
+                                                : 'Contoh: A, B, C, AL.'),
 
-                                Select::make('kategori_id')
-                                    ->label('Kategori')
-                                    ->relationship(
-                                        name: 'kategori',
-                                        titleAttribute: 'nama',
-                                        modifyQueryUsing: fn (Builder $query) => $query->orderBy('kode'),
-                                    )
-                                    ->getOptionLabelFromRecordUsing(
-                                        fn ($record) => "{$record->kode} — {$record->nama}"
-                                    )
-                                    ->searchable()
-                                    ->preload()
-                                    ->required()
-                                    ->live()
-                                    ->disabled($dilindungi),
+                                        Select::make('kategori_id')
+                                            ->label('Kategori')
+                                            ->relationship(
+                                                name: 'kategori',
+                                                titleAttribute: 'nama',
+                                                modifyQueryUsing: fn (Builder $query) => $query->orderBy('kode'),
+                                            )
+                                            ->getOptionLabelFromRecordUsing(
+                                                fn ($record) => "{$record->kode} — {$record->nama}"
+                                            )
+                                            ->searchable()
+                                            ->preload()
+                                            ->required()
+                                            ->live()
+                                            ->disabled($dilindungi),
 
-                                TextInput::make('keterangan')
-                                    ->label('Keterangan')
-                                    ->maxLength(255)
-                                    ->columnSpanFull(),
+                                        TextInput::make('keterangan')
+                                            ->label('Keterangan')
+                                            ->maxLength(255)
+                                            ->columnSpanFull(),
+                                    ]),
                             ]),
 
                         Section::make('Status')

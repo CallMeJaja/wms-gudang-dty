@@ -3,16 +3,15 @@
 @section('title', 'Master Barang')
 
 @section('content')
-    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <p class="text-secondary small mb-0">Daftar barang POY, DTY, dan item pendukung.</p>
         <div>
-            <h1 class="h4 mb-0"><i class="bi bi-box-seam me-1"></i> Master Barang</h1>
-            <p class="text-body-secondary small mb-0">Daftar barang POY, DTY, dan item pendukung.</p>
+            @can('create', App\Models\Barang::class)
+                <a href="{{ route('master.barang.create') }}" class="btn btn-primary btn-sm">
+                    <i class="bi bi-plus-lg me-1"></i> Tambah Barang
+                </a>
+            @endcan
         </div>
-        @can('create', App\Models\Barang::class)
-            <a href="{{ route('master.barang.create') }}" class="btn btn-primary btn-sm">
-                <i class="bi bi-plus-lg me-1"></i> Tambah Barang
-            </a>
-        @endcan
     </div>
 
     <div class="card">
@@ -56,7 +55,7 @@
                                 <td>
                                     <span class="badge text-bg-secondary">{{ $item->kategori?->kode ?? '—' }}</span>
                                 </td>
-                                <td class="wms-num">{{ $item->denier_filament ?? '—' }}</td>
+                                <td>{{ $item->denier_filament ?? '—' }}</td>
                                 <td>{{ $item->satuanDasar?->kode ?? '—' }}</td>
                                 <td class="wms-num">{{ $item->stok_minimum !== null ? number_format((float) $item->stok_minimum, 2, ',', '.') : '—' }}</td>
                                 <td class="text-center">

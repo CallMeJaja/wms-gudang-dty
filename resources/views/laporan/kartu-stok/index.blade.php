@@ -4,10 +4,7 @@
 
 @section('content')
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
-        <div>
-            <h1 class="h4 mb-0"><i class="bi bi-journal-text me-1"></i> Kartu Stok</h1>
-            <p class="text-body-secondary small mb-0">Saldo awal + saldo berjalan per baris, beserta kolom pos.</p>
-        </div>
+        <p class="text-secondary small mb-0">Saldo awal + saldo berjalan per baris, beserta kolom pos.</p>
         @if ($barang_id !== null && $merge !== '')
             <div class="btn-group btn-group-sm">
                 <a href="{{ route('laporan.kartu-stok.excel', request()->query()) }}" class="btn btn-outline-success">
@@ -89,7 +86,7 @@
                         <tbody>
                             @forelse ($baris as $mutasi)
                                 <tr>
-                                    <td class="wms-num">{{ $mutasi->tanggal?->format('d-m-Y') }}</td>
+                                    <td>{{ $mutasi->tanggal?->format('d-m-Y') }}</td>
                                     <td class="font-monospace small">{{ $mutasi->ref_nomor }}</td>
                                     <td class="small">{{ $mutasi->jenis_transaksi->label() }}</td>
                                     <td><span class="badge text-bg-{{ $mutasi->pos->value === 'BUFFER' ? 'warning' : 'success' }}">{{ $mutasi->pos->value }}</span></td>

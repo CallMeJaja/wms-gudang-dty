@@ -9,10 +9,9 @@
                 <i class="bi bi-arrow-left"></i> Stock Opname
             </a>
         </div>
-        <h1 class="h4 mb-0">{{ $opname->nomor_opname }}</h1>
-        <p class="text-body-secondary small mb-0">
-            {{ $opname->barang->kode_barang }} · Merge {{ $opname->merge }} · Grade {{ $opname->grade->kode }}
-            · {{ $opname->tanggal->format('d/m/Y') }}
+        <p class="text-secondary small mb-0">
+            {{ $opname->nomor_opname }} · {{ $opname->barang->kode_barang }} · Merge {{ $opname->merge }} · Grade {{ $opname->grade->kode }}
+            · {{ $opname->tanggal->format('d-m-Y') }}
         </p>
     </div>
 
@@ -55,6 +54,6 @@
         <dt class="col-sm-4">Keterangan</dt>
         <dd class="col-sm-8">{{ $opname->keterangan ?? '—' }}</dd>
         <dt class="col-sm-4">Dicatat oleh</dt>
-        <dd class="col-sm-8">{{ $opname->pembuat->name ?? '—' }}</dd>
+        <dd class="col-sm-8">{{ $opname->pembuat?->name ?? '—' }}</dd>
     </dl>
 @endsection

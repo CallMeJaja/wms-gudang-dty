@@ -4,8 +4,7 @@
 
 @section('content')
     <div class="mb-3">
-        <h1 class="h4 mb-0"><i class="bi bi-plus-circle me-1"></i> Tambah Konversi Satuan</h1>
-        <p class="text-body-secondary small mb-0">Konversi untuk barang DTY / item pendukung.</p>
+        <p class="text-secondary small mb-0">Konversi untuk barang DTY / item pendukung.</p>
     </div>
 
     <div class="card">

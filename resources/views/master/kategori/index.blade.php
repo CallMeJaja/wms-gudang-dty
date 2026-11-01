@@ -3,16 +3,15 @@
 @section('title', 'Kategori Barang')
 
 @section('content')
-    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <p class="text-secondary small mb-0">Data referensi kritis — tidak dapat dihapus bila sudah dipakai.</p>
         <div>
-            <h1 class="h4 mb-0"><i class="bi bi-tags me-1"></i> Kategori Barang</h1>
-            <p class="text-body-secondary small mb-0">Data referensi kritis — tidak dapat dihapus bila sudah dipakai.</p>
+            @can('create', App\Models\KategoriBarang::class)
+                <a href="{{ route('master.kategori.create') }}" class="btn btn-primary btn-sm">
+                    <i class="bi bi-plus-lg me-1"></i> Tambah Kategori
+                </a>
+            @endcan
         </div>
-        @can('create', App\Models\KategoriBarang::class)
-            <a href="{{ route('master.kategori.create') }}" class="btn btn-primary btn-sm">
-                <i class="bi bi-plus-lg me-1"></i> Tambah Kategori
-            </a>
-        @endcan
     </div>
 
     @if ($errors->any())

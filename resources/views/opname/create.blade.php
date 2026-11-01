@@ -9,8 +9,7 @@
                 <i class="bi bi-arrow-left"></i> Stock Opname
             </a>
         </div>
-        <h1 class="h4 mb-0"><i class="bi bi-plus-circle me-1"></i> Opname Baru</h1>
-        <p class="text-body-secondary small mb-0">
+        <p class="text-secondary small mb-0">
             Selisih dihitung otomatis (fisik &minus; sistem); penyesuaian dibuat otomatis dan langsung POSTED.
         </p>
     </div>
@@ -19,7 +18,7 @@
         @csrf
 
         <div class="mb-3">
-            <label for="barang_id" class="form-label">Barang</label>
+            <label for="barang_id" class="form-label">Barang <span class="text-danger">*</span></label>
             <select name="barang_id" id="barang_id" class="form-select" required data-wms-barang>
                 <option value="">— Pilih barang —</option>
                 @foreach ($daftarBarang as $barang)
@@ -31,12 +30,12 @@
         </div>
 
         <div class="mb-3">
-            <label for="merge" class="form-label">Merge</label>
+            <label for="merge" class="form-label">Merge <span class="text-danger">*</span></label>
             <input type="text" name="merge" id="merge" value="{{ old('merge') }}" class="form-control" maxlength="50" required>
         </div>
 
         <div class="mb-3">
-            <label for="grade_id" class="form-label">Grade</label>
+            <label for="grade_id" class="form-label">Grade <span class="text-danger">*</span></label>
             <select name="grade_id" id="grade_id" class="form-select" required data-wms-grade>
                 <option value="">— Pilih grade —</option>
                 @foreach ($daftarGrade as $grade)
@@ -48,13 +47,13 @@
         </div>
 
         <div class="mb-3">
-            <label for="stok_fisik_qty" class="form-label">Stok Fisik (kg)</label>
+            <label for="stok_fisik_qty" class="form-label">Stok Fisik (kg) <span class="text-danger">*</span></label>
             <input type="number" name="stok_fisik_qty" id="stok_fisik_qty" value="{{ old('stok_fisik_qty') }}"
-                   class="form-control" step="0.01" min="0" required>
+                   class="form-control wms-num" step="0.01" min="0" required>
         </div>
 
         <div class="mb-3">
-            <label for="tanggal" class="form-label">Tanggal</label>
+            <label for="tanggal" class="form-label">Tanggal <span class="text-danger">*</span></label>
             <input type="date" name="tanggal" id="tanggal" value="{{ old('tanggal', now()->toDateString()) }}" class="form-control" required>
         </div>
 

@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="mb-3">
-        <h1 class="h4 mb-0"><i class="bi bi-plus-circle me-1"></i> Tambah Satuan</h1>
+        <p class="text-secondary small mb-0">Kode singkat unik, mis. BOX / BOBBIN / KG.</p>
     </div>
 
     <div class="card">

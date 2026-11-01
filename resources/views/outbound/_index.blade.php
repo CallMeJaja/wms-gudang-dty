@@ -6,15 +6,14 @@
 --}}
 
 <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+    <p class="text-secondary small mb-0">{{ $deskripsi }}</p>
     <div>
-        <h1 class="h4 mb-0"><i class="bi bi-box-arrow-up me-1"></i> {{ $judul }}</h1>
-        <p class="text-body-secondary small mb-0">{{ $deskripsi }}</p>
+        @can('create', [App\Models\TransaksiKeluar::class, $jenisKeluar])
+            <a href="{{ route("outbound.{$jenisForm}.create") }}" class="btn btn-primary btn-sm">
+                <i class="bi bi-plus-lg me-1"></i> Transaksi Baru
+            </a>
+        @endcan
     </div>
-    @can('create', [App\Models\TransaksiKeluar::class, $jenisKeluar])
-        <a href="{{ route("outbound.{$jenisForm}.create") }}" class="btn btn-primary btn-sm">
-            <i class="bi bi-plus-lg me-1"></i> Transaksi Baru
-        </a>
-    @endcan
 </div>
 
 <div class="card">
@@ -68,8 +67,16 @@
                     @forelse ($daftar as $item)
                         <tr>
                             <td class="font-monospace small">{{ $item->nomor_transaksi }}</td>
-                            <td class="font-monospace small">{{ $item->nomor_surat_jalan ?? ($item->operator_nama ?? '—') }}</td>
-                            <td class="wms-num">{{ $item->tanggal?->format('d-m-Y') }}</td>
+                            @if ($jenisForm === 'surat-jalan')
+                                @if ($item->nomor_surat_jalan)
+                                    <td class="font-monospace small">{{ $item->nomor_surat_jalan }}</td>
+                                @else
+                                    <td><span class="badge text-bg-secondary">Belum terbit</span></td>
+                                @endif
+                            @else
+                                <td>{{ $item->operator_nama ?? '—' }}</td>
+                            @endif
+                            <td>{{ $item->tanggal?->format('d-m-Y') }}</td>
                             <td class="wms-num">{{ number_format((float) ($item->total_netto ?? 0), 2, ',', '.') }}</td>
                             <td class="text-center">
                                 @include('outbound._badge-status', ['status' => $item->status])

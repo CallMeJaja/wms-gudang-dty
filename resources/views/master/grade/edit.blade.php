@@ -4,8 +4,7 @@
 
 @section('content')
     <div class="mb-3">
-        <h1 class="h4 mb-0"><i class="bi bi-pencil-square me-1"></i> Ubah Grade</h1>
-        <p class="text-body-secondary small mb-0">{{ $grade->kode }} — {{ $grade->kategori?->kode }}</p>
+        <p class="text-secondary small mb-0">{{ $grade->kode }} — {{ $grade->kategori?->kode }}</p>
     </div>
 
     <div class="card">

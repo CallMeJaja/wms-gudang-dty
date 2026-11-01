@@ -4,13 +4,12 @@
 
 @section('content')
     <div class="d-flex justify-content-between align-items-center mb-3">
+        <p class="text-secondary small mb-0">Pencatatan stok fisik &amp; penyesuaian otomatis (selisih = fisik &minus; sistem).</p>
         <div>
-            <h1 class="h4 mb-0"><i class="bi bi-clipboard-check me-1"></i> Stock Opname</h1>
-            <p class="text-body-secondary small mb-0">Pencatatan stok fisik &amp; penyesuaian otomatis (selisih = fisik &minus; sistem).</p>
+            <a href="{{ route('opname.create') }}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-1"></i> Opname Baru
+            </a>
         </div>
-        <a href="{{ route('opname.create') }}" class="btn btn-primary">
-            <i class="bi bi-plus-circle me-1"></i> Opname Baru
-        </a>
     </div>
 
     <form method="GET" action="{{ route('opname.index') }}" class="row g-2 mb-3">
@@ -51,8 +50,8 @@
             <tbody>
                 @forelse ($daftar as $row)
                     <tr>
-                        <td><a href="{{ route('opname.show', $row) }}">{{ $row->nomor_opname }}</a></td>
-                        <td>{{ $row->tanggal->format('d/m/Y') }}</td>
+                        <td class="font-monospace small"><a href="{{ route('opname.show', $row) }}">{{ $row->nomor_opname }}</a></td>
+                        <td>{{ $row->tanggal->format('d-m-Y') }}</td>
                         <td>{{ $row->barang->kode_barang }}</td>
                         <td>{{ $row->merge }}</td>
                         <td>{{ $row->grade->kode }}</td>

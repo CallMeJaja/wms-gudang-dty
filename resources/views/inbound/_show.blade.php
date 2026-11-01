@@ -13,7 +13,7 @@
                 <i class="bi bi-arrow-left"></i> {{ $judul }}
             </a>
         </div>
-        <h1 class="h4 mb-1 font-monospace">{{ $transaksi->nomor_transaksi }}</h1>
+        <div class="h4 mb-1 font-monospace">{{ $transaksi->nomor_transaksi }}</div>
         <div class="d-flex align-items-center gap-2">
             @include('inbound._badge-status', ['status' => $transaksi->status])
             <span class="text-body-secondary small">

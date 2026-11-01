@@ -6,15 +6,14 @@
 --}}
 
 <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+    <p class="text-secondary small mb-0">{{ $deskripsi }}</p>
     <div>
-        <h1 class="h4 mb-0"><i class="bi bi-box-arrow-in-down me-1"></i> {{ $judul }}</h1>
-        <p class="text-body-secondary small mb-0">{{ $deskripsi }}</p>
+        @can('create', [App\Models\TransaksiMasuk::class, $jenisMasuk])
+            <a href="{{ route("inbound.{$jenisForm}.create") }}" class="btn btn-primary btn-sm">
+                <i class="bi bi-plus-lg me-1"></i> Transaksi Baru
+            </a>
+        @endcan
     </div>
-    @can('create', [App\Models\TransaksiMasuk::class, $jenisMasuk])
-        <a href="{{ route("inbound.{$jenisForm}.create") }}" class="btn btn-primary btn-sm">
-            <i class="bi bi-plus-lg me-1"></i> Transaksi Baru
-        </a>
-    @endcan
 </div>
 
 <div class="card">
@@ -71,7 +70,7 @@
                         <tr>
                             <td class="font-monospace small">{{ $item->nomor_transaksi }}</td>
                             <td class="font-monospace small">{{ $item->nomor_gate_pass ?? ($item->merge_poy_asal ?? ($item->ref_dokumen ?? '—')) }}</td>
-                            <td class="wms-num">{{ $item->tanggal?->format('d-m-Y') }}</td>
+                            <td>{{ $item->tanggal?->format('d-m-Y') }}</td>
                             <td>{{ $item->partner?->nama ?? ($item->sumber_internal ?? '—') }}</td>
                             <td class="wms-num">{{ number_format((float) ($item->total_kg ?? 0), 2, ',', '.') }}</td>
                             <td class="text-center">

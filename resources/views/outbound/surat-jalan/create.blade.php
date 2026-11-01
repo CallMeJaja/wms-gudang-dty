@@ -9,8 +9,7 @@
                 <i class="bi bi-arrow-left"></i> Surat Jalan DTY
             </a>
         </div>
-        <h1 class="h4 mb-0"><i class="bi bi-plus-circle me-1"></i> Transaksi Baru — Surat Jalan DTY</h1>
-        <p class="text-body-secondary small mb-0">
+        <p class="text-secondary small mb-0">
             Disimpan sebagai <strong>DRAF</strong> terlebih dahulu; stok belum berkurang sampai diterbitkan.
         </p>
     </div>

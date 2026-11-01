@@ -4,10 +4,7 @@
 
 @section('content')
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
-        <div>
-            <h1 class="h4 mb-0"><i class="bi bi-arrow-left-right me-1"></i> Laporan Keluar-Masuk</h1>
-            <p class="text-body-secondary small mb-0">Sumber: mutasi stok (hanya transaksi yang sudah diposting/diterbitkan).</p>
-        </div>
+        <p class="text-secondary small mb-0">Sumber: mutasi stok (hanya transaksi yang sudah diposting/diterbitkan).</p>
         <div class="btn-group btn-group-sm">
             <a href="{{ route('laporan.keluar-masuk.excel', request()->query()) }}" class="btn btn-outline-success">
                 <i class="bi bi-file-earmark-excel me-1"></i> Excel
@@ -78,7 +75,7 @@
                     <tbody>
                         @forelse ($baris as $mutasi)
                             <tr>
-                                <td class="wms-num">{{ $mutasi->tanggal?->format('d-m-Y') }}</td>
+                                <td>{{ $mutasi->tanggal?->format('d-m-Y') }}</td>
                                 <td class="font-monospace small">{{ $mutasi->barang?->kode_barang }}</td>
                                 <td class="font-monospace small">{{ $mutasi->merge }}</td>
                                 <td class="text-center">{{ $mutasi->grade?->kode }}</td>

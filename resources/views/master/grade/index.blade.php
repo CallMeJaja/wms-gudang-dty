@@ -3,16 +3,15 @@
 @section('title', 'Master Grade')
 
 @section('content')
-    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <p class="text-secondary small mb-0">Grade POY &amp; DTY. Grade C DTY (scrap) wajib dipertahankan.</p>
         <div>
-            <h1 class="h4 mb-0"><i class="bi bi-award me-1"></i> Master Grade</h1>
-            <p class="text-body-secondary small mb-0">Grade POY &amp; DTY. Grade C DTY (scrap) wajib dipertahankan.</p>
+            @can('create', App\Models\Grade::class)
+                <a href="{{ route('master.grade.create') }}" class="btn btn-primary btn-sm">
+                    <i class="bi bi-plus-lg me-1"></i> Tambah Grade
+                </a>
+            @endcan
         </div>
-        @can('create', App\Models\Grade::class)
-            <a href="{{ route('master.grade.create') }}" class="btn btn-primary btn-sm">
-                <i class="bi bi-plus-lg me-1"></i> Tambah Grade
-            </a>
-        @endcan
     </div>
 
     @if ($errors->any())

@@ -4,8 +4,7 @@
 
 @section('content')
     <div class="mb-3">
-        <h1 class="h4 mb-0"><i class="bi bi-plus-circle me-1"></i> Tambah Grade</h1>
-        <p class="text-body-secondary small mb-0">Grade bersifat unik per kategori.</p>
+        <p class="text-secondary small mb-0">Grade bersifat unik per kategori.</p>
     </div>
 
     <div class="card">

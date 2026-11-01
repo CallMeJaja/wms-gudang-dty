@@ -4,10 +4,7 @@
 
 @section('content')
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
-        <div>
-            <h1 class="h4 mb-0"><i class="bi bi-pie-chart me-1"></i> Rekonsiliasi POY vs DTY</h1>
-            <p class="text-body-secondary small mb-0">Rendemen = (DTY masuk &divide; POY keluar) &times; 100.</p>
-        </div>
+        <p class="text-secondary small mb-0">Rendemen = (DTY masuk &divide; POY keluar) &times; 100.</p>
         <div class="btn-group btn-group-sm">
             <a href="{{ route('laporan.rendemen.excel', request()->query()) }}" class="btn btn-outline-success">
                 <i class="bi bi-file-earmark-excel me-1"></i> Excel

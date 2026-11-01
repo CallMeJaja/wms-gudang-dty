@@ -4,8 +4,7 @@
 
 @section('content')
     <div class="mb-3">
-        <h1 class="h4 mb-0"><i class="bi bi-pencil-square me-1"></i> Ubah Konversi Satuan</h1>
-        <p class="text-body-secondary small mb-0">
+        <p class="text-secondary small mb-0">
             {{ $konversi->barang?->kode_barang ?? 'Global' }} —
             {{ $konversi->dariSatuan?->kode }} → {{ $konversi->keSatuan?->kode }}
         </p>

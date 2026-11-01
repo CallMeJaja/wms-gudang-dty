@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="mb-3">
-        <h1 class="h4 mb-0"><i class="bi bi-plus-circle me-1"></i> Tambah Kategori Barang</h1>
+        <p class="text-secondary small mb-0">Kode unik, mis. POY / DTY / PENDUKUNG.</p>
     </div>
 
     <div class="card">

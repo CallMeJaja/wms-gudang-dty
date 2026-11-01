@@ -6,10 +6,10 @@ use App\Models\NomorDokumen;
 use Illuminate\Database\Seeder;
 
 /**
- * Baris nomor_dokumen untuk periode berjalan (PRD §9 DoD F0).
+ * Baris awal nomor_dokumen untuk periode berjalan.
  *
- * Wajib dibuat untuk SEMUA jenis dokumen, agar penomoran atomik
- * dengan lockForUpdate() punya baris yang bisa dikunci.
+ * Baris wajib ada untuk semua jenis dokumen agar penomoran atomik
+ * dengan lockForUpdate() selalu punya baris yang bisa dikunci.
  */
 class NomorDokumenSeeder extends Seeder
 {

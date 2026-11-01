@@ -25,7 +25,7 @@ return new class extends Migration
 
             $table->foreignId('created_by')->constrained('users')->restrictOnDelete();
 
-            // FK dipisah agar tidak ambigu (dulu satu kolom menunjuk 2 tabel).
+            // Dua FK terpisah agar asal penyesuaian tidak ambigu.
             $table->foreignId('transaksi_masuk_id')->nullable()->constrained('transaksi_masuk')->nullOnDelete();
             $table->foreignId('transaksi_keluar_id')->nullable()->constrained('transaksi_keluar')->nullOnDelete();
 

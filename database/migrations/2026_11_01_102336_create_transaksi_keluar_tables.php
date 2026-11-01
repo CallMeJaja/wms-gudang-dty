@@ -26,7 +26,7 @@ return new class extends Migration
 
             $table->foreignId('partner_id')->nullable()->constrained('supplier_customer')->nullOnDelete();
 
-            // Header dokumen Surat Jalan (PRD §4.5).
+            // Data header Surat Jalan yang tercetak pada dokumen pengiriman.
             $table->string('no_kendaraan', 30)->nullable();
             $table->string('nama_sopir', 100)->nullable();
             $table->string('pic_pengirim', 100)->nullable();
@@ -35,7 +35,7 @@ return new class extends Migration
             $table->tinyInteger('shift')->nullable();
             $table->string('operator_nama', 100)->nullable();
 
-            // WAJIB diisi untuk DTY_SCRAP_REJECT (PRD §7.3 no.12).
+            // Wajib diisi untuk DTY_SCRAP_REJECT agar alasan scrap tercatat.
             $table->text('catatan')->nullable();
 
             $table->enum('status', ['DRAFT', 'POSTED', 'ISSUED', 'VOID', 'CANCELLED'])
@@ -66,7 +66,7 @@ return new class extends Migration
 
             $table->decimal('berat_netto_kg', 14, 2);
 
-            // Gross hanya bermakna untuk DTY (PRD §3.3 konsekuensi #5).
+            // Berat gross hanya bermakna untuk DTY; barang lain cukup memakai netto.
             $table->decimal('berat_gross_kg', 14, 2)->nullable();
 
             $table->string('keterangan')->nullable();

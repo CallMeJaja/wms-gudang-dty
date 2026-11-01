@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignId('satuan_dasar_id')->constrained('satuan')->restrictOnDelete();
             $table->decimal('stok_minimum', 14, 2)->nullable();
 
-            // A11: hanya merge bertanda ini yang boleh dialokasikan ke buffer Minggu.
+            // Menandai barang yang merge-nya boleh dialokasikan ke buffer Minggu.
             $table->boolean('is_merge_minggu')->default(false)->index();
 
             $table->boolean('is_active')->default(true);

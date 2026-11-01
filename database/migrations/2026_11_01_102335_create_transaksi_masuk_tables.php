@@ -22,7 +22,7 @@ return new class extends Migration
             // Dokumen resmi Gate Pass (lifecycle DRAFT -> ISSUED -> CANCELLED).
             $table->string('nomor_gate_pass', 50)->nullable()->unique();
 
-            // Tanggal bisnis (bukan timestamp) — lihat A10.
+            // Tanggal bisnis tanpa jam; waktu input tetap tercatat di timestamps.
             $table->date('tanggal');
 
             $table->foreignId('partner_id')->nullable()->constrained('supplier_customer')->nullOnDelete();
@@ -50,7 +50,7 @@ return new class extends Migration
 
             $table->timestamps();
 
-            // Index laporan keluar-masuk (PRD §6.1).
+            // Mempercepat laporan keluar-masuk berdasarkan tanggal, jenis, dan status.
             $table->index(['tanggal', 'jenis_masuk', 'status'], 'trx_masuk_laporan_index');
             $table->index(['jenis_masuk', 'merge_poy_asal'], 'trx_masuk_merge_asal_index');
         });

@@ -8,13 +8,13 @@ use App\Models\Satuan;
 use Illuminate\Database\Seeder;
 
 /**
- * Konversi satuan default (PRD §3.3).
+ * Data awal konversi satuan untuk perhitungan stok.
  *
- * ATURAN PENTING:
- * - POY TIDAK memiliki konversi bobbin -> kg. Saldo POY wajib dari
- *   timbangan (A1b). Karena itu tidak ada baris konversi untuk POY.
- * - DTY boleh dikonversi: box -> bobbin -> kg untuk validasi silang.
- * - Pallet hanya untuk threshold visual, BUKAN konversi akuntansi (A2).
+ * Aturan:
+ * - POY tidak memiliki konversi bobbin ke kg karena saldo POY wajib
+ *   berasal dari timbangan. Karena itu tidak ada baris konversi untuk POY.
+ * - DTY boleh dikonversi dari box ke bobbin lalu ke kg untuk validasi silang.
+ * - Pallet hanya dipakai sebagai ambang visual, bukan konversi akuntansi.
  */
 class KonversiSatuanSeeder extends Seeder
 {

@@ -15,7 +15,8 @@ return new class extends Migration
             $table->foreignId('barang_id')->constrained('barang')->cascadeOnDelete();
             $table->string('merge', 50);
 
-            // FK nyata: relasi grade <-> kategori divalidasi di service (PRD §7.5).
+            // Kolom ini hanya mengikat grade secara umum. Kesesuaian grade
+            // dengan kategori barang divalidasi di service, bukan oleh FK.
             $table->foreignId('grade_id')->constrained('grade')->restrictOnDelete();
 
             // Satuan mengikuti barang.satuan_dasar_id:
@@ -28,7 +29,7 @@ return new class extends Migration
 
             $table->timestamps();
 
-            // A6: satu kombinasi barang + merge + grade = satu baris stok.
+            // Satu kombinasi barang, merge, dan grade hanya boleh punya satu baris stok.
             $table->unique(['barang_id', 'merge', 'grade_id'], 'stok_barang_unique');
         });
 

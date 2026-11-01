@@ -28,7 +28,8 @@ return new class extends Migration
                 ->constrained('transaksi_masuk')
                 ->nullOnDelete();
 
-            // true = pasokan < 7 pallet, buffer sengaja tidak disisihkan (A13).
+            // Bernilai true saat pasokan mingguan kurang dari 7 pallet,
+            // sehingga buffer sengaja tidak disisihkan.
             $table->boolean('dilewati')->default(false);
 
             $table->string('keterangan')->nullable();

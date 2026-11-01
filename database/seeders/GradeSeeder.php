@@ -7,11 +7,11 @@ use App\Models\KategoriBarang;
 use Illuminate\Database\Seeder;
 
 /**
- * Grade bersifat tertutup (A7) — nilainya berasal dari config/wms.php.
+ * Data awal grade yang bersumber dari config/wms.php.
  *
- * CATATAN PENTING: grade DTY 'C' sengaja tetap di-seed dan aktif.
- * Data logbook tidak memuatnya, tetapi PIC mengonfirmasi scrap grade C
- * pernah keluar dan dicatat (jawaban no. 5 / PRD §3.5).
+ * Grade DTY 'C' sengaja tetap di-seed dan aktif. Meskipun tidak muncul
+ * di data logbook, scrap grade C tetap keluar dan dicatat, sehingga
+ * grade tersebut harus tersedia.
  */
 class GradeSeeder extends Seeder
 {

@@ -16,7 +16,8 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->timestamps();
 
-            // A7: grade bersifat tertutup & unik per kategori.
+            // Grade bersifat tertutup: kode harus unik di dalam kategorinya,
+            // sehingga kategori berbeda tetap boleh memakai kode yang sama.
             $table->unique(['kode', 'kategori_id'], 'grade_kode_kategori_unique');
         });
     }

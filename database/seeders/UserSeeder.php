@@ -8,11 +8,11 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
 /**
- * Akun default sesuai PRD §9 DoD F0.
+ * Akun awal untuk administrator, operator, dan manajer.
  *
- * PENTING: A16 — operator lapangan memakai SATU AKUN BERSAMA per shift,
- * bukan akun per orang. Karena itu operator_nama di transaksi tetap
- * diisi manual, terpisah dari created_by.
+ * Operator lapangan memakai satu akun bersama per shift, bukan akun
+ * per orang. Karena itu operator_nama pada transaksi tetap diisi manual
+ * dan terpisah dari created_by.
  */
 class UserSeeder extends Seeder
 {

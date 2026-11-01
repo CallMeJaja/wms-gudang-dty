@@ -8,15 +8,14 @@ use App\Models\Satuan;
 use Illuminate\Database\Seeder;
 
 /**
- * Master barang sesuai PRD §3.1.
+ * Data awal master barang untuk kebutuhan operasional gudang.
  *
- * Catatan penting:
- * - POY & DTY memakai satuan dasar KG (single source of truth, A1).
- * - Item pendukung memakai PCS / ROLL / KG sesuai satuan dasarnya.
- * - is_merge_minggu hanya untuk POY yang dipakai produksi hari Minggu (A11).
- *   Barang master bersifat generik (per merge dibuat saat transaksi),
- *   sehingga nilai default seeder adalah false. Penandaan merge Minggu
- *   dilakukan lewat CRUD master data di F1.
+ * Catatan:
+ * - POY dan DTY memakai satuan dasar KG agar saldo mengikuti timbangan.
+ * - Item pendukung memakai PCS, ROLL, atau KG sesuai satuan dasarnya.
+ * - Barang master bersifat generik; merge baru dibuat saat transaksi.
+ *   Karena itu is_merge_minggu default-nya false dan penandaan merge
+ *   Minggu dilakukan lewat CRUD master data.
  */
 class BarangSeeder extends Seeder
 {

@@ -14,7 +14,7 @@
     $info = array_filter([
         'Tanggal' => $transaksi->tanggal?->format('d-m-Y'),
         'Jenis' => $transaksi->jenis_keluar?->label(),
-        'Partner' => $transaksi->partner?->nama,
+        'Mitra' => $transaksi->partner?->nama,
         'No. Surat Jalan' => $transaksi->nomor_surat_jalan,
         'No. Kendaraan' => $transaksi->no_kendaraan,
         'Sopir' => $transaksi->nama_sopir,

@@ -22,13 +22,13 @@ class PartnerForm
                         Grid::make(1)
                             ->columnSpan(2)
                             ->schema([
-                                Section::make('Identitas Partner')
-                                    ->description('Supplier, customer, atau partner internal yang dipakai pada transaksi.')
+                                Section::make('Identitas Mitra')
+                                    ->description('Pemasok, pelanggan, atau mitra internal yang dipakai pada transaksi.')
                                     ->icon(Heroicon::OutlinedIdentification)
                                     ->columns(2)
                                     ->schema([
                                         TextInput::make('kode')
-                                            ->label('Kode Partner')
+                                            ->label('Kode Mitra')
                                             ->required()
                                             ->maxLength(30)
                                             ->unique(ignoreRecord: true)
@@ -36,7 +36,7 @@ class PartnerForm
                                             ->helperText('Unik. Contoh: IPCI, CUST-001.'),
 
                                         TextInput::make('nama')
-                                            ->label('Nama Partner')
+                                            ->label('Nama Mitra')
                                             ->required()
                                             ->maxLength(150),
 
@@ -58,10 +58,12 @@ class PartnerForm
                             ->schema([
                                 Select::make('jenis')
                                     ->label('Jenis')
-                                    ->options(array_combine(SupplierCustomer::JENIS, SupplierCustomer::JENIS))
+                                    ->options(fn (): array => collect(SupplierCustomer::JENIS)
+                                        ->mapWithKeys(fn (string $jenis): array => [$jenis => SupplierCustomer::labelJenis($jenis)])
+                                        ->all())
                                     ->required()
                                     ->native(false)
-                                    ->helperText('Menentukan peran partner pada transaksi masuk dan keluar.'),
+                                    ->helperText('Menentukan peran mitra pada transaksi masuk dan keluar.'),
                             ]),
                     ]),
             ]);

@@ -37,7 +37,7 @@ class AdminPanelProvider extends PanelProvider
             ->darkMode(true)
             ->userMenu(position: UserMenuPosition::Sidebar)
             ->navigationGroups([
-                NavigationGroup::make('Data Master'),
+                NavigationGroup::make('Data Induk'),
                 NavigationGroup::make('Penerimaan'),
                 NavigationGroup::make('Pengeluaran'),
                 NavigationGroup::make('Persediaan'),

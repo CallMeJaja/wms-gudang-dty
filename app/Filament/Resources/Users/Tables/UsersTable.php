@@ -34,7 +34,7 @@ class UsersTable
                     ->copyable(),
 
                 TextColumn::make('role')
-                    ->label('Role')
+                    ->label('Peran')
                     ->badge()
                     ->formatStateUsing(fn ($state): string => self::roleValue($state)?->label() ?? '-')
                     ->color(fn ($state): string => match (self::roleValue($state)) {
@@ -59,7 +59,7 @@ class UsersTable
             ])
             ->filters([
                 SelectFilter::make('role')
-                    ->label('Role')
+                    ->label('Peran')
                     ->options(fn (): array => collect(Role::cases())
                         ->mapWithKeys(fn (Role $role): array => [$role->value => $role->label()])
                         ->all()),
@@ -75,7 +75,7 @@ class UsersTable
                 EditAction::make(),
             ])
             ->emptyStateHeading('Belum ada pengguna')
-            ->emptyStateDescription('Tambahkan pengguna untuk mengakses aplikasi lama dan panel ini.')
+            ->emptyStateDescription('Tambahkan pengguna untuk mengakses panel ini.')
             ->emptyStateIcon('heroicon-o-users');
     }
 

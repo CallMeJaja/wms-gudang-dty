@@ -16,6 +16,18 @@ class SupplierCustomer extends Model
 
     public const JENIS = ['SUPPLIER', 'CUSTOMER', 'BOTH', 'INTERNAL'];
 
+    public const JENIS_LABEL = [
+        'SUPPLIER' => 'Pemasok',
+        'CUSTOMER' => 'Pelanggan',
+        'BOTH' => 'Keduanya',
+        'INTERNAL' => 'Internal',
+    ];
+
+    public static function labelJenis(?string $jenis): string
+    {
+        return self::JENIS_LABEL[$jenis] ?? (string) $jenis;
+    }
+
     public function transaksiMasuk(): HasMany
     {
         return $this->hasMany(TransaksiMasuk::class, 'partner_id');

@@ -66,7 +66,7 @@ class PenerimaanPendukungForm
                                     ->displayFormat('d/m/Y'),
 
                                 Select::make('partner_id')
-                                    ->label('Supplier / Partner')
+                                    ->label('Pemasok / Mitra')
                                     ->relationship(
                                         name: 'partner',
                                         titleAttribute: 'nama',

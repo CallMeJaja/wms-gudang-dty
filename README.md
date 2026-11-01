@@ -22,12 +22,12 @@ ketersediaan stok dapat dipantau secara akurat dan mendukung kelancaran proses p
 
 - **Beranda** — ringkasan stok aktif, status buffer Minggu beserta aksi rilis buffer,
   grafik stok 30 hari, ringkasan per kategori, dan alert stok menipis.
-- **Master data** — Barang, Partner, Grade, Kategori Barang, Satuan, dan Konversi Satuan.
+- **Master data** — Barang, Mitra, Grade, Kategori Barang, Satuan, dan Konversi Satuan.
 - **Transaksi masuk** — Penerimaan POY, Gate Pass Pendukung, dan Penerimaan DTY.
 - **Transaksi keluar** — Pengeluaran POY, Surat Jalan DTY, dan Pengeluaran Scrap.
 - **Stok** — Stok Barang dan Stok Opname.
 - **Laporan** — Keluar-Masuk, Kartu Stok, dan Rendemen, dengan ekspor Excel/PDF serta cetak.
-- **Pengguna dan activity log** — manajemen akun dan jejak aktivitas pengguna.
+- **Pengguna dan riwayat aktivitas** — manajemen akun dan jejak aktivitas pengguna.
 - **Cetak dokumen** — Gate Pass dan Surat Jalan siap cetak.
 
 ### Alur Bisnis Inti

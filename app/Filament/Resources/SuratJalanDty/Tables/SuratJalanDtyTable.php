@@ -39,7 +39,7 @@ class SuratJalanDtyTable
                     ->sortable(),
 
                 TextColumn::make('partner.nama')
-                    ->label('Partner')
+                    ->label('Mitra')
                     ->placeholder('—'),
 
                 TextColumn::make('no_kendaraan')
@@ -90,7 +90,7 @@ class SuratJalanDtyTable
                     ->options(SuratJalanDtyResource::opsiStatus()),
 
                 SelectFilter::make('partner')
-                    ->label('Partner')
+                    ->label('Mitra')
                     ->relationship('partner', 'nama')
                     ->searchable()
                     ->preload(),

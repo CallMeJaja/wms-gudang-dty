@@ -48,7 +48,7 @@ final class DashboardData
     }
 
     /**
-     * @return array<int, array{kode: string, aktifKg: float, bufferKg: float, totalKg: float}>
+     * @return array<int, array{kode: string, label: string, aktifKg: float, bufferKg: float, totalKg: float}>
      */
     public static function ringkasanKategori(): array
     {
@@ -65,6 +65,7 @@ final class DashboardData
 
             $hasil[] = [
                 'kode' => $kode,
+                'label' => $kode === KategoriBarang::PENDUKUNG ? 'Pendukung' : $kode,
                 'aktifKg' => $aktif,
                 'bufferKg' => $buffer,
                 'totalKg' => $aktif + $buffer,

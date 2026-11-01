@@ -26,15 +26,15 @@ class PartnerResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUserGroup;
 
-    protected static ?string $navigationLabel = 'Partner';
+    protected static ?string $navigationLabel = 'Mitra';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Data Master';
+    protected static string|UnitEnum|null $navigationGroup = 'Data Induk';
 
     protected static ?int $navigationSort = 11;
 
-    protected static ?string $modelLabel = 'Partner';
+    protected static ?string $modelLabel = 'Mitra';
 
-    protected static ?string $pluralModelLabel = 'Partner';
+    protected static ?string $pluralModelLabel = 'Mitra';
 
     protected static ?string $recordTitleAttribute = 'nama';
 

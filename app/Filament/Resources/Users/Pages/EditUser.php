@@ -50,7 +50,7 @@ class EditUser extends EditRecord
         if ($actor !== null && $record->is($actor)) {
             if ($newRole !== Role::Admin) {
                 throw ValidationException::withMessages([
-                    'data.role' => 'Role akun sendiri tidak dapat diubah dari Admin.',
+                    'data.role' => 'Peran akun sendiri tidak dapat diubah dari Admin.',
                 ]);
             }
 

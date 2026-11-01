@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 /**
  * Log audit sistem — append-only / immutable.
@@ -20,6 +21,29 @@ class ActivityLog extends Model
      * Mematikan timestamps otomatis; created_at diisi manual.
      */
     public $timestamps = false;
+
+    public const EVENT_LABEL = [
+        'LOGIN' => 'Masuk',
+        'LOGOUT' => 'Keluar',
+        'CREATE' => 'Tambah',
+        'UPDATE' => 'Ubah',
+        'DELETE' => 'Hapus',
+        'VOID' => 'Void',
+        'RELEASE_BUFFER' => 'Rilis Buffer',
+    ];
+
+    public const MODUL_LABEL = [
+        'MASTER_PARTNER' => 'Mitra',
+        'MASTER_GRADE' => 'Grade',
+        'MASTER_KATEGORI' => 'Kategori',
+        'MASTER_SATUAN' => 'Satuan',
+        'MASTER_KONVERSI' => 'Konversi',
+        'MASTER_BARANG' => 'Barang',
+        'TRANSAKSI_MASUK' => 'Transaksi Masuk',
+        'TRANSAKSI_KELUAR' => 'Transaksi Keluar',
+        'STOK_OPNAME' => 'Stok Opname',
+        'AUTH' => 'Autentikasi',
+    ];
 
     protected $fillable = [
         'user_id',
@@ -43,6 +67,16 @@ class ActivityLog extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public static function labelEvent(?string $event): string
+    {
+        return self::EVENT_LABEL[$event] ?? Str::headline((string) $event);
+    }
+
+    public static function labelModul(?string $modul): string
+    {
+        return self::MODUL_LABEL[$modul] ?? Str::headline((string) $modul);
     }
 
     /*

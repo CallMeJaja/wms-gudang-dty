@@ -15,7 +15,7 @@
 
     $info = array_filter([
         'Tanggal' => $transaksi->tanggal?->format('d-m-Y'),
-        'Partner' => $transaksi->partner?->nama,
+        'Mitra' => $transaksi->partner?->nama,
         'Sumber internal' => $transaksi->sumber_internal,
         'Merge POY asal' => $transaksi->merge_poy_asal,
         'Ref. dokumen' => $transaksi->ref_dokumen,

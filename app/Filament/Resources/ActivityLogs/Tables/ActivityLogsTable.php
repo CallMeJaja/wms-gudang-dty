@@ -24,13 +24,14 @@ class ActivityLogsTable
                     ->sortable(),
 
                 TextColumn::make('user.name')
-                    ->label('User')
+                    ->label('Pengguna')
                     ->placeholder('Sistem')
                     ->toggleable(),
 
                 TextColumn::make('event')
-                    ->label('Event')
+                    ->label('Aktivitas')
                     ->badge()
+                    ->formatStateUsing(fn (?string $state): string => ActivityLog::labelEvent($state))
                     ->color(fn (string $state): string => match ($state) {
                         'LOGIN', 'RELEASE_BUFFER' => 'success',
                         'LOGOUT' => 'gray',
@@ -43,6 +44,7 @@ class ActivityLogsTable
                 TextColumn::make('modul')
                     ->label('Modul')
                     ->badge()
+                    ->formatStateUsing(fn (?string $state): string => ActivityLog::labelModul($state))
                     ->color('gray')
                     ->searchable(),
 
@@ -70,16 +72,10 @@ class ActivityLogsTable
             ])
             ->filters([
                 SelectFilter::make('event')
-                    ->label('Event')
-                    ->options([
-                        'LOGIN' => 'LOGIN',
-                        'LOGOUT' => 'LOGOUT',
-                        'CREATE' => 'CREATE',
-                        'UPDATE' => 'UPDATE',
-                        'DELETE' => 'DELETE',
-                        'VOID' => 'VOID',
-                        'RELEASE_BUFFER' => 'RELEASE_BUFFER',
-                    ]),
+                    ->label('Aktivitas')
+                    ->options(fn (): array => collect(ActivityLog::EVENT_LABEL)
+                        ->mapWithKeys(fn (string $label, string $event): array => [$event => $label])
+                        ->all()),
 
                 SelectFilter::make('modul')
                     ->label('Modul')
@@ -87,10 +83,11 @@ class ActivityLogsTable
                         ->distinct()
                         ->orderBy('modul')
                         ->pluck('modul', 'modul')
+                        ->map(fn (string $modul): string => ActivityLog::labelModul($modul))
                         ->all()),
 
                 SelectFilter::make('user')
-                    ->label('User')
+                    ->label('Pengguna')
                     ->relationship('user', 'name')
                     ->searchable()
                     ->preload(),
@@ -106,7 +103,7 @@ class ActivityLogsTable
                         ->when($data['sampai'] ?? null, fn (Builder $q, $d): Builder => $q->whereDate('created_at', '<=', $d))),
             ])
             ->recordActions([])
-            ->emptyStateHeading('Belum ada activity log')
+            ->emptyStateHeading('Belum ada riwayat aktivitas')
             ->emptyStateDescription('Aktivitas pengguna akan tercatat otomatis di sini.')
             ->emptyStateIcon('heroicon-o-clock');
     }

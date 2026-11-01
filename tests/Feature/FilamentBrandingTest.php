@@ -52,7 +52,7 @@ class FilamentBrandingTest extends TestCase
 
         $this->assertCount(6, $groups);
         $this->assertSame(
-            ['Data Master', 'Penerimaan', 'Pengeluaran', 'Persediaan', 'Laporan', 'Pengaturan'],
+            ['Data Induk', 'Penerimaan', 'Pengeluaran', 'Persediaan', 'Laporan', 'Pengaturan'],
             array_map(fn ($group): string|Htmlable => $group->getLabel(), $groups),
         );
         $this->assertSame(
@@ -72,7 +72,7 @@ class FilamentBrandingTest extends TestCase
         $this->assertSame('Konversi', KonversiSatuanResource::getNavigationLabel());
         $this->assertSame('Gate Pass', PenerimaanPendukungResource::getNavigationLabel());
         $this->assertSame('Scrap / Reject', PengeluaranScrapResource::getNavigationLabel());
-        $this->assertSame('Log Aktivitas', ActivityLogResource::getNavigationLabel());
+        $this->assertSame('Riwayat Aktivitas', ActivityLogResource::getNavigationLabel());
     }
 
     #[Test]
@@ -91,7 +91,7 @@ class FilamentBrandingTest extends TestCase
 
         $response->assertOk();
 
-        foreach (['Data Master', 'Penerimaan', 'Pengeluaran', 'Persediaan', 'Laporan', 'Pengaturan'] as $label) {
+        foreach (['Data Induk', 'Penerimaan', 'Pengeluaran', 'Persediaan', 'Laporan', 'Pengaturan'] as $label) {
             $response->assertSee($label);
         }
     }

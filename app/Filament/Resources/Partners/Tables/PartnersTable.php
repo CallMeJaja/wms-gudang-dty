@@ -40,6 +40,7 @@ class PartnersTable
                 TextColumn::make('jenis')
                     ->label('Jenis')
                     ->badge()
+                    ->formatStateUsing(fn (?string $state): string => SupplierCustomer::labelJenis($state))
                     ->color(fn (?string $state): string => match ($state) {
                         'SUPPLIER' => 'info',
                         'CUSTOMER' => 'success',
@@ -62,7 +63,9 @@ class PartnersTable
             ->filters([
                 SelectFilter::make('jenis')
                     ->label('Jenis')
-                    ->options(array_combine(SupplierCustomer::JENIS, SupplierCustomer::JENIS)),
+                    ->options(fn (): array => collect(SupplierCustomer::JENIS)
+                        ->mapWithKeys(fn (string $jenis): array => [$jenis => SupplierCustomer::labelJenis($jenis)])
+                        ->all()),
 
                 TrashedFilter::make()
                     ->label('Data terhapus'),
@@ -79,7 +82,7 @@ class PartnersTable
                                 'DELETE',
                                 'MASTER_PARTNER',
                                 (int) $record->id,
-                                "Hapus partner (soft delete): {$record->kode}",
+                                "Hapus mitra (soft delete): {$record->kode}",
                             );
                         }),
                 ])
@@ -93,7 +96,7 @@ class PartnersTable
                     ForceDeleteBulkAction::make(),
                 ])->visible(fn (): bool => Auth::user()?->canManage() ?? false),
             ])
-            ->emptyStateHeading('Belum ada partner')
+            ->emptyStateHeading('Belum ada mitra')
             ->emptyStateDescription('Tambahkan supplier atau customer untuk dipakai pada transaksi.')
             ->emptyStateIcon('heroicon-o-user-group');
     }

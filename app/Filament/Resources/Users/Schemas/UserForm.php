@@ -26,7 +26,7 @@ class UserForm
                             ->columnSpan(2)
                             ->schema([
                                 Section::make('Identitas Pengguna')
-                                    ->description('Akun untuk aplikasi lama dan panel administrasi gudang.')
+                                    ->description('Akun untuk mengakses panel administrasi gudang.')
                                     ->icon(Heroicon::OutlinedUserCircle)
                                     ->columns(2)
                                     ->schema([
@@ -40,7 +40,7 @@ class UserForm
                                             ->required()
                                             ->maxLength(50)
                                             ->unique(ignoreRecord: true)
-                                            ->helperText('Dipakai di aplikasi lama.'),
+                                            ->helperText('Dipakai sebagai identitas internal.'),
 
                                         TextInput::make('email')
                                             ->label('Email')
@@ -51,7 +51,7 @@ class UserForm
                                             ->helperText('Dipakai untuk login panel.'),
 
                                         Select::make('role')
-                                            ->label('Role')
+                                            ->label('Peran')
                                             ->required()
                                             ->options(fn (): array => collect(Role::cases())
                                                 ->mapWithKeys(fn (Role $role): array => [$role->value => $role->label()])

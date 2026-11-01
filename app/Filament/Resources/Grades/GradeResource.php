@@ -27,7 +27,7 @@ class GradeResource extends Resource
 
     protected static ?string $navigationLabel = 'Grade';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Data Master';
+    protected static string|UnitEnum|null $navigationGroup = 'Data Induk';
 
     protected static ?int $navigationSort = 12;
 

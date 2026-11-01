@@ -71,7 +71,7 @@ class PenerimaanPoyForm
                                     ->helperText('Akun dipakai bersama per shift (A16).'),
 
                                 Select::make('partner_id')
-                                    ->label('Supplier / Partner')
+                                    ->label('Pemasok / Mitra')
                                     ->relationship(
                                         name: 'partner',
                                         titleAttribute: 'nama',

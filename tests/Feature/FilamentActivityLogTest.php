@@ -84,7 +84,7 @@ class FilamentActivityLogTest extends TestCase
 
         Livewire::test(ListActivityLogs::class)
             ->assertCanSeeTableRecords([$login, $create, $update])
-            ->assertSee('MASTER_BARANG')
+            ->assertSee('Barang')
             ->assertSee('Buat barang uji')
             ->assertSee($this->operator->name);
     }

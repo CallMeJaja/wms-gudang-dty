@@ -20,7 +20,7 @@ class RingkasanKategoriWidget extends StatsOverviewWidget
     {
         return array_map(function (array $baris): Stat {
             return Stat::make(
-                $baris['kode'],
+                $baris['label'],
                 number_format($baris['totalKg'], 2, ',', '.').' kg'
             )
                 ->description(sprintf(

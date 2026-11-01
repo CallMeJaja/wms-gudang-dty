@@ -157,7 +157,7 @@ class FilamentUserTest extends TestCase
         Livewire::test(EditUser::class, ['record' => $this->admin->getKey()])
             ->fillForm(['role' => Role::Operator->value])
             ->call('save')
-            ->assertHasFormErrors(['role' => 'Role akun sendiri tidak dapat diubah dari Admin.']);
+            ->assertHasFormErrors(['role' => 'Peran akun sendiri tidak dapat diubah dari Admin.']);
 
         $this->assertSame(Role::Admin, $this->admin->fresh()->role);
 

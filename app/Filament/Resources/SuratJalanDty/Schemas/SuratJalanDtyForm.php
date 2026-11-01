@@ -63,7 +63,7 @@ class SuratJalanDtyForm
                                     ->displayFormat('d/m/Y'),
 
                                 Select::make('partner_id')
-                                    ->label('Partner / Pelanggan')
+                                    ->label('Mitra / Pelanggan')
                                     ->relationship(
                                         name: 'partner',
                                         titleAttribute: 'nama',

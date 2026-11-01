@@ -23,7 +23,7 @@ class EditPartner extends EditRecord
                         'DELETE',
                         'MASTER_PARTNER',
                         (int) $record->id,
-                        "Hapus partner (soft delete): {$record->kode}",
+                        "Hapus mitra (soft delete): {$record->kode}",
                     );
                 }),
             ForceDeleteAction::make(),
@@ -40,7 +40,7 @@ class EditPartner extends EditRecord
             'UPDATE',
             'MASTER_PARTNER',
             (int) $partner->id,
-            "Ubah partner: {$partner->kode} — {$partner->nama} ({$partner->jenis})",
+            "Ubah mitra: {$partner->kode} — {$partner->nama} ({$partner->jenis})",
         );
     }
 }

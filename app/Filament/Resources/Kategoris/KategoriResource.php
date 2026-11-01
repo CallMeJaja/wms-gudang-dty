@@ -25,7 +25,7 @@ class KategoriResource extends Resource
 
     protected static ?string $navigationLabel = 'Kategori';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Data Master';
+    protected static string|UnitEnum|null $navigationGroup = 'Data Induk';
 
     protected static ?int $navigationSort = 13;
 

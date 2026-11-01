@@ -8,6 +8,9 @@ use App\Models\ActivityLog;
 use App\Models\MutasiStok;
 use App\Models\StokBarang;
 use App\Models\User;
+use App\Services\AlokasiBufferService;
+use App\Services\RilisBufferService;
+use App\Services\StatusBufferMinggu;
 use App\Services\StokService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -16,7 +19,11 @@ use Tests\Concerns\MembuatDataUji;
 use Tests\TestCase;
 
 /**
- * Uji dashboard & rilis buffer Minggu (F4, PRD §5.2.3–§5.2.4).
+ * Uji service buffer Minggu (F4, PRD §5.2.3–§5.2.4).
+ *
+ * UI dashboard sudah dipindahkan ke Filament dan diuji oleh
+ * FilamentDashboardWidgetsTest; file ini mempertahankan cakupan service
+ * (status buffer, rilis service, perintah terjadwal).
  *
  * DB: SQLite :memory: (phpunit.xml) — MySQL dev TIDAK tersentuh.
  */
@@ -29,10 +36,6 @@ class DashboardTest extends TestCase
 
     private User $admin;
 
-    private User $operator;
-
-    private User $manajer;
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -40,8 +43,6 @@ class DashboardTest extends TestCase
         $this->siapkanMasterDasar();
         $this->stok = $this->app->make(StokService::class);
         $this->admin = User::factory()->admin()->create();
-        $this->operator = User::factory()->operator()->create();
-        $this->manajer = User::factory()->manajer()->create();
     }
 
     protected function tearDown(): void
@@ -74,54 +75,30 @@ class DashboardTest extends TestCase
     }
 
     #[Test]
-    public function tamu_dialihkan_ke_login(): void
+    public function status_buffer_siap_saat_mencapai_target(): void
     {
-        $this->get(route('dashboard'))->assertRedirect(route('login'));
-    }
-
-    #[Test]
-    public function ketiga_role_bisa_buka_dashboard(): void
-    {
-        $this->kunciHariKerja();
-
-        foreach ([$this->admin, $this->operator, $this->manajer] as $user) {
-            $this->actingAs($user)->get(route('dashboard'))->assertOk();
-        }
-    }
-
-    #[Test]
-    public function widget_menampilkan_angka_buffer_sesuai_data(): void
-    {
-        $this->kunciHariKerja();
-        $this->isiBuffer($this->kgPerPallet());
-
-        $this->actingAs($this->admin)->get(route('dashboard'))
-            ->assertOk()
-            ->assertSee('1,00 / 6 pallet', false)
-            ->assertSee('Buffer Minggu', false);
-    }
-
-    #[Test]
-    public function status_siap_saat_mencapai_target(): void
-    {
-        $this->kunciHariKerja();
+        $this->kunciTanggal('2026-10-13');
         $this->isiBuffer($this->targetBufferKg());
 
-        $this->actingAs($this->admin)->get(route('dashboard'))
-            ->assertOk()
-            ->assertSee('Siap', false);
+        $status = $this->app->make(AlokasiBufferService::class)->statusBuffer();
+
+        $this->assertSame(StatusBufferMinggu::SIAP, $status->level);
+        $this->assertSame('Siap', $status->label);
+        $this->assertSame($this->targetBufferKg(), $status->bufferKg);
     }
 
     #[Test]
-    public function status_belum_siap_saat_kurang(): void
+    public function status_buffer_belum_siap_saat_kurang(): void
     {
-        $this->kunciHariKerja(); // Selasa: sisa 5 hari kerja
+        $this->kunciTanggal('2026-10-13'); // Selasa: sisa 5 hari kerja
         $this->isiBuffer($this->kgPerPallet());
 
-        $this->actingAs($this->admin)->get(route('dashboard'))
-            ->assertOk()
-            ->assertSee('Belum Siap', false)
-            ->assertSee('Sisa 5 hari kerja', false);
+        $status = $this->app->make(AlokasiBufferService::class)->statusBuffer();
+
+        $this->assertSame(StatusBufferMinggu::BELUM_SIAP, $status->level);
+        $this->assertSame('Belum Siap', $status->label);
+        $this->assertSame(5, $status->sisaHariKerja);
+        $this->assertSame(1.0, $status->bufferPallet);
     }
 
     #[Test]
@@ -132,9 +109,10 @@ class DashboardTest extends TestCase
         $aktif = 1000.0;
         $this->isiBuffer($buffer, $aktif);
 
-        $this->actingAs($this->admin)->post(route('dashboard.rilis-buffer'))
-            ->assertRedirect()
-            ->assertSessionHas('sukses');
+        $hasil = $this->app->make(RilisBufferService::class)->rilis(now(), $this->admin->id);
+
+        $this->assertSame($buffer, $hasil['dirilis_kg']);
+        $this->assertSame(1, $hasil['baris']);
 
         $stok = StokBarang::query()->sole();
         $this->assertSame(0.0, (float) $stok->stok_buffer);
@@ -149,13 +127,15 @@ class DashboardTest extends TestCase
         $this->kunciTanggal('2026-10-18'); // Minggu
         $this->isiBuffer($this->kgPerPallet(), 500.0);
 
-        $this->actingAs($this->admin)->post(route('dashboard.rilis-buffer'))->assertRedirect();
+        $service = $this->app->make(RilisBufferService::class);
+        $service->rilis(now(), $this->admin->id);
 
         $sesudahPertama = StokBarang::query()->sole()->replicate();
 
-        $this->actingAs($this->admin)->post(route('dashboard.rilis-buffer'))
-            ->assertRedirect()
-            ->assertSessionHas('sukses');
+        $kedua = $service->rilis(now(), $this->admin->id);
+
+        $this->assertSame(0.0, $kedua['dirilis_kg']);
+        $this->assertSame(0, $kedua['baris']);
 
         $stok = StokBarang::query()->sole();
         $this->assertSame(0.0, (float) $stok->stok_buffer);
@@ -163,40 +143,12 @@ class DashboardTest extends TestCase
     }
 
     #[Test]
-    public function rilis_hari_kerja_ditolak(): void
+    public function rilis_otomatis_hanya_boleh_hari_minggu(): void
     {
-        $this->kunciTanggal('2026-10-19'); // Senin
-        $this->isiBuffer($this->kgPerPallet(), 500.0);
+        $service = $this->app->make(RilisBufferService::class);
 
-        $this->actingAs($this->admin)->post(route('dashboard.rilis-buffer'))
-            ->assertRedirect()
-            ->assertSessionHas('error');
-
-        $stok = StokBarang::query()->sole();
-        $this->assertSame($this->kgPerPallet(), (float) $stok->stok_buffer);
-        $this->assertSame(0, MutasiStok::query()->where('jenis_transaksi', JenisMutasi::RilisBuffer)->count());
-    }
-
-    #[Test]
-    public function operator_boleh_rilis(): void
-    {
-        $this->kunciTanggal('2026-10-18'); // Minggu
-        $this->isiBuffer($this->kgPerPallet());
-
-        $this->actingAs($this->operator)->post(route('dashboard.rilis-buffer'))
-            ->assertRedirect()
-            ->assertSessionHas('sukses');
-
-        $this->assertSame(0.0, (float) StokBarang::query()->sole()->stok_buffer);
-    }
-
-    #[Test]
-    public function manajer_ditolak_403(): void
-    {
-        $this->kunciTanggal('2026-10-18'); // Minggu
-        $this->isiBuffer($this->kgPerPallet());
-
-        $this->actingAs($this->manajer)->post(route('dashboard.rilis-buffer'))->assertForbidden();
+        $this->assertTrue($service->bolehRilisOtomatis($this->kunciTanggal('2026-10-18'))); // Minggu
+        $this->assertFalse($service->bolehRilisOtomatis($this->kunciTanggal('2026-10-19'))); // Senin
     }
 
     #[Test]

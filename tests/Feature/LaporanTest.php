@@ -7,24 +7,27 @@ use App\Enums\JenisMasuk;
 use App\Enums\StatusDokumen;
 use App\Models\Barang;
 use App\Models\MutasiStok;
-use App\Models\Satuan;
 use App\Models\SupplierCustomer;
 use App\Models\TransaksiKeluar;
 use App\Models\TransaksiKeluarDetail;
 use App\Models\TransaksiMasuk;
 use App\Models\TransaksiMasukDetail;
 use App\Models\User;
+use App\Services\LaporanService;
 use App\Services\PenerimaanService;
 use App\Services\PengeluaranService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Tests\Concerns\MembuatDataUji;
 use Tests\TestCase;
 
 /**
- * Uji laporan & cetak F5 (PRD §6).
+ * Uji matematika laporan F5 (PRD §6).
+ *
+ * Route index legacy sudah dihapus; cakupan bisnis dipindahkan ke
+ * LaporanService. UI Filament diuji oleh FilamentLaporanTest dan endpoint
+ * export oleh LaporanExportTest.
  *
  * DB: SQLite :memory: (phpunit.xml) — MySQL dev TIDAK tersentuh.
  */
@@ -33,19 +36,15 @@ class LaporanTest extends TestCase
     use MembuatDataUji;
     use RefreshDatabase;
 
-    private User $admin;
-
     private User $operator;
-
-    private User $manajer;
 
     private Barang $poy;
 
     private Barang $dty;
 
-    private Barang $pendukung;
-
     private SupplierCustomer $ipci;
+
+    private LaporanService $laporan;
 
     protected function setUp(): void
     {
@@ -54,26 +53,15 @@ class LaporanTest extends TestCase
         $this->siapkanMasterDasar();
         $this->kunciHariKerja();
 
-        $this->admin = User::factory()->admin()->create();
         $this->operator = User::factory()->operator()->create();
-        $this->manajer = User::factory()->manajer()->create();
 
         $this->poy = $this->barangPoy(true);
         $this->dty = $this->barangDty();
 
-        $pcs = Satuan::create(['kode' => Satuan::PCS, 'nama' => 'Pieces']);
-
-        $this->pendukung = Barang::create([
-            'kategori_id' => $this->kategoriPendukung->id,
-            'kode_barang' => 'PPR TUB DTY',
-            'nama_barang' => 'Paper Tube DTY Bullnose',
-            'satuan_dasar_id' => $pcs->id,
-            'is_merge_minggu' => false,
-            'is_active' => true,
-        ]);
-
         $this->ipci = SupplierCustomer::create(['kode' => 'IPCI', 'nama' => 'IPCI', 'jenis' => 'BOTH']);
         SupplierCustomer::create(['kode' => 'STORE-IPCI', 'nama' => 'Store IPCI', 'jenis' => 'SUPPLIER']);
+
+        $this->laporan = $this->app->make(LaporanService::class);
     }
 
     protected function tearDown(): void
@@ -84,31 +72,18 @@ class LaporanTest extends TestCase
     }
 
     #[Test]
-    public function tamu_diarahkan_ke_login_untuk_semua_halaman_laporan(): void
-    {
-        $this->get(route('laporan.keluar-masuk.index'))->assertRedirect(route('login'));
-        $this->get(route('laporan.kartu-stok.index'))->assertRedirect(route('login'));
-        $this->get(route('laporan.rendemen.index'))->assertRedirect(route('login'));
-    }
-
-    #[Test]
-    public function manajer_bisa_membuka_ketiga_laporan(): void
-    {
-        $this->actingAs($this->manajer)->get(route('laporan.keluar-masuk.index'))->assertOk();
-        $this->actingAs($this->manajer)->get(route('laporan.kartu-stok.index'))->assertOk();
-        $this->actingAs($this->manajer)->get(route('laporan.rendemen.index'))->assertOk();
-    }
-
-    #[Test]
-    public function keluar_masuk_menampilkan_mutasi_yang_diposting(): void
+    public function keluar_masuk_hanya_menampilkan_mutasi_yang_diposting(): void
     {
         $transaksi = $this->buatMasukPoy('M-POY-1', 1000, '2026-10-13');
 
-        $this->actingAs($this->operator)
-            ->get(route('laporan.keluar-masuk.index', ['dari' => '2026-10-01', 'sampai' => '2026-10-31']))
-            ->assertOk()
-            ->assertSee($transaksi->nomor_transaksi)
-            ->assertSee('M-POY-1');
+        $baris = $this->laporan->barisKeluarMasuk([
+            'dari' => '2026-10-01',
+            'sampai' => '2026-10-31',
+        ]);
+
+        $this->assertCount(1, $baris);
+        $this->assertSame($transaksi->nomor_transaksi, $baris->first()->ref_nomor);
+        $this->assertSame('M-POY-1', $baris->first()->merge);
     }
 
     #[Test]
@@ -119,10 +94,12 @@ class LaporanTest extends TestCase
         $this->assertSame(StatusDokumen::Draft, $draf->status);
         $this->assertSame(0, MutasiStok::query()->count());
 
-        $this->actingAs($this->operator)
-            ->get(route('laporan.keluar-masuk.index', ['dari' => '2026-10-01', 'sampai' => '2026-10-31']))
-            ->assertOk()
-            ->assertDontSee($draf->nomor_transaksi);
+        $baris = $this->laporan->barisKeluarMasuk([
+            'dari' => '2026-10-01',
+            'sampai' => '2026-10-31',
+        ]);
+
+        $this->assertCount(0, $baris);
     }
 
     #[Test]
@@ -130,13 +107,12 @@ class LaporanTest extends TestCase
     {
         $this->buatMasukPoy('M-KS-1', 800, '2026-09-20');
 
-        $this->actingAs($this->operator)
-            ->get(route('laporan.kartu-stok.index', [
-                'barang_id' => $this->poy->id, 'merge' => 'M-KS-1',
-                'dari' => '2026-10-01', 'sampai' => '2026-10-31',
-            ]))
-            ->assertOk()
-            ->assertSee('800,00');
+        $hasil = $this->laporan->kartuStok(
+            $this->poy->id, 'M-KS-1', null, null, '2026-10-01', '2026-10-31',
+        );
+
+        $this->assertSame(800.0, $hasil['saldoAwal']);
+        $this->assertCount(0, $hasil['baris']);
     }
 
     #[Test]
@@ -147,14 +123,13 @@ class LaporanTest extends TestCase
         $keluar = $this->buatDrafKeluarPoy('M-KS-2', 400, '2026-10-10');
         $this->app->make(PengeluaranService::class)->posting($keluar, $this->operator->id);
 
-        $this->actingAs($this->operator)
-            ->get(route('laporan.kartu-stok.index', [
-                'barang_id' => $this->poy->id, 'merge' => 'M-KS-2',
-                'dari' => '2026-10-01', 'sampai' => '2026-10-31',
-            ]))
-            ->assertOk()
-            ->assertSee('1.000,00')
-            ->assertSee('600,00');
+        $hasil = $this->laporan->kartuStok(
+            $this->poy->id, 'M-KS-2', null, null, '2026-10-01', '2026-10-31',
+        );
+
+        $this->assertCount(2, $hasil['baris']);
+        $this->assertSame(1000.0, (float) $hasil['baris']->first()->saldo_berjalan);
+        $this->assertSame(600.0, (float) $hasil['baris']->last()->saldo_berjalan);
     }
 
     #[Test]
@@ -165,29 +140,22 @@ class LaporanTest extends TestCase
         $this->app->make(PengeluaranService::class)->posting($keluar, $this->operator->id);
         $this->buatMasukDty('4P1065', 950, '2026-10-13');
 
-        $this->actingAs($this->operator)
-            ->get(route('laporan.rendemen.index', ['dari' => '2026-10-01', 'sampai' => '2026-10-31']))
-            ->assertOk()
-            ->assertSee('95,00%')
-            ->assertSee('5,00%');
+        $hasil = $this->laporan->rendemen('2026-10-01', '2026-10-31');
+
+        $this->assertSame(1000.0, $hasil['totalPoy']);
+        $this->assertSame(950.0, $hasil['totalDty']);
+        $this->assertSame(95.0, $hasil['rendemen']);
+        $this->assertSame(5.0, $hasil['waste']);
     }
 
     #[Test]
-    public function rendemen_menampilkan_disclaimer_otomatis(): void
+    public function rendemen_poy_nol_tanpa_error(): void
     {
-        $this->actingAs($this->operator)
-            ->get(route('laporan.rendemen.index'))
-            ->assertOk()
-            ->assertSee((string) config('wms.rendemen.disclaimer'));
-    }
+        $hasil = $this->laporan->rendemen('2026-10-01', '2026-10-31');
 
-    #[Test]
-    public function rendemen_poy_nol_tampil_strip_tanpa_error(): void
-    {
-        $this->actingAs($this->operator)
-            ->get(route('laporan.rendemen.index', ['dari' => '2026-10-01', 'sampai' => '2026-10-31']))
-            ->assertOk()
-            ->assertSee('-');
+        $this->assertSame(0.0, $hasil['totalPoy']);
+        $this->assertNull($hasil['rendemen']);
+        $this->assertNull($hasil['waste']);
     }
 
     #[Test]
@@ -202,57 +170,15 @@ class LaporanTest extends TestCase
         $this->buatMasukDty('MERGE-A', 900, '2026-10-13');
         $this->buatMasukDty('MERGE-B', 400, '2026-10-13');
 
-        $this->actingAs($this->operator)
-            ->get(route('laporan.rendemen.index', ['dari' => '2026-10-01', 'sampai' => '2026-10-31']))
-            ->assertOk()
-            ->assertSee('MERGE-A')
-            ->assertSee('MERGE-B')
-            ->assertSee('90,00%')
-            ->assertSee('80,00%');
-    }
+        $hasil = $this->laporan->rendemen('2026-10-01', '2026-10-31');
 
-    #[Test]
-    public function export_excel_keluar_masuk_mengembalikan_xlsx(): void
-    {
-        $this->buatMasukPoy('M-XL-1', 100, '2026-10-13');
+        $mergeA = $hasil['perMerge']->firstWhere('merge', 'MERGE-A');
+        $mergeB = $hasil['perMerge']->firstWhere('merge', 'MERGE-B');
 
-        $respon = $this->actingAs($this->operator)
-            ->get(route('laporan.keluar-masuk.excel', ['dari' => '2026-10-01', 'sampai' => '2026-10-31']));
-
-        $respon->assertOk();
-        $this->assertStringContainsString(
-            'spreadsheetml', (string) $respon->headers->get('Content-Type'),
-            'Export Excel harus berformat xlsx.'
-        );
-        $dasar = $respon->baseResponse;
-        $this->assertInstanceOf(BinaryFileResponse::class, $dasar);
-        $this->assertGreaterThan(0, $dasar->getFile()->getSize());
-    }
-
-    #[Test]
-    public function export_pdf_rendemen_mengembalikan_pdf(): void
-    {
-        $respon = $this->actingAs($this->operator)
-            ->get(route('laporan.rendemen.pdf', ['dari' => '2026-10-01', 'sampai' => '2026-10-31']));
-
-        $respon->assertOk();
-        $this->assertStringContainsString(
-            'pdf', strtolower((string) $respon->headers->get('Content-Type')),
-            'Export PDF harus berformat pdf.'
-        );
-        $this->assertGreaterThan(0, strlen((string) $respon->getContent()));
-    }
-
-    #[Test]
-    public function cetak_gate_pass_memuat_nomor_dokumen(): void
-    {
-        $transaksi = $this->buatMasukPendukung();
-
-        $this->actingAs($this->operator)
-            ->get(route('inbound.pendukung.cetak', $transaksi))
-            ->assertOk()
-            ->assertSee($transaksi->nomor_transaksi)
-            ->assertSee('GATE PASS');
+        $this->assertNotNull($mergeA);
+        $this->assertNotNull($mergeB);
+        $this->assertSame(90.0, $mergeA['rendemen']);
+        $this->assertSame(80.0, $mergeB['rendemen']);
     }
 
     /*
@@ -330,35 +256,6 @@ class LaporanTest extends TestCase
             'grade_id' => $this->gradeDtyA->id,
             'jumlah_kemasan' => 2,
             'berat_kg' => $berat,
-        ]);
-
-        $this->app->make(PenerimaanService::class)->posting($transaksi, $this->operator->id);
-
-        return $transaksi->fresh();
-    }
-
-    private function buatMasukPendukung(): TransaksiMasuk
-    {
-        $pcs = Satuan::query()->where('kode', Satuan::PCS)->value('id');
-
-        $transaksi = TransaksiMasuk::create([
-            'nomor_transaksi' => 'IN-GP-'.uniqid(),
-            'jenis_masuk' => JenisMasuk::PendukungGatepass,
-            'nomor_gate_pass' => 'GP-'.uniqid(),
-            'tanggal' => '2026-10-13',
-            'status' => StatusDokumen::Draft,
-            'created_by' => $this->operator->id,
-        ]);
-
-        TransaksiMasukDetail::create([
-            'transaksi_masuk_id' => $transaksi->id,
-            'barang_id' => $this->pendukung->id,
-            'merge' => 'BATCH-A',
-            'grade_id' => $this->gradePendukungStd->id,
-            'jumlah_kemasan' => 100,
-            'satuan_kemasan_id' => $pcs,
-            'berat_kg' => 100,
-            'keterangan' => 'GRN-VELVET',
         ]);
 
         $this->app->make(PenerimaanService::class)->posting($transaksi, $this->operator->id);

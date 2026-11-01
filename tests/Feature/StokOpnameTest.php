@@ -18,6 +18,13 @@ use PHPUnit\Framework\Attributes\Test;
 use Tests\Concerns\MembuatDataUji;
 use Tests\TestCase;
 
+/**
+ * Uji service stock opname (F6).
+ *
+ * UI/controller legacy sudah dihapus; cakupan bisnis dipertahankan dengan
+ * memanggil StokOpnameService langsung. UI Filament diuji terpisah oleh
+ * FilamentStokOpnameTest.
+ */
 class StokOpnameTest extends TestCase
 {
     use MembuatDataUji;
@@ -47,28 +54,26 @@ class StokOpnameTest extends TestCase
         );
     }
 
-    private function payload(array $over = []): array
+    private function proses(float $stokFisik, string $tanggal = '2026-11-01', ?int $userId = null): StokOpname
     {
-        return array_merge([
-            'barang_id' => $this->barang->id,
-            'merge' => 'M1',
-            'grade_id' => $this->gradeDtyA->id,
-            'stok_fisik_qty' => 100,
-            'tanggal' => '2026-11-01',
-        ], $over);
+        return $this->app->make(StokOpnameService::class)->proses(
+            $this->barang,
+            'M1',
+            $this->gradeDtyA->id,
+            $stokFisik,
+            $tanggal,
+            $userId ?? $this->admin->id,
+        );
     }
 
     #[Test]
-    public function operator_ditolak_buka_create_dan_store(): void
+    public function operator_tidak_boleh_proses_opname(): void
     {
-        $this->actingAs($this->operator)->get(route('opname.create'))->assertForbidden();
-        $this->actingAs($this->operator)->post(route('opname.store'), $this->payload())->assertForbidden();
-    }
+        $this->stokAwal(100);
 
-    #[Test]
-    public function admin_bisa_buka_form_create(): void
-    {
-        $this->actingAs($this->admin)->get(route('opname.create'))->assertOk();
+        $this->expectException(AturanBisnisException::class);
+
+        $this->proses(130, userId: $this->operator->id);
     }
 
     #[Test]
@@ -76,11 +81,8 @@ class StokOpnameTest extends TestCase
     {
         $this->stokAwal(100);
 
-        $opname = $this->actingAs($this->admin)
-            ->post(route('opname.store'), $this->payload(['stok_fisik_qty' => 130]))
-            ->assertRedirect();
+        $row = $this->proses(130);
 
-        $row = StokOpname::query()->latest('id')->firstOrFail();
         $this->assertNotNull($row->transaksi_masuk_id);
         $this->assertNull($row->transaksi_keluar_id);
         $this->assertSame(JenisMasuk::AdjustmentIn, $row->transaksiMasuk->jenis_masuk);
@@ -96,11 +98,8 @@ class StokOpnameTest extends TestCase
     {
         $this->stokAwal(100);
 
-        $this->actingAs($this->admin)
-            ->post(route('opname.store'), $this->payload(['stok_fisik_qty' => 70]))
-            ->assertRedirect();
+        $row = $this->proses(70);
 
-        $row = StokOpname::query()->latest('id')->firstOrFail();
         $this->assertNotNull($row->transaksi_keluar_id);
         $this->assertNull($row->transaksi_masuk_id);
         $this->assertSame(JenisKeluar::AdjustmentOut, $row->transaksiKeluar->jenis_keluar);
@@ -114,21 +113,37 @@ class StokOpnameTest extends TestCase
     {
         $this->stokAwal(100);
 
-        $this->actingAs($this->admin)
-            ->post(route('opname.store'), $this->payload(['stok_fisik_qty' => 100]))
-            ->assertRedirect();
+        $row = $this->proses(100);
 
-        $row = StokOpname::query()->latest('id')->firstOrFail();
         $this->assertNull($row->transaksi_masuk_id);
         $this->assertNull($row->transaksi_keluar_id);
     }
 
     #[Test]
-    public function fisik_negatif_ditolak_validasi(): void
+    public function fisik_negatif_ditolak(): void
     {
-        $this->actingAs($this->admin)
-            ->post(route('opname.store'), $this->payload(['stok_fisik_qty' => -5]))
-            ->assertSessionHasErrors('stok_fisik_qty');
+        $this->stokAwal(100);
+
+        $this->expectException(AturanBisnisException::class);
+
+        $this->proses(-5);
+    }
+
+    #[Test]
+    public function grade_kategori_lain_ditolak(): void
+    {
+        $this->stokAwal(100);
+
+        $this->expectException(AturanBisnisException::class);
+
+        $this->app->make(StokOpnameService::class)->proses(
+            $this->barang,
+            'M1',
+            $this->gradePoyAl->id,
+            100,
+            '2026-11-01',
+            $this->admin->id,
+        );
     }
 
     #[Test]
@@ -136,9 +151,7 @@ class StokOpnameTest extends TestCase
     {
         $this->stokAwal(100);
 
-        $opname = $this->app->make(StokOpnameService::class)->proses(
-            $this->barang, 'M1', $this->gradeDtyA->id, 125, '2026-11-01', $this->admin->id,
-        );
+        $opname = $this->proses(125);
 
         $this->assertSame(25.0, (float) $opname->refresh()->selisih_qty);
         $this->assertNotContains('selisih_qty', (new StokOpname)->getFillable());

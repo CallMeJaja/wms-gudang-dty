@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Enums\JenisKeluar;
+use App\Enums\JenisMasuk;
 use App\Enums\JenisMutasi;
 use App\Enums\PosStok;
 use App\Enums\StatusDokumen;
@@ -16,18 +17,23 @@ use App\Models\StokBarang;
 use App\Models\SupplierCustomer;
 use App\Models\TransaksiKeluar;
 use App\Models\TransaksiMasuk;
+use App\Models\TransaksiMasukDetail;
 use App\Models\User;
 use App\Services\PenerimaanService;
 use App\Services\StokService;
 use App\Services\VoidTransaksiService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Gate;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\Concerns\MembuatDataUji;
 use Tests\TestCase;
 
 /**
  * Uji void transaksi masuk (F6): POY / Gate Pass / DTY + cerminan keluar.
+ *
+ * UI/controller legacy sudah dihapus; void dipanggil langsung lewat
+ * VoidTransaksiService dan otorisasi diperiksa lewat Gate policy.
  *
  * DB: SQLite :memory: (phpunit.xml) — MySQL dev TIDAK tersentuh.
  */
@@ -101,12 +107,7 @@ class VoidTransaksiTest extends TestCase
         $berat = 1000.0;
         $transaksi = $this->postingPoy($berat);
 
-        $hasil = $this->actingAs($this->admin)
-            ->post(route('inbound.poy.void', $transaksi), ['alasan_void' => 'Salah input berat timbangan.'])
-            ->assertRedirect(route('inbound.poy.show', $transaksi))
-            ->assertSessionHas('sukses');
-
-        $hasil->assertSessionHasNoErrors();
+        $this->voidService->voidTransaksiMasuk($transaksi, 'Salah input berat timbangan.', $this->admin->id);
 
         $transaksi->refresh();
         $this->assertSame(StatusDokumen::Void, $transaksi->status);
@@ -169,39 +170,36 @@ class VoidTransaksiTest extends TestCase
 
     /*
     |--------------------------------------------------------------------------
-    | 4. Operator 403 saat akses route void
+    | 4. Operator tidak diizinkan void (policy), status tetap POSTED
     |--------------------------------------------------------------------------
     */
 
     #[Test]
-    public function operator_ditolak_403_saat_akses_route_void(): void
+    public function operator_tidak_diizinkan_void_transaksi_masuk(): void
     {
         $transaksi = $this->postingPoy(500.0);
 
-        $this->actingAs($this->operator)
-            ->post(route('inbound.poy.void', $transaksi), ['alasan_void' => 'Operator mencoba void.'])
-            ->assertForbidden();
+        $this->assertFalse(
+            Gate::forUser($this->operator)->allows('void', [$transaksi, JenisMasuk::PoyIpci])
+        );
+        $this->assertTrue(
+            Gate::forUser($this->admin)->allows('void', [$transaksi, JenisMasuk::PoyIpci])
+        );
 
         $this->assertSame(StatusDokumen::Posted, $transaksi->fresh()->status);
     }
 
     /*
     |--------------------------------------------------------------------------
-    | 5. Alasan kosong / pendek ditolak validasi
+    | 5. Alasan terlalu pendek ditolak lapis service
     |--------------------------------------------------------------------------
     */
 
     #[Test]
-    public function alasan_kosong_atau_pendek_ditolak(): void
+    public function alasan_pendek_ditolak(): void
     {
         $transaksi = $this->postingPoy(500.0);
 
-        // Kosong -> 422 validasi request.
-        $this->actingAs($this->admin)
-            ->post(route('inbound.poy.void', $transaksi), ['alasan_void' => ''])
-            ->assertSessionHasErrors('alasan_void');
-
-        // Terlalu pendek -> AturanBisnisException lapis service.
         $this->expectException(AturanBisnisException::class);
         $this->voidService->voidTransaksiMasuk($transaksi->fresh(), 'XYZ', $this->admin->id);
     }
@@ -341,9 +339,9 @@ class VoidTransaksiTest extends TestCase
         $this->app->make(PenerimaanService::class)->posting($transaksi, $this->operator->id);
         $nomorGp = $transaksi->fresh()->nomor_gate_pass;
 
-        $this->actingAs($this->admin)
-            ->post(route('inbound.pendukung.void', $transaksi), ['alasan_void' => 'Gate Pass ganda, batalkan satu.'])
-            ->assertRedirect(route('inbound.pendukung.show', $transaksi));
+        $this->voidService->voidTransaksiMasuk(
+            $transaksi->fresh(), 'Gate Pass ganda, batalkan satu.', $this->admin->id,
+        );
 
         $segar = $transaksi->fresh();
         $this->assertSame(StatusDokumen::Void, $segar->status);
@@ -365,9 +363,9 @@ class VoidTransaksiTest extends TestCase
 
         $this->assertSame(66.0, (float) StokBarang::query()->where('barang_id', $this->dty->id)->value('stok_aktif'));
 
-        $this->actingAs($this->admin)
-            ->post(route('inbound.dty.void', $transaksi), ['alasan_void' => 'DTY salah merge asal produksi.'])
-            ->assertRedirect(route('inbound.dty.show', $transaksi));
+        $this->voidService->voidTransaksiMasuk(
+            $transaksi->fresh(), 'DTY salah merge asal produksi.', $this->admin->id,
+        );
 
         $this->assertSame(StatusDokumen::Void, $transaksi->fresh()->status);
         $this->assertSame(0.0, (float) StokBarang::query()->where('barang_id', $this->dty->id)->value('stok_aktif'));
@@ -423,7 +421,9 @@ class VoidTransaksiTest extends TestCase
 
     private function buatDrafPoy(float $berat): TransaksiMasuk
     {
-        $this->actingAs($this->operator)->post(route('inbound.poy.store'), [
+        $transaksi = TransaksiMasuk::create([
+            'nomor_transaksi' => 'IN-POY-'.uniqid(),
+            'jenis_masuk' => JenisMasuk::PoyIpci,
             'tanggal' => '2026-10-13',
             'partner_id' => $this->ipci->id,
             'ref_dokumen' => 'SP-001',
@@ -431,60 +431,73 @@ class VoidTransaksiTest extends TestCase
             'operator_nama' => 'Budi',
             'pengirim' => 'R. Jamal',
             'penerima' => 'Budi',
-            'detail' => [[
-                'barang_id' => $this->poy->id,
-                'merge' => 'M-POY-1',
-                'grade_id' => $this->gradePoyAl->id,
-                'jumlah_box' => '',
-                'jumlah_bobbin' => '',
-                'berat_kg' => $berat,
-            ]],
-        ])->assertSessionHasNoErrors();
+            'status' => StatusDokumen::Draft,
+            'created_by' => $this->operator->id,
+        ]);
 
-        return TransaksiMasuk::query()->latest('id')->firstOrFail();
+        $transaksi->detail()->create([
+            'barang_id' => $this->poy->id,
+            'merge' => 'M-POY-1',
+            'grade_id' => $this->gradePoyAl->id,
+            'berat_kg' => $berat,
+        ]);
+
+        return $transaksi;
     }
 
     private function drafPendukung(float $qty): TransaksiMasuk
     {
         $pcs = Satuan::query()->where('kode', Satuan::PCS)->value('id');
-        $nomor = 'GP-'.uniqid();
 
-        $this->actingAs($this->operator)->post(route('inbound.pendukung.store'), [
-            'nomor_gate_pass' => $nomor,
+        $transaksi = TransaksiMasuk::create([
+            'nomor_transaksi' => 'IN-GP-'.uniqid(),
+            'jenis_masuk' => JenisMasuk::PendukungGatepass,
+            'nomor_gate_pass' => 'GP-'.uniqid(),
             'tanggal' => '2026-10-13',
             'partner_id' => $this->storeIpci->id,
             'ref_dokumen' => 'GP-001',
-            'detail' => [[
-                'barang_id' => $this->pendukung->id,
-                'merge' => 'BATCH-A',
-                'jumlah_kemasan' => $qty,
-                'satuan_kemasan_id' => $pcs,
-                'keterangan' => 'GRN-VELVET',
-            ]],
-        ])->assertSessionHasNoErrors();
+            'status' => StatusDokumen::Draft,
+            'created_by' => $this->operator->id,
+        ]);
 
-        return TransaksiMasuk::query()->latest('id')->firstOrFail();
+        $transaksi->detail()->create([
+            'barang_id' => $this->pendukung->id,
+            'merge' => 'BATCH-A',
+            'grade_id' => $this->gradePendukungStd->id,
+            'jumlah_kemasan' => $qty,
+            'satuan_kemasan_id' => $pcs,
+            'berat_kg' => $qty,
+            'keterangan' => 'GRN-VELVET',
+        ]);
+
+        return $transaksi;
     }
 
     private function drafDty(): TransaksiMasuk
     {
-        $this->actingAs($this->operator)->post(route('inbound.dty.store'), [
+        $transaksi = TransaksiMasuk::create([
+            'nomor_transaksi' => 'IN-DTY-'.uniqid(),
+            'jenis_masuk' => JenisMasuk::DtyProduksi,
             'tanggal' => '2026-10-13',
             'shift' => 2,
             'operator_nama' => 'Siti',
             'sumber_internal' => 'AREA PRODUKSI',
             'merge_poy_asal' => '4P1065',
-            'detail' => [[
-                'barang_id' => $this->dty->id,
-                'merge' => '4D9160',
-                'grade_id' => $this->gradeDtyA->id,
-                'jumlah_box' => 2,
-                'jumlah_bobbin' => 12,
-                'berat_kg' => 66,
-                'berat_gross_kg' => 71.48,
-            ]],
-        ])->assertSessionHasNoErrors();
+            'status' => StatusDokumen::Draft,
+            'created_by' => $this->operator->id,
+        ]);
 
-        return TransaksiMasuk::query()->latest('id')->firstOrFail();
+        $transaksi->detail()->create([
+            'barang_id' => $this->dty->id,
+            'merge' => '4D9160',
+            'grade_id' => $this->gradeDtyA->id,
+            'jumlah_kemasan' => 2,
+            'satuan_kemasan_id' => $this->satuanBox->id,
+            'jumlah_bobbin' => 12,
+            'berat_kg' => 66,
+            'keterangan' => TransaksiMasukDetail::penandaGross(71.48),
+        ]);
+
+        return $transaksi;
     }
 }

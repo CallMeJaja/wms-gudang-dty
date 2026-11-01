@@ -16,14 +16,19 @@ use App\Models\TransaksiKeluar;
 use App\Models\User;
 use App\Services\PengeluaranService;
 use App\Services\StokService;
+use App\Services\VoidTransaksiService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Gate;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\Concerns\MembuatDataUji;
 use Tests\TestCase;
 
 /**
- * Uji modul transaksi keluar F3 (controller + policy + validasi + UI HTTP).
+ * Uji service transaksi keluar F3 (posting/issue, policy, void).
+ *
+ * UI/controller legacy sudah dihapus; cakupan bisnis dipertahankan dengan
+ * memanggil PengeluaranService/VoidTransaksiService dan Gate policy langsung.
  *
  * DB: SQLite :memory: (phpunit.xml) — MySQL dev TIDAK tersentuh.
  */
@@ -78,31 +83,13 @@ class OutboundTest extends TestCase
     }
 
     #[Test]
-    public function operator_bisa_store_poy_draft_tanpa_mengurangi_stok(): void
-    {
-        $this->actingAs($this->operator)
-            ->post(route('outbound.poy.store'), $this->payloadPoy())
-            ->assertRedirect();
-
-        $transaksi = TransaksiKeluar::query()->sole();
-
-        $this->assertSame(StatusDokumen::Draft, $transaksi->status);
-        $this->assertSame(JenisKeluar::PoyProduksi, $transaksi->jenis_keluar);
-        $this->assertSame(0, StokBarang::query()->count(), 'DRAFT tidak boleh membuat saldo stok.');
-        $this->assertSame(0, MutasiStok::query()->count(), 'DRAFT tidak boleh menulis mutasi.');
-    }
-
-    #[Test]
     public function posting_poy_mengurangi_stok_aktif_persis(): void
     {
         $this->isiStok($this->poy, 'M-POY-1', $this->gradePoyAl->id, 1000, 500);
 
         $transaksi = $this->buatDrafPoy(['berat_netto_kg' => 400]);
 
-        $this->actingAs($this->operator)
-            ->post(route('outbound.poy.posting', $transaksi))
-            ->assertRedirect(route('outbound.poy.show', $transaksi))
-            ->assertSessionHas('sukses');
+        $this->app->make(PengeluaranService::class)->posting($transaksi, $this->operator->id);
 
         $this->assertSame(StatusDokumen::Posted, $transaksi->fresh()->status);
 
@@ -122,32 +109,20 @@ class OutboundTest extends TestCase
 
         $transaksi = $this->buatDrafPoy(['berat_netto_kg' => 200]);
 
-        $this->actingAs($this->operator)
-            ->from(route('outbound.poy.show', $transaksi))
-            ->post(route('outbound.poy.posting', $transaksi))
-            ->assertSessionHasErrors('posting');
-
-        $this->assertSame(
-            AturanBisnisException::PESAN_BUFFER_TIDAK_BOLEH_DIPAKAI,
-            session('errors')->first('posting'),
-        );
+        try {
+            $this->app->make(PengeluaranService::class)->posting($transaksi, $this->operator->id);
+            $this->fail('Pengeluaran melebihi stok aktif harus ditolak.');
+        } catch (AturanBisnisException $e) {
+            $this->assertSame(
+                AturanBisnisException::PESAN_BUFFER_TIDAK_BOLEH_DIPAKAI,
+                $e->getMessage(),
+            );
+        }
 
         $this->assertSame(StatusDokumen::Draft, $transaksi->fresh()->status);
         $saldo = StokBarang::query()->where('barang_id', $this->poy->id)->sole();
         $this->assertSame(100.0, (float) $saldo->stok_aktif);
         $this->assertSame(5000.0, (float) $saldo->stok_buffer);
-    }
-
-    #[Test]
-    public function manajer_create_poy_ditolak_403(): void
-    {
-        $this->actingAs($this->manajer)
-            ->get(route('outbound.poy.create'))
-            ->assertForbidden();
-
-        $this->actingAs($this->manajer)
-            ->post(route('outbound.poy.store'), $this->payloadPoy())
-            ->assertForbidden();
     }
 
     #[Test]
@@ -157,9 +132,7 @@ class OutboundTest extends TestCase
 
         $transaksi = $this->buatDrafSj();
 
-        $this->actingAs($this->operator)
-            ->post(route('outbound.surat-jalan.issue', $transaksi))
-            ->assertRedirect();
+        $this->app->make(PengeluaranService::class)->issue($transaksi, $this->operator->id);
 
         $transaksi->refresh();
         $this->assertSame(StatusDokumen::Issued, $transaksi->status);
@@ -183,8 +156,9 @@ class OutboundTest extends TestCase
             'Kedua SJ harus bertanggal sama.'
         );
 
-        $this->actingAs($this->operator)->post(route('outbound.surat-jalan.issue', $pertama))->assertRedirect();
-        $this->actingAs($this->operator)->post(route('outbound.surat-jalan.issue', $kedua))->assertRedirect();
+        $service = $this->app->make(PengeluaranService::class);
+        $service->issue($pertama, $this->operator->id);
+        $service->issue($kedua, $this->operator->id);
 
         $pertama->refresh();
         $kedua->refresh();
@@ -195,27 +169,14 @@ class OutboundTest extends TestCase
     }
 
     #[Test]
-    public function surat_jalan_draft_tidak_mengurangi_stok(): void
+    public function scrap_tanpa_catatan_ditolak(): void
     {
-        $this->isiStok($this->dty, '4D9160', $this->gradeDtyA->id, 1000);
+        $this->isiStok($this->dty, '4D9160', $this->gradeDtyC->id, 500);
 
-        $this->actingAs($this->operator)
-            ->post(route('outbound.surat-jalan.store'), $this->payloadSj())
-            ->assertRedirect();
+        $transaksi = $this->buatDrafScrap([], ['catatan' => null]);
 
-        $saldo = StokBarang::query()->where('barang_id', $this->dty->id)->sole();
-        $this->assertSame(1000.0, (float) $saldo->stok_aktif);
-        $this->assertSame(0, MutasiStok::query()->count());
-    }
-
-    #[Test]
-    public function scrap_tanpa_catatan_ditolak_validasi(): void
-    {
-        $this->actingAs($this->operator)
-            ->post(route('outbound.scrap.store'), $this->payloadScrap(['catatan' => '']))
-            ->assertSessionHasErrors(['catatan']);
-
-        $this->assertSame(0, TransaksiKeluar::query()->count());
+        $this->expectException(AturanBisnisException::class);
+        $this->app->make(PengeluaranService::class)->posting($transaksi, $this->operator->id);
     }
 
     #[Test]
@@ -225,28 +186,12 @@ class OutboundTest extends TestCase
 
         $transaksi = $this->buatDrafScrap();
 
-        $this->actingAs($this->operator)
-            ->post(route('outbound.scrap.posting', $transaksi))
-            ->assertRedirect(route('outbound.scrap.show', $transaksi));
+        $this->app->make(PengeluaranService::class)->posting($transaksi, $this->operator->id);
 
         $this->assertSame(StatusDokumen::Posted, $transaksi->fresh()->status);
 
         $saldo = StokBarang::query()->where('barang_id', $this->dty->id)->sole();
         $this->assertSame(400.0, (float) $saldo->stok_aktif);
-    }
-
-    #[Test]
-    public function shift_poy_wajib_dan_harus_1_2_3(): void
-    {
-        $this->actingAs($this->operator)
-            ->post(route('outbound.poy.store'), $this->payloadPoy([], ['shift' => null]))
-            ->assertSessionHasErrors(['shift']);
-
-        $this->actingAs($this->operator)
-            ->post(route('outbound.poy.store'), $this->payloadPoy([], ['shift' => 5]))
-            ->assertSessionHasErrors(['shift']);
-
-        $this->assertSame(0, TransaksiKeluar::query()->count());
     }
 
     #[Test]
@@ -257,11 +202,11 @@ class OutboundTest extends TestCase
         $transaksi = $this->buatDrafPoy(['berat_netto_kg' => 400]);
         $this->app->make(PengeluaranService::class)->posting($transaksi, $this->operator->id);
 
-        $this->actingAs($this->admin)
-            ->post(route('outbound.poy.void', $transaksi->fresh()), [
-                'alasan_void' => 'Salah input berat timbangan produksi.',
-            ])
-            ->assertRedirect();
+        $this->app->make(VoidTransaksiService::class)->voidTransaksiKeluar(
+            $transaksi->fresh(),
+            'Salah input berat timbangan produksi.',
+            $this->admin->id,
+        );
 
         $this->assertSame(StatusDokumen::Void, $transaksi->fresh()->status);
 
@@ -270,52 +215,42 @@ class OutboundTest extends TestCase
     }
 
     #[Test]
-    public function operator_void_ditolak_403(): void
+    public function grade_kategori_lain_ditolak_di_detail(): void
+    {
+        $this->isiStok($this->poy, 'M-POY-1', $this->gradePoyAl->id, 1000);
+
+        $poy = $this->buatDrafPoy(['grade_id' => $this->gradeDtyA->id]);
+
+        try {
+            $this->app->make(PengeluaranService::class)->posting($poy, $this->operator->id);
+            $this->fail('Grade DTY pada pengeluaran POY harus ditolak.');
+        } catch (AturanBisnisException) {
+            $this->assertSame(0, MutasiStok::query()->count());
+        }
+
+        $this->isiStok($this->dty, '4D9160', $this->gradeDtyA->id, 1000);
+        $sj = $this->buatDrafSj(['grade_id' => $this->gradePoyAl->id]);
+
+        $this->expectException(AturanBisnisException::class);
+        $this->app->make(PengeluaranService::class)->issue($sj, $this->operator->id);
+    }
+
+    #[Test]
+    public function pengeluaran_policy_void_hanya_admin_dan_posting_hanya_role_tulis(): void
     {
         $this->isiStok($this->poy, 'M-POY-1', $this->gradePoyAl->id, 1000);
 
         $transaksi = $this->buatDrafPoy(['berat_netto_kg' => 100]);
         $this->app->make(PengeluaranService::class)->posting($transaksi, $this->operator->id);
+        $transaksi->refresh();
 
-        $this->actingAs($this->operator)
-            ->post(route('outbound.poy.void', $transaksi->fresh()), [
-                'alasan_void' => 'Salah input berat timbangan produksi.',
-            ])
-            ->assertForbidden();
-    }
+        $this->assertFalse(Gate::forUser($this->operator)->allows('void', [$transaksi, JenisKeluar::PoyProduksi]));
+        $this->assertTrue(Gate::forUser($this->admin)->allows('void', [$transaksi, JenisKeluar::PoyProduksi]));
 
-    #[Test]
-    public function grade_kategori_lain_ditolak_di_detail(): void
-    {
-        $this->actingAs($this->operator)
-            ->post(route('outbound.poy.store'), $this->payloadPoy([
-                'grade_id' => $this->gradeDtyA->id,
-            ]))
-            ->assertSessionHasErrors('detail.0.grade_id');
+        $draf = $this->buatDrafPoy(['berat_netto_kg' => 50]);
 
-        $this->actingAs($this->operator)
-            ->post(route('outbound.surat-jalan.store'), $this->payloadSj([
-                'grade_id' => $this->gradePoyAl->id,
-            ]))
-            ->assertSessionHasErrors('detail.0.grade_id');
-
-        $this->assertSame(0, TransaksiKeluar::query()->count());
-    }
-
-    #[Test]
-    public function nomor_surat_jalan_tidak_bisa_duplikat_manual(): void
-    {
-        $this->isiStok($this->dty, '4D9160', $this->gradeDtyA->id, 1000);
-
-        $this->actingAs($this->operator)
-            ->post(route('outbound.surat-jalan.store'), $this->payloadSj([], ['nomor_surat_jalan' => '1/DTY/PEI/X/2026']))
-            ->assertRedirect();
-
-        $this->actingAs($this->operator)
-            ->post(route('outbound.surat-jalan.store'), $this->payloadSj([], ['nomor_surat_jalan' => '1/DTY/PEI/X/2026']))
-            ->assertSessionHasErrors(['nomor_surat_jalan']);
-
-        $this->assertSame(1, TransaksiKeluar::query()->count());
+        $this->assertTrue(Gate::forUser($this->operator)->allows('posting', [$draf, JenisKeluar::PoyProduksi]));
+        $this->assertFalse(Gate::forUser($this->manajer)->allows('posting', [$draf, JenisKeluar::PoyProduksi]));
     }
 
     /*
@@ -342,109 +277,89 @@ class OutboundTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $gantiHeader
      * @param  array<string, mixed>  $gantiDetail
-     * @return array<string, mixed>
+     * @param  array<string, mixed>  $gantiHeader
      */
-    private function payloadPoy(array $gantiDetail = [], array $gantiHeader = []): array
+    private function buatDrafPoy(array $gantiDetail = [], array $gantiHeader = []): TransaksiKeluar
     {
-        return array_merge([
+        $transaksi = TransaksiKeluar::create(array_merge([
+            'nomor_transaksi' => 'OUT-POY-'.uniqid(),
+            'jenis_keluar' => JenisKeluar::PoyProduksi,
             'tanggal' => '2026-10-13',
             'shift' => 1,
             'operator_nama' => 'Budi',
             'catatan' => null,
-            'detail' => [
-                array_merge([
-                    'barang_id' => $this->poy->id,
-                    'merge' => 'M-POY-1',
-                    'grade_id' => $this->gradePoyAl->id,
-                    'jumlah_kemasan' => '',
-                    'jumlah_bobbin' => '',
-                    'berat_netto_kg' => 100,
-                    'berat_gross_kg' => '',
-                ], $gantiDetail),
-            ],
-        ], $gantiHeader);
+            'status' => StatusDokumen::Draft,
+            'created_by' => $this->operator->id,
+        ], $gantiHeader));
+
+        $transaksi->detail()->create(array_merge([
+            'barang_id' => $this->poy->id,
+            'merge' => 'M-POY-1',
+            'grade_id' => $this->gradePoyAl->id,
+            'berat_netto_kg' => 100,
+        ], $gantiDetail));
+
+        return $transaksi;
     }
 
     /**
-     * @param  array<string, mixed>  $gantiHeader
      * @param  array<string, mixed>  $gantiDetail
-     * @return array<string, mixed>
+     * @param  array<string, mixed>  $gantiHeader
      */
-    private function payloadSj(array $gantiDetail = [], array $gantiHeader = []): array
+    private function buatDrafSj(array $gantiDetail = [], array $gantiHeader = []): TransaksiKeluar
     {
-        return array_merge([
+        $transaksi = TransaksiKeluar::create(array_merge([
+            'nomor_transaksi' => 'OUT-SJ-'.uniqid(),
+            'jenis_keluar' => JenisKeluar::DtySuratJalan,
+            'nomor_surat_jalan' => null,
             'tanggal' => '2026-10-13',
-            'nomor_surat_jalan' => '',
             'partner_id' => $this->ipci->id,
             'no_kendaraan' => 'B 1234 CD',
             'nama_sopir' => 'Joko',
             'pic_pengirim' => 'R. Jamal',
             'pic_mengetahui' => 'Budi',
             'catatan' => null,
-            'detail' => [
-                array_merge([
-                    'barang_id' => $this->dty->id,
-                    'merge' => '4D9160',
-                    'grade_id' => $this->gradeDtyA->id,
-                    'jumlah_kemasan' => 2,
-                    'jumlah_bobbin' => 12,
-                    'berat_netto_kg' => 66,
-                    'berat_gross_kg' => 71.48,
-                ], $gantiDetail),
-            ],
-        ], $gantiHeader);
+            'status' => StatusDokumen::Draft,
+            'created_by' => $this->operator->id,
+        ], $gantiHeader));
+
+        $transaksi->detail()->create(array_merge([
+            'barang_id' => $this->dty->id,
+            'merge' => '4D9160',
+            'grade_id' => $this->gradeDtyA->id,
+            'jumlah_kemasan' => 2,
+            'jumlah_bobbin' => 12,
+            'berat_netto_kg' => 66,
+            'berat_gross_kg' => 71.48,
+        ], $gantiDetail));
+
+        return $transaksi;
     }
 
     /**
-     * @param  array<string, mixed>  $ganti
-     * @return array<string, mixed>
+     * @param  array<string, mixed>  $gantiDetail
+     * @param  array<string, mixed>  $gantiHeader
      */
-    private function payloadScrap(array $ganti = []): array
+    private function buatDrafScrap(array $gantiDetail = [], array $gantiHeader = []): TransaksiKeluar
     {
-        return array_merge([
+        $transaksi = TransaksiKeluar::create(array_merge([
+            'nomor_transaksi' => 'OUT-SCRAP-'.uniqid(),
+            'jenis_keluar' => JenisKeluar::DtyScrapReject,
             'tanggal' => '2026-10-13',
             'catatan' => 'Dijual ke pengepul scrap.',
-            'detail' => [
-                [
-                    'barang_id' => $this->dty->id,
-                    'merge' => '4D9160',
-                    'grade_id' => $this->gradeDtyC->id,
-                    'jumlah_bobbin' => 6,
-                    'berat_netto_kg' => 100,
-                ],
-            ],
-        ], $ganti);
-    }
+            'status' => StatusDokumen::Draft,
+            'created_by' => $this->operator->id,
+        ], $gantiHeader));
 
-    /**
-     * @param  array<string, mixed>  $ganti
-     */
-    private function buatDrafPoy(array $ganti = []): TransaksiKeluar
-    {
-        $this->actingAs($this->operator)
-            ->post(route('outbound.poy.store'), $this->payloadPoy($ganti))
-            ->assertSessionHasNoErrors();
+        $transaksi->detail()->create(array_merge([
+            'barang_id' => $this->dty->id,
+            'merge' => '4D9160',
+            'grade_id' => $this->gradeDtyC->id,
+            'jumlah_bobbin' => 6,
+            'berat_netto_kg' => 100,
+        ], $gantiDetail));
 
-        return TransaksiKeluar::query()->latest('id')->firstOrFail();
-    }
-
-    private function buatDrafSj(): TransaksiKeluar
-    {
-        $this->actingAs($this->operator)
-            ->post(route('outbound.surat-jalan.store'), $this->payloadSj())
-            ->assertSessionHasNoErrors();
-
-        return TransaksiKeluar::query()->latest('id')->firstOrFail();
-    }
-
-    private function buatDrafScrap(): TransaksiKeluar
-    {
-        $this->actingAs($this->operator)
-            ->post(route('outbound.scrap.store'), $this->payloadScrap())
-            ->assertSessionHasNoErrors();
-
-        return TransaksiKeluar::query()->latest('id')->firstOrFail();
+        return $transaksi;
     }
 }

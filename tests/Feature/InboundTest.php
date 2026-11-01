@@ -15,6 +15,7 @@ use App\Models\Satuan;
 use App\Models\StokBarang;
 use App\Models\SupplierCustomer;
 use App\Models\TransaksiMasuk;
+use App\Models\TransaksiMasukDetail;
 use App\Models\User;
 use App\Services\NomorDokumenService;
 use App\Services\PenerimaanService;
@@ -25,11 +26,11 @@ use Tests\Concerns\MembuatDataUji;
 use Tests\TestCase;
 
 /**
- * Uji modul transaksi masuk F2B (controller + policy + validasi + UI HTTP).
+ * Uji service transaksi masuk F2 (posting/issue, buffer, penomoran, gross DTY).
  *
- * Cakupan: RBAC (Admin/Operator/Manajer/tamu), DRAFT tidak mengubah stok,
- * posting POY mengisi stok & buffer Minggu, issue Gate Pass, auto-fill &
- * peringatan gross DTY, serta penolakan grade lintas kategori.
+ * UI/controller legacy sudah dihapus; cakupan bisnis dipertahankan dengan
+ * memanggil PenerimaanService langsung. Draf dibangun lewat model seperti
+ * yang sebelumnya ditulis controller.
  *
  * DB: SQLite :memory: (phpunit.xml) — MySQL dev TIDAK tersentuh.
  */
@@ -38,23 +39,13 @@ class InboundTest extends TestCase
     use MembuatDataUji;
     use RefreshDatabase;
 
-    private User $admin;
-
     private User $operator;
-
-    private User $manajer;
 
     private Barang $poy;
 
     private Barang $dty;
 
     private Barang $pendukung;
-
-    private Grade $gradePoyAm;
-
-    private Grade $gradeDtyB;
-
-    private Grade $gradeDtyC;
 
     private SupplierCustomer $ipci;
 
@@ -67,9 +58,7 @@ class InboundTest extends TestCase
         $this->siapkanMasterDasar();
         $this->kunciHariKerja(); // Selasa — hari kerja, buffer Minggu aktif
 
-        $this->admin = User::factory()->admin()->create();
         $this->operator = User::factory()->operator()->create();
-        $this->manajer = User::factory()->manajer()->create();
 
         $this->poy = $this->barangPoy(true);
         $this->dty = $this->barangDty();
@@ -85,22 +74,7 @@ class InboundTest extends TestCase
             'is_active' => true,
         ]);
 
-        $this->gradePoyAm = Grade::create([
-            'kode' => 'Am',
-            'kategori_id' => $this->kategoriPoy->id,
-            'keterangan' => 'POY grade Am',
-            'is_active' => true,
-        ]);
-
-        $this->gradeDtyB = Grade::create([
-            'kode' => 'B',
-            'kategori_id' => $this->kategoriDty->id,
-            'keterangan' => 'DTY grade B',
-            'is_active' => true,
-        ]);
-
-        // Grade C sengaja TIDAK ada di config toleransi gross (PRD §3.3).
-        $this->gradeDtyC = Grade::create([
+        Grade::create([
             'kode' => 'C',
             'kategori_id' => $this->kategoriDty->id,
             'keterangan' => 'DTY scrap',
@@ -118,112 +92,27 @@ class InboundTest extends TestCase
         parent::tearDown();
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | 1. RBAC: Operator boleh index + create POY
-    |--------------------------------------------------------------------------
-    */
-
     #[Test]
-    public function operator_bisa_membuka_index_dan_create_poy(): void
+    public function draf_belum_mengubah_stok(): void
     {
-        $this->actingAs($this->operator)
-            ->get(route('inbound.poy.index'))
-            ->assertOk()
-            ->assertSee('Penerimaan POY (IPCI)');
+        $this->buatDrafPoy(1000);
 
-        $this->actingAs($this->operator)
-            ->get(route('inbound.poy.create'))
-            ->assertOk()
-            ->assertSee('Berat Netto (Kg) wajib — konversi otomatis tidak tersedia.');
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | 2. Manajer: index 200, create 403
-    |--------------------------------------------------------------------------
-    */
-
-    #[Test]
-    public function manajer_bisa_index_tapi_tidak_bisa_create(): void
-    {
-        $this->actingAs($this->manajer)
-            ->get(route('inbound.poy.index'))
-            ->assertOk();
-
-        $this->actingAs($this->manajer)
-            ->get(route('inbound.poy.create'))
-            ->assertForbidden();
-
-        // Route tulis juga ditolak (tolak.manajer).
-        $this->actingAs($this->manajer)
-            ->post(route('inbound.poy.store'), $this->payloadPoy())
-            ->assertForbidden();
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | 3. Tamu diarahkan ke login
-    |--------------------------------------------------------------------------
-    */
-
-    #[Test]
-    public function tamu_diarahkan_ke_login(): void
-    {
-        $this->get(route('inbound.poy.index'))->assertRedirect(route('login'));
-        $this->get(route('inbound.dty.index'))->assertRedirect(route('login'));
-        $this->get(route('inbound.pendukung.index'))->assertRedirect(route('login'));
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | 4. Simpan POY DRAFT -> stok TIDAK bertambah
-    |--------------------------------------------------------------------------
-    */
-
-    #[Test]
-    public function simpan_poy_sebagai_draft_tidak_mengubah_stok(): void
-    {
-        $this->actingAs($this->operator)
-            ->post(route('inbound.poy.store'), $this->payloadPoy(['berat_kg' => 1000]))
-            ->assertRedirect();
-
-        $transaksi = TransaksiMasuk::query()->sole();
-
-        $this->assertSame(StatusDokumen::Draft, $transaksi->status);
-        $this->assertSame(JenisMasuk::PoyIpci, $transaksi->jenis_masuk);
         $this->assertSame(0, StokBarang::query()->count(), 'DRAFT tidak boleh membuat saldo stok.');
         $this->assertSame(0, MutasiStok::query()->count(), 'DRAFT tidak boleh menulis mutasi.');
         $this->assertSame(0, AlokasiBuffer::query()->count());
-
-        $this->assertDatabaseHas('activity_logs', [
-            'event' => 'CREATE',
-            'modul' => 'TRANSAKSI_MASUK_POY',
-            'ref_id' => $transaksi->id,
-        ]);
     }
-
-    /*
-    |--------------------------------------------------------------------------
-    | 5. Posting POY -> stok aktif bertambah + mutasi tercatat
-    |--------------------------------------------------------------------------
-    */
 
     #[Test]
     public function posting_poy_menambah_stok_aktif_dan_mutasi(): void
     {
         $berat = 1000.0;
 
-        $transaksi = $this->buatDrafPoy([
-            'berat_kg' => $berat,
-            'jumlah_box' => 2,
+        $transaksi = $this->buatDrafPoy($berat, [
+            'jumlah_kemasan' => 2,
             'jumlah_bobbin' => 63,
         ]);
 
-        $this->actingAs($this->operator)
-            ->post(route('inbound.poy.posting', $transaksi))
-            ->assertRedirect(route('inbound.poy.show', $transaksi))
-            ->assertSessionHas('sukses');
+        $this->app->make(PenerimaanService::class)->posting($transaksi, $this->operator->id);
 
         $transaksi->refresh();
         $this->assertSame(StatusDokumen::Posted, $transaksi->status);
@@ -248,12 +137,6 @@ class InboundTest extends TestCase
         $this->assertSame($transaksi->nomor_transaksi, $mutasi->ref_nomor);
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | 6. Posting POY merge Minggu >= ambang pallet -> buffer 1 pallet
-    |--------------------------------------------------------------------------
-    */
-
     #[Test]
     public function posting_poy_merge_minggu_mengisi_buffer_satu_pallet(): void
     {
@@ -261,11 +144,9 @@ class InboundTest extends TestCase
         $ambangPallet = (int) config('wms.ambang_poy.lewati_buffer_jika_kurang_dari');
         $pasokan = $ambangPallet * $this->kgPerPallet();
 
-        $transaksi = $this->buatDrafPoy(['berat_kg' => $pasokan]);
+        $transaksi = $this->buatDrafPoy($pasokan);
 
-        $this->actingAs($this->operator)
-            ->post(route('inbound.poy.posting', $transaksi))
-            ->assertRedirect();
+        $this->app->make(PenerimaanService::class)->posting($transaksi, $this->operator->id);
 
         $saldo = StokBarang::query()
             ->where('barang_id', $this->poy->id)
@@ -287,62 +168,32 @@ class InboundTest extends TestCase
         );
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | 7. POY tanpa berat_kg -> pesan persis yang diminta
-    |--------------------------------------------------------------------------
-    */
-
     #[Test]
     public function poy_tanpa_berat_kg_ditolak_dengan_pesan_konversi(): void
     {
-        // 1) Lewat HTTP: berat kg kosong ditolak validasi (pesan wajib isi).
-        $this->actingAs($this->operator)
-            ->post(route('inbound.poy.store'), $this->payloadPoy([
-                'berat_kg' => '',
-                'jumlah_bobbin' => 63,
-            ]))
-            ->assertSessionHasErrors(['detail.0.berat_kg']);
-
-        $this->assertSame(0, TransaksiMasuk::query()->count());
-
-        // 2) Lapis aturan bisnis (A1b): pesan PERSIS dari AturanBisnisException
-        //    dipakai saat validasi akhir posting (mis. data lama/diubah manual).
         $pesan = AturanBisnisException::PESAN_POY_WAJIB_KG;
 
-        $transaksi = $this->buatDrafPoy(['berat_kg' => 500]);
+        $transaksi = $this->buatDrafPoy(500);
         $transaksi->detail()->update(['berat_kg' => 0]);
 
-        $this->actingAs($this->operator)
-            ->from(route('inbound.poy.show', $transaksi))
-            ->post(route('inbound.poy.posting', $transaksi))
-            ->assertSessionHasErrors('posting');
-
-        $this->assertSame(
-            $pesan,
-            session('errors')->first('posting'),
-            'Pesan POY wajib kg harus persis sesuai PRD A1b.'
-        );
+        try {
+            $this->app->make(PenerimaanService::class)->posting($transaksi->fresh(), $this->operator->id);
+            $this->fail('POY tanpa berat kg harus ditolak.');
+        } catch (AturanBisnisException $e) {
+            $this->assertSame($pesan, $e->getMessage(), 'Pesan POY wajib kg harus persis sesuai PRD A1b.');
+        }
 
         // Status tetap DRAFT & stok tidak bertambah (rollback).
         $this->assertSame(StatusDokumen::Draft, $transaksi->fresh()->status);
         $this->assertSame(0, StokBarang::query()->count());
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | 8. Pendukung: issue -> stok bertambah + status ISSUED
-    |--------------------------------------------------------------------------
-    */
-
     #[Test]
     public function issue_gate_pass_menambah_stok_dan_status_issued(): void
     {
         $transaksi = $this->buatDrafPendukung(3456);
 
-        $this->actingAs($this->operator)
-            ->post(route('inbound.pendukung.issue', $transaksi))
-            ->assertRedirect(route('inbound.pendukung.show', $transaksi));
+        $this->app->make(PenerimaanService::class)->posting($transaksi, $this->operator->id);
 
         $transaksi->refresh();
         $this->assertSame(StatusDokumen::Issued, $transaksi->status);
@@ -352,66 +203,30 @@ class InboundTest extends TestCase
         // Satuan kemasan PCS == satuan dasar PCS -> qty 1:1.
         $this->assertSame(3456.0, (float) $saldo->stok_aktif);
         $this->assertSame(0.0, (float) $saldo->stok_buffer, 'Item pendukung tidak memakai buffer.');
-
-        $this->assertDatabaseHas('activity_logs', [
-            'event' => 'UPDATE',
-            'modul' => 'TRANSAKSI_MASUK_PENDUKUNG',
-            'ref_id' => $transaksi->id,
-        ]);
     }
-
-    /*
-    |--------------------------------------------------------------------------
-    | 9. Pendukung: nomor_gate_pass ter-generate & berformat
-    |--------------------------------------------------------------------------
-    */
 
     #[Test]
-    public function nomor_gate_pass_digenerate_otomatis_dan_sesuai_format(): void
+    public function nomor_gate_pass_service_mengikuti_format_dan_naik(): void
     {
-        $this->actingAs($this->operator)
-            ->post(route('inbound.pendukung.store'), $this->payloadPendukung(100, nomorGatePass: ''))
-            ->assertRedirect();
+        $nomor = $this->app->make(NomorDokumenService::class);
 
-        $transaksi = TransaksiMasuk::query()->sole();
-        $harapan = $this->app->make(NomorDokumenService::class)->peek('GATE_PASS');
+        $pertama = $nomor->generate('GATE_PASS');
+        $kedua = $nomor->generate('GATE_PASS');
 
-        // peek() setelah generate = nomor berikutnya, jadi format dicek langsung.
-        $pola = '#^\d+/GP/PEI/[IVX]+/\d{4}$#';
-        $this->assertMatchesRegularExpression($pola, (string) $transaksi->nomor_gate_pass);
-
-        // Format template dari config dipakai apa adanya.
-        $template = (string) config('wms.format_nomor.GATE_PASS');
-        $this->assertStringContainsString('{nomor}', $template);
-        $this->assertStringEndsWith('/'.now()->format('Y'), (string) $transaksi->nomor_gate_pass);
-        $this->assertNotSame($harapan, $transaksi->nomor_gate_pass);
-
-        // Counter naik: dokumen berikutnya mendapat nomor berbeda.
-        $kedua = $this->buatDrafPendukung(50);
-        $this->assertNotSame($transaksi->nomor_gate_pass, $kedua->nomor_gate_pass);
+        $this->assertMatchesRegularExpression('#^\d+/GP/PEI/[IVX]+/\d{4}$#', $pertama);
+        $this->assertStringEndsWith('/'.now()->format('Y'), $pertama);
+        $this->assertNotSame($pertama, $kedua, 'Counter nomor harus naik untuk dokumen berikutnya.');
     }
-
-    /*
-    |--------------------------------------------------------------------------
-    | 10. DTY: posting -> stok DTY bertambah
-    |--------------------------------------------------------------------------
-    */
 
     #[Test]
     public function posting_dty_menambah_stok_dty(): void
     {
-        $transaksi = $this->buatDrafDty([
-            'jumlah_box' => 2,
-            'berat_kg' => 66,
-            'berat_gross_kg' => 71.48,
-        ]);
+        $transaksi = $this->buatDrafDty();
 
         $this->assertSame('AREA PRODUKSI', $transaksi->sumber_internal);
         $this->assertSame('4P1065', $transaksi->merge_poy_asal);
 
-        $this->actingAs($this->operator)
-            ->post(route('inbound.dty.posting', $transaksi))
-            ->assertRedirect(route('inbound.dty.show', $transaksi));
+        $this->app->make(PenerimaanService::class)->posting($transaksi, $this->operator->id);
 
         $transaksi->refresh();
         $this->assertSame(StatusDokumen::Posted, $transaksi->status);
@@ -422,76 +237,53 @@ class InboundTest extends TestCase
         $this->assertSame(12, (int) $saldo->jumlah_bobbin);
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | 11. DTY: gross di luar toleransi -> PERINGATAN (bukan blokir)
-    |--------------------------------------------------------------------------
-    */
-
     #[Test]
     public function dty_gross_di_luar_toleransi_hanya_peringatan(): void
     {
         $rentang = PenerimaanService::rentangGrossGrade('A');
         $this->assertNotNull($rentang);
 
-        // Gross per box jauh di atas batas atas grade A.
-        $box = 1;
-        $gross = $rentang['max'] + 10;
+        $diLuar = $rentang['max'] + 10;
+        $diDalam = ($rentang['min'] + $rentang['max']) / 2;
 
-        $this->actingAs($this->operator)
-            ->post(route('inbound.dty.store'), $this->payloadDty([
-                'jumlah_box' => $box,
-                'berat_kg' => 33,
-                'berat_gross_kg' => $gross,
-            ]))
-            ->assertSessionHasNoErrors()
-            ->assertSessionHas('peringatan');
+        $this->assertTrue(PenerimaanService::grossDiLuarToleransi($diLuar, 'A'));
+        $this->assertFalse(PenerimaanService::grossDiLuarToleransi($diDalam, 'A'));
+        // Grade tanpa entri config (C) tidak pernah dianggap di luar toleransi.
+        $this->assertNull(PenerimaanService::rentangGrossGrade('C'));
+        $this->assertFalse(PenerimaanService::grossDiLuarToleransi($diLuar, 'C'));
 
-        $transaksi = TransaksiMasuk::query()->sole();
-        $this->assertSame(StatusDokumen::Draft, $transaksi->status, 'Peringatan tidak boleh memblokir simpan.');
+        // Peringatan tidak boleh memblokir posting.
+        $transaksi = $this->buatDrafDty([
+            'keterangan' => TransaksiMasukDetail::penandaGross($diLuar * 2),
+        ]);
 
-        // Halaman detail tetap menampilkan peringatan yang sama.
-        $this->actingAs($this->operator)
-            ->get(route('inbound.dty.show', $transaksi))
-            ->assertOk()
-            ->assertSee('di luar toleransi', false);
+        $this->app->make(PenerimaanService::class)->posting($transaksi, $this->operator->id);
+
+        $this->assertSame(StatusDokumen::Posted, $transaksi->fresh()->status);
     }
-
-    /*
-    |--------------------------------------------------------------------------
-    | 12. Grade milik kategori lain ditolak
-    |--------------------------------------------------------------------------
-    */
 
     #[Test]
     public function grade_kategori_lain_ditolak(): void
     {
-        // Grade AL (POY) dipakai pada barang DTY -> harus ditolak.
-        $this->actingAs($this->operator)
-            ->post(route('inbound.dty.store'), $this->payloadDty([
-                'grade_id' => $this->gradePoyAl->id,
-            ]))
-            ->assertSessionHasErrors('detail.0.grade_id');
+        $dty = $this->buatDrafDty(['grade_id' => $this->gradePoyAl->id]);
 
-        $this->assertSame(0, TransaksiMasuk::query()->count());
+        try {
+            $this->app->make(PenerimaanService::class)->posting($dty, $this->operator->id);
+            $this->fail('Grade POY pada transaksi DTY harus ditolak.');
+        } catch (AturanBisnisException) {
+            $this->assertSame(0, StokBarang::query()->count());
+        }
 
-        $this->actingAs($this->operator)
-            ->post(route('inbound.poy.store'), $this->payloadPoy([
-                'grade_id' => $this->gradeDtyA->id,
-            ]))
-            ->assertSessionHasErrors('detail.0.grade_id');
+        $poy = $this->buatDrafPoy(500, ['grade_id' => $this->gradeDtyA->id]);
+
+        $this->expectException(AturanBisnisException::class);
+        $this->app->make(PenerimaanService::class)->posting($poy, $this->operator->id);
     }
-
-    /*
-    |--------------------------------------------------------------------------
-    | 13. Anti double-posting (lapis service)
-    |--------------------------------------------------------------------------
-    */
 
     #[Test]
     public function posting_dua_kali_tidak_menggandakan_stok(): void
     {
-        $transaksi = $this->buatDrafPoy(['berat_kg' => 500]);
+        $transaksi = $this->buatDrafPoy(500);
 
         $service = $this->app->make(PenerimaanService::class);
         $service->posting($transaksi, $this->operator->id);
@@ -507,86 +299,32 @@ class InboundTest extends TestCase
         }
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | 14. Barang lintas jenis (DTY dipakai di transaksi POY) ditolak
-    |--------------------------------------------------------------------------
-    */
-
     #[Test]
     public function barang_kategori_lain_ditolak_pada_jenis_yang_salah(): void
     {
-        $this->actingAs($this->operator)
-            ->post(route('inbound.poy.store'), $this->payloadPoy([
-                'barang_id' => $this->dty->id,
-                'grade_id' => $this->gradeDtyA->id,
-            ]))
-            ->assertSessionHasErrors('detail.0.barang_id');
-    }
+        $transaksi = $this->buatDrafPoy(500, [
+            'barang_id' => $this->dty->id,
+            'grade_id' => $this->gradeDtyA->id,
+        ]);
 
-    /*
-    |--------------------------------------------------------------------------
-    | 15. Halaman detail tampil + delete draf
-    |--------------------------------------------------------------------------
-    */
-
-    #[Test]
-    public function detail_tampil_dan_draf_bisa_dihapus(): void
-    {
-        $transaksi = $this->buatDrafPoy(['berat_kg' => 120]);
-
-        $this->actingAs($this->operator)
-            ->get(route('inbound.poy.show', $transaksi))
-            ->assertOk()
-            ->assertSee($transaksi->nomor_transaksi)
-            ->assertSee('120,00');
-
-        $this->actingAs($this->operator)
-            ->delete(route('inbound.poy.destroy', $transaksi))
-            ->assertRedirect(route('inbound.poy.index'));
-
-        $this->assertSame(0, TransaksiMasuk::query()->count());
-        $this->assertDatabaseHas('activity_logs', ['event' => 'DELETE', 'modul' => 'TRANSAKSI_MASUK_POY']);
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | 16. Draf yang sudah POSTED tidak bisa dihapus / diedit
-    |--------------------------------------------------------------------------
-    */
-
-    #[Test]
-    public function transaksi_posted_tidak_bisa_diedit_atau_dihapus(): void
-    {
-        $transaksi = $this->buatDrafPoy(['berat_kg' => 200]);
+        $this->expectException(AturanBisnisException::class);
         $this->app->make(PenerimaanService::class)->posting($transaksi, $this->operator->id);
-
-        $this->actingAs($this->operator)
-            ->get(route('inbound.poy.edit', $transaksi->fresh()))
-            ->assertForbidden();
-
-        $this->actingAs($this->operator)
-            ->delete(route('inbound.poy.destroy', $transaksi->fresh()))
-            ->assertForbidden();
-
-        $this->actingAs($this->operator)
-            ->post(route('inbound.poy.posting', $transaksi->fresh()))
-            ->assertForbidden();
     }
 
     /*
     |--------------------------------------------------------------------------
-    | Pembantu: payload HTTP
+    | Pembantu: bangun draf langsung lewat model
     |--------------------------------------------------------------------------
     */
 
     /**
-     * @param  array<string, mixed>  $ganti
-     * @return array<string, mixed>
+     * @param  array<string, mixed>  $gantiDetail
      */
-    private function payloadPoy(array $ganti = []): array
+    private function buatDrafPoy(float $berat, array $gantiDetail = []): TransaksiMasuk
     {
-        return [
+        $transaksi = TransaksiMasuk::create([
+            'nomor_transaksi' => 'IN-TEST-'.uniqid(),
+            'jenis_masuk' => JenisMasuk::PoyIpci,
             'tanggal' => '2026-10-13',
             'partner_id' => $this->ipci->id,
             'ref_dokumen' => 'SP-001',
@@ -594,110 +332,79 @@ class InboundTest extends TestCase
             'operator_nama' => 'Budi',
             'pengirim' => 'R. Jamal',
             'penerima' => 'Budi',
-            'detail' => [
-                array_merge([
-                    'barang_id' => $this->poy->id,
-                    'merge' => 'M-POY-1',
-                    'grade_id' => $this->gradePoyAl->id,
-                    'jumlah_box' => '',
-                    'jumlah_bobbin' => '',
-                    'berat_kg' => 1000,
-                ], $ganti),
-            ],
-        ];
+            'status' => StatusDokumen::Draft,
+            'created_by' => $this->operator->id,
+        ]);
+
+        $transaksi->detail()->create(array_merge([
+            'barang_id' => $this->poy->id,
+            'merge' => 'M-POY-1',
+            'grade_id' => $this->gradePoyAl->id,
+            'jumlah_kemasan' => 2,
+            'satuan_kemasan_id' => $this->satuanBox->id,
+            'jumlah_bobbin' => 63,
+            'berat_kg' => $berat,
+        ], $gantiDetail));
+
+        return $transaksi;
     }
 
-    /**
-     * @param  array<string, mixed>  $ganti
-     * @return array<string, mixed>
-     */
-    private function payloadPendukung(float $qty = 100, string $nomorGatePass = '27041797'): array
+    private function buatDrafPendukung(float $qty): TransaksiMasuk
     {
         $pcs = Satuan::query()->where('kode', Satuan::PCS)->value('id');
 
-        return [
-            'nomor_gate_pass' => $nomorGatePass,
+        $transaksi = TransaksiMasuk::create([
+            'nomor_transaksi' => 'IN-GP-'.uniqid(),
+            'jenis_masuk' => JenisMasuk::PendukungGatepass,
+            'nomor_gate_pass' => 'GP-'.uniqid(),
             'tanggal' => '2026-10-13',
             'partner_id' => $this->storeIpci->id,
             'ref_dokumen' => 'GP-001',
-            'detail' => [
-                [
-                    'barang_id' => $this->pendukung->id,
-                    // Item pendukung tidak memakai grade (Gate Pass tanpa grade);
-                    // grade netral kategori PENDUKUNG diisi controller.
-                    'merge' => 'BATCH-A',
-                    'jumlah_kemasan' => $qty,
-                    'satuan_kemasan_id' => $pcs,
-                    'keterangan' => 'GRN-VELVET',
-                ],
-            ],
-        ];
+            'status' => StatusDokumen::Draft,
+            'created_by' => $this->operator->id,
+        ]);
+
+        $transaksi->detail()->create([
+            'barang_id' => $this->pendukung->id,
+            'merge' => 'BATCH-A',
+            'grade_id' => $this->gradePendukungStd->id,
+            'jumlah_kemasan' => $qty,
+            'satuan_kemasan_id' => $pcs,
+            'berat_kg' => $qty,
+            'keterangan' => 'GRN-VELVET',
+        ]);
+
+        return $transaksi;
     }
 
     /**
-     * @param  array<string, mixed>  $ganti
-     * @return array<string, mixed>
+     * @param  array<string, mixed>  $gantiDetail
      */
-    private function payloadDty(array $ganti = []): array
+    private function buatDrafDty(array $gantiDetail = []): TransaksiMasuk
     {
-        return [
+        $transaksi = TransaksiMasuk::create([
+            'nomor_transaksi' => 'IN-DTY-'.uniqid(),
+            'jenis_masuk' => JenisMasuk::DtyProduksi,
             'tanggal' => '2026-10-13',
             'shift' => 2,
             'operator_nama' => 'Siti',
             'sumber_internal' => 'AREA PRODUKSI',
             'merge_poy_asal' => '4P1065',
-            'detail' => [
-                array_merge([
-                    'barang_id' => $this->dty->id,
-                    'merge' => '4D9160',
-                    'grade_id' => $this->gradeDtyA->id,
-                    'jumlah_box' => 2,
-                    'jumlah_bobbin' => 12,
-                    'berat_kg' => 66,
-                    'berat_gross_kg' => 71.48,
-                ], $ganti),
-            ],
-        ];
-    }
+            'status' => StatusDokumen::Draft,
+            'created_by' => $this->operator->id,
+        ]);
 
-    /*
-    |--------------------------------------------------------------------------
-    | Pembantu: buat draf lewat HTTP (menguji jalur penuh)
-    |--------------------------------------------------------------------------
-    */
+        $transaksi->detail()->create(array_merge([
+            'barang_id' => $this->dty->id,
+            'merge' => '4D9160',
+            'grade_id' => $this->gradeDtyA->id,
+            'jumlah_kemasan' => 2,
+            'satuan_kemasan_id' => $this->satuanBox->id,
+            'jumlah_bobbin' => 12,
+            'berat_kg' => 66,
+            'keterangan' => TransaksiMasukDetail::penandaGross(71.48),
+        ], $gantiDetail));
 
-    /**
-     * @param  array<string, mixed>  $ganti
-     */
-    private function buatDrafPoy(array $ganti = []): TransaksiMasuk
-    {
-        $this->actingAs($this->operator)
-            ->post(route('inbound.poy.store'), $this->payloadPoy($ganti))
-            ->assertSessionHasNoErrors();
-
-        return TransaksiMasuk::query()->latest('id')->firstOrFail();
-    }
-
-    private function buatDrafPendukung(float $qty = 100): TransaksiMasuk
-    {
-        $nomor = 'GP-'.uniqid();
-
-        $this->actingAs($this->operator)
-            ->post(route('inbound.pendukung.store'), $this->payloadPendukung($qty, $nomor))
-            ->assertSessionHasNoErrors();
-
-        return TransaksiMasuk::query()->latest('id')->firstOrFail();
-    }
-
-    /**
-     * @param  array<string, mixed>  $ganti
-     */
-    private function buatDrafDty(array $ganti = []): TransaksiMasuk
-    {
-        $this->actingAs($this->operator)
-            ->post(route('inbound.dty.store'), $this->payloadDty($ganti))
-            ->assertSessionHasNoErrors();
-
-        return TransaksiMasuk::query()->latest('id')->firstOrFail();
+        return $transaksi;
     }
 }

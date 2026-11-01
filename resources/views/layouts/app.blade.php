@@ -32,6 +32,52 @@
                             <i class="bi bi-speedometer2 me-1"></i> Dashboard
                         </a>
                     </li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle {{ request()->routeIs('master.*') ? 'active' : '' }}"
+                           href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-database me-1"></i> Master Data
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item {{ request()->routeIs('master.barang.*') ? 'active' : '' }}"
+                                   href="{{ route('master.barang.index') }}">
+                                    <i class="bi bi-box-seam me-1"></i> Barang
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item {{ request()->routeIs('master.partner.*') ? 'active' : '' }}"
+                                   href="{{ route('master.partner.index') }}">
+                                    <i class="bi bi-people me-1"></i> Partner
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item {{ request()->routeIs('master.grade.*') ? 'active' : '' }}"
+                                   href="{{ route('master.grade.index') }}">
+                                    <i class="bi bi-award me-1"></i> Grade
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item {{ request()->routeIs('master.konversi.*') ? 'active' : '' }}"
+                                   href="{{ route('master.konversi.index') }}">
+                                    <i class="bi bi-arrow-left-right me-1"></i> Konversi
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item {{ request()->routeIs('master.kategori.*') ? 'active' : '' }}"
+                                   href="{{ route('master.kategori.index') }}">
+                                    <i class="bi bi-tags me-1"></i> Kategori
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item {{ request()->routeIs('master.satuan.*') ? 'active' : '' }}"
+                                   href="{{ route('master.satuan.index') }}">
+                                    <i class="bi bi-rulers me-1"></i> Satuan
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
                 </ul>
 
                 <ul class="navbar-nav align-items-lg-center">

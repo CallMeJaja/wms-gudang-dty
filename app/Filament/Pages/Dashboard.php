@@ -11,7 +11,6 @@ use App\Services\RilisBufferService;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Pages\Dashboard as BaseDashboard;
-use Filament\Widgets\AccountWidget;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Facades\Auth;
 
@@ -79,7 +78,6 @@ class Dashboard extends BaseDashboard
     public function getWidgets(): array
     {
         return [
-            AccountWidget::class,
             RingkasanOperasionalWidget::class,
             GrafikStokWidget::class,
             RingkasanKategoriWidget::class,

@@ -7,9 +7,11 @@ use App\Models\Grade;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Validation\Rules\Unique;
 
@@ -27,51 +29,62 @@ class GradeForm
 
         return $schema
             ->components([
-                Section::make('Identitas Grade')
-                    ->description('Kode grade unik di dalam satu kategori.')
-                    ->columns(2)
+                Grid::make(3)
                     ->columnSpanFull()
                     ->schema([
-                        TextInput::make('kode')
-                            ->label('Kode Grade')
-                            ->required()
-                            ->maxLength(10)
-                            ->unique(
-                                ignoreRecord: true,
-                                modifyRuleUsing: fn (Unique $rule, Get $get) => $rule
-                                    ->where('kategori_id', $get('kategori_id')),
-                            )
-                            ->disabled($dilindungi)
-                            ->helperText(fn (?Grade $record): string => $dilindungi($record)
-                                ? 'Grade C kategori DTY adalah grade scrap dan tidak dapat diubah.'
-                                : 'Contoh: A, B, C, AL.'),
+                        Section::make('Identitas Grade')
+                            ->description('Kode grade unik di dalam satu kategori.')
+                            ->icon(Heroicon::OutlinedTag)
+                            ->columnSpan(2)
+                            ->columns(2)
+                            ->schema([
+                                TextInput::make('kode')
+                                    ->label('Kode Grade')
+                                    ->required()
+                                    ->maxLength(10)
+                                    ->unique(
+                                        ignoreRecord: true,
+                                        modifyRuleUsing: fn (Unique $rule, Get $get) => $rule
+                                            ->where('kategori_id', $get('kategori_id')),
+                                    )
+                                    ->disabled($dilindungi)
+                                    ->helperText(fn (?Grade $record): string => $dilindungi($record)
+                                        ? 'Grade C kategori DTY adalah grade scrap dan tidak dapat diubah.'
+                                        : 'Contoh: A, B, C, AL.'),
 
-                        Select::make('kategori_id')
-                            ->label('Kategori')
-                            ->relationship(
-                                name: 'kategori',
-                                titleAttribute: 'nama',
-                                modifyQueryUsing: fn (Builder $query) => $query->orderBy('kode'),
-                            )
-                            ->getOptionLabelFromRecordUsing(
-                                fn ($record) => "{$record->kode} — {$record->nama}"
-                            )
-                            ->searchable()
-                            ->preload()
-                            ->required()
-                            ->live()
-                            ->disabled($dilindungi),
+                                Select::make('kategori_id')
+                                    ->label('Kategori')
+                                    ->relationship(
+                                        name: 'kategori',
+                                        titleAttribute: 'nama',
+                                        modifyQueryUsing: fn (Builder $query) => $query->orderBy('kode'),
+                                    )
+                                    ->getOptionLabelFromRecordUsing(
+                                        fn ($record) => "{$record->kode} — {$record->nama}"
+                                    )
+                                    ->searchable()
+                                    ->preload()
+                                    ->required()
+                                    ->live()
+                                    ->disabled($dilindungi),
 
-                        TextInput::make('keterangan')
-                            ->label('Keterangan')
-                            ->maxLength(255)
-                            ->columnSpanFull(),
+                                TextInput::make('keterangan')
+                                    ->label('Keterangan')
+                                    ->maxLength(255)
+                                    ->columnSpanFull(),
+                            ]),
 
-                        Toggle::make('is_active')
-                            ->label('Aktif')
-                            ->default(true)
-                            ->disabled($dilindungi)
-                            ->helperText('Grade nonaktif tidak muncul pada pilihan transaksi.'),
+                        Section::make('Status')
+                            ->description('Grade C kategori DTY adalah grade scrap dan tidak dapat diubah.')
+                            ->icon(Heroicon::OutlinedCheckCircle)
+                            ->columnSpan(1)
+                            ->schema([
+                                Toggle::make('is_active')
+                                    ->label('Aktif')
+                                    ->default(true)
+                                    ->disabled($dilindungi)
+                                    ->helperText('Grade nonaktif tidak muncul pada pilihan transaksi.'),
+                            ]),
                     ]),
             ]);
     }

@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Kategoris\Schemas;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 
 class KategoriForm
 {
@@ -14,6 +15,7 @@ class KategoriForm
             ->components([
                 Section::make('Identitas Kategori')
                     ->description('Kategori barang menentukan perlakuan stok (POY, DTY, pendukung).')
+                    ->icon(Heroicon::OutlinedFolder)
                     ->columns(2)
                     ->columnSpanFull()
                     ->schema([

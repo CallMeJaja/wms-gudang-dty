@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Barangs\Schemas;
 
 use App\Models\KategoriBarang;
+use App\Models\Satuan;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -26,6 +27,7 @@ class BarangForm
                 Section::make('Identitas Barang')
                     ->description('Kode dan nama barang sesuai master gudang.')
                     ->columns(2)
+                    ->columnSpanFull()
                     ->schema([
                         TextInput::make('kode_barang')
                             ->label('Kode Barang')
@@ -73,6 +75,7 @@ class BarangForm
                 Section::make('Spesifikasi Benang')
                     ->description('Denier dan filament hanya relevan untuk POY/DTY.')
                     ->columns(2)
+                    ->columnSpanFull()
                     ->schema([
                         TextInput::make('denier')
                             ->label('Denier')
@@ -87,6 +90,7 @@ class BarangForm
 
                 Section::make('Pengaturan Stok')
                     ->columns(2)
+                    ->columnSpanFull()
                     ->schema([
                         TextInput::make('stok_minimum')
                             ->label('Stok Minimum')
@@ -135,6 +139,6 @@ class BarangForm
 
     private static function kodeSatuan(?int $satuanId): ?string
     {
-        return $satuanId ? \App\Models\Satuan::find($satuanId)?->kode : null;
+        return $satuanId ? Satuan::find($satuanId)?->kode : null;
     }
 }

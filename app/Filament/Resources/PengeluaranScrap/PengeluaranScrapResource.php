@@ -27,13 +27,13 @@ class PengeluaranScrapResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedTrash;
 
-    protected static ?string $navigationLabel = 'Pengeluaran Scrap';
+    protected static ?string $navigationLabel = 'Scrap / Reject';
 
     protected static ?string $modelLabel = 'Pengeluaran Scrap';
 
     protected static ?string $pluralModelLabel = 'Pengeluaran Scrap';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Transaksi Keluar';
+    protected static string|UnitEnum|null $navigationGroup = 'Pengeluaran';
 
     protected static ?int $navigationSort = 112;
 

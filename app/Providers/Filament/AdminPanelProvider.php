@@ -45,13 +45,13 @@ class AdminPanelProvider extends PanelProvider
                 fn () => view('filament.sidebar-footer'),
             )
             ->navigationGroups([
-                NavigationGroup::make('Master Data')
+                NavigationGroup::make('Data Master')
                     ->icon(Heroicon::OutlinedRectangleStack),
-                NavigationGroup::make('Transaksi Masuk')
+                NavigationGroup::make('Penerimaan')
                     ->icon(Heroicon::OutlinedArrowDownTray),
-                NavigationGroup::make('Transaksi Keluar')
+                NavigationGroup::make('Pengeluaran')
                     ->icon(Heroicon::OutlinedArrowUpTray),
-                NavigationGroup::make('Stok')
+                NavigationGroup::make('Persediaan')
                     ->icon(Heroicon::OutlinedArchiveBox),
                 NavigationGroup::make('Laporan')
                     ->icon(Heroicon::OutlinedChartBar),

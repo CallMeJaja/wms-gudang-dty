@@ -25,7 +25,7 @@ class SatuanResource extends Resource
 
     protected static ?string $navigationLabel = 'Satuan';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Master Data';
+    protected static string|UnitEnum|null $navigationGroup = 'Data Master';
 
     protected static ?int $navigationSort = 14;
 

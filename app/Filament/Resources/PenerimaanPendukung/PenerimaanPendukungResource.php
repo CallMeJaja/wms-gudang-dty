@@ -28,13 +28,13 @@ class PenerimaanPendukungResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedArchiveBox;
 
-    protected static ?string $navigationLabel = 'Gate Pass Pendukung';
+    protected static ?string $navigationLabel = 'Gate Pass';
 
     protected static ?string $modelLabel = 'Gate Pass Pendukung';
 
     protected static ?string $pluralModelLabel = 'Gate Pass Pendukung';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Transaksi Masuk';
+    protected static string|UnitEnum|null $navigationGroup = 'Penerimaan';
 
     protected static ?int $navigationSort = 101;
 

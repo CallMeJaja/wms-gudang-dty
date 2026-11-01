@@ -25,7 +25,7 @@ class KonversiSatuanResource extends Resource
 
     protected static ?string $navigationLabel = 'Konversi Satuan';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Master Data';
+    protected static string|UnitEnum|null $navigationGroup = 'Data Master';
 
     protected static ?int $navigationSort = 15;
 

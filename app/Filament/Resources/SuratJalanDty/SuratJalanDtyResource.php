@@ -34,7 +34,7 @@ class SuratJalanDtyResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Surat Jalan DTY';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Transaksi Keluar';
+    protected static string|UnitEnum|null $navigationGroup = 'Pengeluaran';
 
     protected static ?int $navigationSort = 111;
 

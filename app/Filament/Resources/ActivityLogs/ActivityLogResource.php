@@ -21,15 +21,15 @@ class ActivityLogResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClock;
 
-    protected static ?string $navigationLabel = 'Activity Log';
+    protected static ?string $navigationLabel = 'Log Aktivitas';
 
     protected static string|UnitEnum|null $navigationGroup = 'Pengaturan';
 
     protected static ?int $navigationSort = 141;
 
-    protected static ?string $modelLabel = 'Activity Log';
+    protected static ?string $modelLabel = 'Log Aktivitas';
 
-    protected static ?string $pluralModelLabel = 'Activity Log';
+    protected static ?string $pluralModelLabel = 'Log Aktivitas';
 
     protected static ?string $recordTitleAttribute = 'id';
 

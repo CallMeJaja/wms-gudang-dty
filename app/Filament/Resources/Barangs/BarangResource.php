@@ -26,7 +26,7 @@ class BarangResource extends Resource
 
     protected static ?string $navigationLabel = 'Barang';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Master Data';
+    protected static string|UnitEnum|null $navigationGroup = 'Data Master';
 
     protected static ?int $navigationSort = 10;
 

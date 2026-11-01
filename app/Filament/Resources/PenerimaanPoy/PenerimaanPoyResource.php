@@ -33,7 +33,7 @@ class PenerimaanPoyResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Penerimaan POY';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Transaksi Masuk';
+    protected static string|UnitEnum|null $navigationGroup = 'Penerimaan';
 
     protected static ?int $navigationSort = 100;
 

@@ -25,7 +25,7 @@ class StokOpnameResource extends Resource
 
     protected static ?string $navigationLabel = 'Stok Opname';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Stok';
+    protected static string|UnitEnum|null $navigationGroup = 'Persediaan';
 
     protected static ?int $navigationSort = 121;
 

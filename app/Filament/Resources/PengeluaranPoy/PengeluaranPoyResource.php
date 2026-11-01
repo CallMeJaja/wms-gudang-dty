@@ -33,7 +33,7 @@ class PengeluaranPoyResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Pengeluaran POY';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Transaksi Keluar';
+    protected static string|UnitEnum|null $navigationGroup = 'Pengeluaran';
 
     protected static ?int $navigationSort = 110;
 

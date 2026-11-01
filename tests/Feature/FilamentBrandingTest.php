@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Enums\JenisKeluar;
 use App\Enums\JenisMasuk;
 use App\Enums\StatusDokumen;
+use App\Filament\Resources\ActivityLogs\ActivityLogResource;
 use App\Filament\Resources\Barangs\BarangResource;
 use App\Filament\Resources\PenerimaanDty\PenerimaanDtyResource;
 use App\Filament\Resources\PenerimaanPendukung\PenerimaanPendukungResource;
@@ -49,7 +50,7 @@ class FilamentBrandingTest extends TestCase
 
         $this->assertCount(6, $groups);
         $this->assertSame(
-            ['Master Data', 'Transaksi Masuk', 'Transaksi Keluar', 'Stok', 'Laporan', 'Pengaturan'],
+            ['Data Master', 'Penerimaan', 'Pengeluaran', 'Persediaan', 'Laporan', 'Pengaturan'],
             array_map(fn ($group): string|Htmlable => $group->getLabel(), $groups),
         );
         $this->assertSame([
@@ -63,13 +64,21 @@ class FilamentBrandingTest extends TestCase
     }
 
     #[Test]
+    public function label_navigasi_memakai_istilah_yang_jelas(): void
+    {
+        $this->assertSame('Gate Pass', PenerimaanPendukungResource::getNavigationLabel());
+        $this->assertSame('Scrap / Reject', PengeluaranScrapResource::getNavigationLabel());
+        $this->assertSame('Log Aktivitas', ActivityLogResource::getNavigationLabel());
+    }
+
+    #[Test]
     public function dashboard_admin_menampilkan_label_grup_navigasi(): void
     {
         $response = $this->actingAs(User::factory()->admin()->create())->get('/admin');
 
         $response->assertOk();
 
-        foreach (['Master Data', 'Transaksi Masuk', 'Transaksi Keluar', 'Stok', 'Laporan', 'Pengaturan'] as $label) {
+        foreach (['Data Master', 'Penerimaan', 'Pengeluaran', 'Persediaan', 'Laporan', 'Pengaturan'] as $label) {
             $response->assertSee($label);
         }
     }

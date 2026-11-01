@@ -23,7 +23,7 @@ class StokBarangResource extends Resource
 
     protected static ?string $navigationLabel = 'Stok Barang';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Stok';
+    protected static string|UnitEnum|null $navigationGroup = 'Persediaan';
 
     protected static ?int $navigationSort = 120;
 

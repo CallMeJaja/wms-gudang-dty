@@ -9,7 +9,6 @@ use Filament\Actions\ActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -53,9 +52,11 @@ class KonversiSatuansTable
                     ->alignEnd()
                     ->sortable(),
 
-                IconColumn::make('is_default')
+                TextColumn::make('is_default')
                     ->label('Default')
-                    ->boolean()
+                    ->badge()
+                    ->formatStateUsing(fn (bool $state): string => $state ? 'Default' : '—')
+                    ->color(fn (bool $state): string => $state ? 'success' : 'gray')
                     ->alignCenter(),
             ])
             ->filters([

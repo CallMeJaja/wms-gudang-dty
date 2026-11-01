@@ -10,7 +10,6 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
@@ -65,15 +64,19 @@ class BarangsTable
                     ->sortable()
                     ->alignEnd(),
 
-                IconColumn::make('is_merge_minggu')
-                    ->label('Merge')
-                    ->boolean()
+                TextColumn::make('is_merge_minggu')
+                    ->label('Buffer Minggu')
+                    ->badge()
+                    ->formatStateUsing(fn (bool $state): string => $state ? 'Buffer' : '—')
+                    ->color(fn (bool $state): string => $state ? 'success' : 'gray')
                     ->alignCenter()
                     ->tooltip('Penanda buffer Minggu (khusus POY, A11)'),
 
-                IconColumn::make('is_active')
-                    ->label('Aktif')
-                    ->boolean()
+                TextColumn::make('is_active')
+                    ->label('Status')
+                    ->badge()
+                    ->formatStateUsing(fn (bool $state): string => $state ? 'Aktif' : 'Nonaktif')
+                    ->color(fn (bool $state): string => $state ? 'success' : 'danger')
                     ->alignCenter(),
 
                 TextColumn::make('updated_at')

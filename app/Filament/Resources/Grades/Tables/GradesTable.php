@@ -10,7 +10,6 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Notifications\Notification;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
@@ -48,9 +47,11 @@ class GradesTable
                     ->searchable()
                     ->wrap(),
 
-                IconColumn::make('is_active')
-                    ->label('Aktif')
-                    ->boolean()
+                TextColumn::make('is_active')
+                    ->label('Status')
+                    ->badge()
+                    ->formatStateUsing(fn (bool $state): string => $state ? 'Aktif' : 'Nonaktif')
+                    ->color(fn (bool $state): string => $state ? 'success' : 'danger')
                     ->alignCenter(),
 
                 TextColumn::make('stok_barang_count')

@@ -16,8 +16,8 @@ use Illuminate\Database\Eloquent\Builder;
 /**
  * Komponen form bersama tiga resource pengeluaran (POY, Surat Jalan, Scrap).
  *
- * Baris detail sengaja tidak menampilkan `satuan_kemasan_id` karena form
- * legacy pengeluaran hanya memakai Kemasan/Bobbin sebagai atribut fisik.
+ * Baris detail sengaja tidak menampilkan `satuan_kemasan_id`: pengeluaran
+ * hanya memakai Kemasan/Bobbin sebagai atribut fisik, bukan sumber saldo KG.
  */
 final class PengeluaranForm
 {

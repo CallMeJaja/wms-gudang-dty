@@ -41,9 +41,7 @@ class SatuansTable
                     ->alignCenter()
                     ->sortable(),
             ])
-            ->filters([
-                //
-            ])
+            ->filters([])
             ->actionsColumnLabel('Aksi')
             ->recordActions([
                 ActionGroup::make([

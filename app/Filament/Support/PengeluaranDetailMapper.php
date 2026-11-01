@@ -42,7 +42,7 @@ final class PengeluaranDetailMapper
         $data['berat_gross_kg'] = $gross === null ? null : round($gross, 2);
         $data['keterangan'] = self::teksAtauNull($data['keterangan'] ?? null);
 
-        // Legacy form pengeluaran tidak memilih satuan kemasan.
+        // Form pengeluaran tidak memilih satuan kemasan; kolomnya dikosongkan.
         $data['satuan_kemasan_id'] = null;
 
         return $data;

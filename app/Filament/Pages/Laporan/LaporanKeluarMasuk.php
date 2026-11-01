@@ -14,7 +14,7 @@ use UnitEnum;
  * Laporan keluar-masuk (PRD §6.1) di panel Filament.
  *
  * Filter dibaca langsung dari query string agar URL dapat dibagikan dan
- * parameter yang sama dipakai oleh endpoint export legacy.
+ * parameter yang sama dipakai oleh endpoint export.
  */
 class LaporanKeluarMasuk extends Page
 {

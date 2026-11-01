@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Auth;
  * Perilaku bersama halaman "Buat" penerimaan.
  *
  * Nomor transaksi selalu digenerate di server (atomik) dan status awal DRAFT
- * — sama seperti controller lama. Stok baru berubah saat Posting/Issue.
+ * — mengikuti alur backend. Stok baru berubah saat Posting/Issue.
  */
 trait CreatesPenerimaanRecord
 {

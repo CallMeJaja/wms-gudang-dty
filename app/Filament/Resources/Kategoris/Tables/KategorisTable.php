@@ -53,9 +53,7 @@ class KategorisTable
                     ->alignCenter()
                     ->sortable(),
             ])
-            ->filters([
-                //
-            ])
+            ->filters([])
             ->actionsColumnLabel('Aksi')
             ->recordActions([
                 ActionGroup::make([

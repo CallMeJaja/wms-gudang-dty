@@ -8,7 +8,7 @@ namespace App\Filament\Support;
 final class WmsForm
 {
     /**
-     * Opsi shift dari config/wms.php (bukan hardcode).
+     * Opsi shift dari config/wms.php (SSOT).
      *
      * @return array<int, string>
      */

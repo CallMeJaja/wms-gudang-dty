@@ -59,7 +59,7 @@ class LaporanKartuStok extends Page
     }
 
     /**
-     * Hanya sertakan kunci yang terisi agar endpoint export legacy tetap valid.
+     * Hanya sertakan kunci yang terisi agar endpoint export tetap valid.
      *
      * @return array<string, int|string>
      */

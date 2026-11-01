@@ -19,8 +19,8 @@ use Filament\Support\Icons\Heroicon;
 /**
  * Form pengeluaran POY ke lantai produksi (PRD §4.3).
  *
- * Detail tidak menampilkan satuan kemasan karena form legacy pengeluaran
- * hanya mencatat Kemasan/Bobbin sebagai atribut fisik.
+ * Detail tidak menampilkan satuan kemasan: pengeluaran hanya mencatat
+ * Kemasan/Bobbin sebagai atribut fisik.
  */
 class PengeluaranPoyForm
 {

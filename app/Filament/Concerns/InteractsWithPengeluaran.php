@@ -26,8 +26,8 @@ use Illuminate\Support\Facades\Auth;
  * - Query & route binding selalu dibatasi ke satu `jenis_keluar`, sehingga
  *   record jenis lain tidak bisa dibuka lewat URL resource yang salah.
  * - Otorisasi memakai PengeluaranPolicy yang sudah ada, dengan argumen jenis.
- * - Aksi Posting/Issue/Void memanggil service bisnis yang sama seperti
- *   controller legacy — tidak ada logika stok yang diduplikasi di UI.
+ * - Aksi Posting/Issue/Void memanggil service bisnis yang sama dengan
+ *   alur backend — tidak ada logika stok yang diduplikasi di UI.
  */
 trait InteractsWithPengeluaran
 {

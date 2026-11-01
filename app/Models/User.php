@@ -4,15 +4,34 @@ namespace App\Models;
 
 use App\Enums\Role;
 use Database\Factories\UserFactory;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
+
+    /**
+     * Hanya user aktif yang boleh masuk panel Filament
+     * (Admin, Operator, Manajer — pembatasan per-fitur lewat Policy).
+     */
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return $this->is_active;
+    }
+
+    /**
+     * Label tampilan di panel.
+     */
+    public function getFilamentName(): string
+    {
+        return $this->name ?: (string) $this->username;
+    }
 
     protected $fillable = [
         'name',

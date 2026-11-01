@@ -6,10 +6,14 @@ use App\Enums\JenisKeluar;
 use App\Filament\Support\PengeluaranForm;
 use App\Services\NomorDokumenService;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 
 /**
  * Form pengeluaran Scrap / Reject DTY (PRD §7.3 no.12).
@@ -22,39 +26,67 @@ class PengeluaranScrapForm
     {
         return $schema
             ->components([
-                Section::make('Identitas Dokumen')
-                    ->description('Pengeluaran scrap/reject DTY. Catatan wajib menyebut tujuan atau penerima.')
-                    ->columns(3)
+                Grid::make(3)
                     ->columnSpanFull()
                     ->schema([
-                        TextInput::make('nomor_transaksi')
-                            ->label('Nomor Transaksi')
-                            ->disabled()
-                            ->dehydrated(false)
-                            ->placeholder(fn () => app(NomorDokumenService::class)->peek('TRX_KELUAR'))
-                            ->helperText('Digenerate otomatis saat disimpan.'),
+                        Section::make('Identitas Dokumen')
+                            ->description('Pengeluaran scrap/reject DTY. Catatan wajib menyebut tujuan atau penerima.')
+                            ->icon(Heroicon::OutlinedDocumentText)
+                            ->columnSpan(2)
+                            ->columns(2)
+                            ->schema([
+                                TextInput::make('nomor_transaksi')
+                                    ->label('Nomor Transaksi')
+                                    ->disabled()
+                                    ->dehydrated(false)
+                                    ->placeholder(fn () => app(NomorDokumenService::class)->peek('TRX_KELUAR'))
+                                    ->helperText('Digenerate otomatis saat disimpan.'),
 
-                        DatePicker::make('tanggal')
-                            ->label('Tanggal Keluar')
-                            ->required()
-                            ->default(now())
-                            ->native(false)
-                            ->displayFormat('d/m/Y'),
+                                DatePicker::make('tanggal')
+                                    ->label('Tanggal Keluar')
+                                    ->required()
+                                    ->default(now())
+                                    ->native(false)
+                                    ->displayFormat('d/m/Y'),
+                            ]),
 
+                        Section::make('Ringkasan')
+                            ->icon(Heroicon::OutlinedInformationCircle)
+                            ->columnSpan(1)
+                            ->schema([
+                                Placeholder::make('jenis_dokumen')
+                                    ->label('Jenis Dokumen')
+                                    ->content('Scrap / Reject'),
+                                Placeholder::make('status_dokumen')
+                                    ->label('Status')
+                                    ->content('Draf'),
+                                Placeholder::make('total_netto')
+                                    ->label('Total Netto')
+                                    ->content(fn (Get $get): string => number_format(PengeluaranForm::totalNetto($get('detail')), 2, ',', '.').' kg'),
+                                Placeholder::make('alur_stok')
+                                    ->label('Alur Stok')
+                                    ->content('Stok DTY berkurang setelah Posting. Catatan wajib.'),
+                            ]),
+                    ]),
+
+                Section::make('Rincian Barang')
+                    ->description('Satu baris = satu kombinasi barang + merge + grade.')
+                    ->icon(Heroicon::OutlinedTableCells)
+                    ->columnSpanFull()
+                    ->schema([
+                        PengeluaranForm::detailRepeater(JenisKeluar::DtyScrapReject),
+                    ]),
+
+                Section::make('Catatan')
+                    ->icon(Heroicon::OutlinedChatBubbleLeftRight)
+                    ->columnSpanFull()
+                    ->schema([
                         Textarea::make('catatan')
                             ->label('Catatan (Tujuan/Penerima Scrap)')
                             ->required()
                             ->minLength(3)
                             ->maxLength(2000)
-                            ->rows(3)
-                            ->columnSpanFull(),
-                    ]),
-
-                Section::make('Rincian Barang')
-                    ->description('Satu baris = satu kombinasi barang + merge + grade.')
-                    ->columnSpanFull()
-                    ->schema([
-                        PengeluaranForm::detailRepeater(JenisKeluar::DtyScrapReject),
+                            ->rows(3),
                     ]),
             ]);
     }

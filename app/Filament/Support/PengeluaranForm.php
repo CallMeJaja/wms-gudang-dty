@@ -31,6 +31,30 @@ final class PengeluaranForm
         return WmsForm::opsiShift();
     }
 
+    public static function totalNetto(mixed $detail): float
+    {
+        if (! is_array($detail)) {
+            return 0.0;
+        }
+
+        return round(array_sum(array_map(
+            fn ($baris): float => is_array($baris) ? (float) ($baris['berat_netto_kg'] ?? 0) : 0.0,
+            $detail,
+        )), 2);
+    }
+
+    public static function totalGross(mixed $detail): float
+    {
+        if (! is_array($detail)) {
+            return 0.0;
+        }
+
+        return round(array_sum(array_map(
+            fn ($baris): float => is_array($baris) ? (float) ($baris['berat_gross_kg'] ?? 0) : 0.0,
+            $detail,
+        )), 2);
+    }
+
     public static function detailRepeater(JenisKeluar $jenis): Repeater
     {
         $kodeKategori = PengeluaranService::kodeKategori($jenis);

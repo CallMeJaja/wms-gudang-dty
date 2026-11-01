@@ -121,12 +121,15 @@ class FilamentBrandingTest extends TestCase
     }
 
     #[Test]
-    public function sidebar_memuat_pencarian_menu(): void
+    public function sidebar_memuat_pencarian_menu_dan_pintasan_papan_tombol(): void
     {
         $this->actingAs(User::factory()->admin()->create())
             ->get('/admin')
             ->assertOk()
-            ->assertSee('Cari menu');
+            ->assertSee('Cari menu')
+            ->assertSee('wms-sidebar-search-kbd', false)
+            ->assertSee('Ctrl K')
+            ->assertDontSee('fi-global-search-ctn', false);
     }
 
     #[Test]

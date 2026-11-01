@@ -39,6 +39,7 @@ class AdminPanelProvider extends PanelProvider
             ->darkMode(true)
             ->userMenu(position: UserMenuPosition::Sidebar)
             ->databaseNotifications(position: DatabaseNotificationsPosition::Sidebar)
+            ->globalSearch(false)
             ->navigationGroups([
                 NavigationGroup::make('Data Induk'),
                 NavigationGroup::make('Penerimaan'),

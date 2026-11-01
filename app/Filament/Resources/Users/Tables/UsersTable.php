@@ -70,6 +70,7 @@ class UsersTable
                     ->falseLabel('Nonaktif')
                     ->placeholder('Semua status'),
             ])
+            ->actionsColumnLabel('Aksi')
             ->recordActions([
                 EditAction::make(),
             ])

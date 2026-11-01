@@ -124,6 +124,7 @@ class StokOpnamesTable
                     ->searchable()
                     ->preload(),
             ])
+            ->actionsColumnLabel('Aksi')
             ->recordActions([
                 static::aksiLihat(),
             ])

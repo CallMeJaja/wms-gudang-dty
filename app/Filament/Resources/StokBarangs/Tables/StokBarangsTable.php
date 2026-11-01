@@ -107,6 +107,7 @@ class StokBarangsTable
                         )
                     )),
             ])
+            ->actionsColumnLabel('Aksi')
             ->recordActions([
                 Action::make('kartuStok')
                     ->label('Kartu Stok')

@@ -5,8 +5,11 @@ namespace Tests\Feature;
 use App\Enums\JenisKeluar;
 use App\Enums\JenisMasuk;
 use App\Enums\StatusDokumen;
+use App\Filament\Pages\Dashboard;
 use App\Filament\Resources\ActivityLogs\ActivityLogResource;
 use App\Filament\Resources\Barangs\BarangResource;
+use App\Filament\Resources\Kategoris\KategoriResource;
+use App\Filament\Resources\KonversiSatuans\KonversiSatuanResource;
 use App\Filament\Resources\PenerimaanDty\PenerimaanDtyResource;
 use App\Filament\Resources\PenerimaanPendukung\PenerimaanPendukungResource;
 use App\Filament\Resources\PenerimaanPoy\PenerimaanPoyResource;
@@ -59,11 +62,26 @@ class FilamentBrandingTest extends TestCase
     }
 
     #[Test]
-    public function label_navigasi_memakai_istilah_yang_jelas(): void
+    public function label_navigasi_memakai_istilah_yang_ringkas(): void
     {
+        $this->assertSame('POY', PenerimaanPoyResource::getNavigationLabel());
+        $this->assertSame('DTY', PenerimaanDtyResource::getNavigationLabel());
+        $this->assertSame('POY', PengeluaranPoyResource::getNavigationLabel());
+        $this->assertSame('Surat Jalan', SuratJalanDtyResource::getNavigationLabel());
+        $this->assertSame('Kategori', KategoriResource::getNavigationLabel());
+        $this->assertSame('Konversi', KonversiSatuanResource::getNavigationLabel());
         $this->assertSame('Gate Pass', PenerimaanPendukungResource::getNavigationLabel());
         $this->assertSame('Scrap / Reject', PengeluaranScrapResource::getNavigationLabel());
         $this->assertSame('Log Aktivitas', ActivityLogResource::getNavigationLabel());
+    }
+
+    #[Test]
+    public function dashboard_memakai_label_dan_judul_dashboard(): void
+    {
+        $dashboard = app(Dashboard::class);
+
+        $this->assertSame('Dashboard', Dashboard::getNavigationLabel());
+        $this->assertSame('Dashboard', $dashboard->getTitle());
     }
 
     #[Test]

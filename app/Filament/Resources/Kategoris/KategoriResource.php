@@ -23,7 +23,7 @@ class KategoriResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedFolder;
 
-    protected static ?string $navigationLabel = 'Kategori Barang';
+    protected static ?string $navigationLabel = 'Kategori';
 
     protected static string|UnitEnum|null $navigationGroup = 'Data Master';
 

@@ -28,7 +28,7 @@ class SuratJalanDtyResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedTruck;
 
-    protected static ?string $navigationLabel = 'Surat Jalan DTY';
+    protected static ?string $navigationLabel = 'Surat Jalan';
 
     protected static ?string $modelLabel = 'Surat Jalan DTY';
 

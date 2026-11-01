@@ -27,7 +27,7 @@ class PengeluaranPoyResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedArrowUpTray;
 
-    protected static ?string $navigationLabel = 'Pengeluaran POY';
+    protected static ?string $navigationLabel = 'POY';
 
     protected static ?string $modelLabel = 'Pengeluaran POY';
 

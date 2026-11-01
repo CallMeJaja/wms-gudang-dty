@@ -27,7 +27,7 @@ class PenerimaanPoyResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCube;
 
-    protected static ?string $navigationLabel = 'Penerimaan POY';
+    protected static ?string $navigationLabel = 'POY';
 
     protected static ?string $modelLabel = 'Penerimaan POY';
 

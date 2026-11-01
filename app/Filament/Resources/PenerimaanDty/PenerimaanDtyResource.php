@@ -27,7 +27,7 @@ class PenerimaanDtyResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedArrowDownTray;
 
-    protected static ?string $navigationLabel = 'Penerimaan DTY';
+    protected static ?string $navigationLabel = 'DTY';
 
     protected static ?string $modelLabel = 'Penerimaan DTY';
 

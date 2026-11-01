@@ -12,11 +12,22 @@ use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Pages\Dashboard as BaseDashboard;
 use Filament\Widgets\AccountWidget;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Facades\Auth;
 
 class Dashboard extends BaseDashboard
 {
     protected static ?int $navigationSort = 0;
+
+    public static function getNavigationLabel(): string|Htmlable
+    {
+        return 'Dashboard';
+    }
+
+    public function getTitle(): string|Htmlable
+    {
+        return 'Dashboard';
+    }
 
     public function getSubheading(): ?string
     {

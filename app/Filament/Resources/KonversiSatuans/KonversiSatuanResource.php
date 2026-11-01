@@ -23,7 +23,7 @@ class KonversiSatuanResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedArrowsRightLeft;
 
-    protected static ?string $navigationLabel = 'Konversi Satuan';
+    protected static ?string $navigationLabel = 'Konversi';
 
     protected static string|UnitEnum|null $navigationGroup = 'Data Master';
 

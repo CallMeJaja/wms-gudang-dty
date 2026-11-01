@@ -1,0 +1,3 @@
+@props(['livewire' => null])
+
+{!! $slot !!}

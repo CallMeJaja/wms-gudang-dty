@@ -104,23 +104,105 @@ class FilamentTransaksiMasukTest extends TestCase
     {
         $this->actingAs($this->admin());
 
-        $this->get('/admin/transaksi-masuks')->assertOk();
-        $this->get('/admin/transaksi-masuks/create')->assertOk();
+        $this->get('/admin/penerimaan-poy')->assertOk();
+        $this->get('/admin/penerimaan-poy/create')->assertOk();
+    }
+
+    #[Test]
+    public function ketiga_jenis_penerimaan_punya_halaman_sendiri(): void
+    {
+        $this->actingAs($this->admin());
+
+        foreach (['poy', 'pendukung', 'dty'] as $jenis) {
+            $this->get("/admin/penerimaan-{$jenis}")->assertOk();
+            $this->get("/admin/penerimaan-{$jenis}/create")->assertOk();
+        }
+    }
+
+    #[Test]
+    public function repeater_detail_memakai_grid_bukan_tabel_sempit(): void
+    {
+        $this->actingAs($this->admin());
+
+        $this->get('/admin/penerimaan-dty/create')
+            ->assertOk()
+            ->assertDontSee('fi-fo-table-repeater', false)
+            ->assertSee('fi-fo-repeater', false);
+    }
+
+    #[Test]
+    public function partial_ringkasan_modal_bisa_dirender(): void
+    {
+        $transaksi = $this->draf();
+        $transaksi->detail()->create([
+            'barang_id' => $this->barang->id,
+            'merge' => '4P1044',
+            'grade_id' => $this->grade->id,
+            'jumlah_kemasan' => 7,
+            'berat_kg' => 4032,
+        ]);
+
+        $html = view('filament.penerimaan.ringkasan', [
+            'transaksi' => $transaksi->load([
+                'detail.barang.kategori',
+                'detail.grade',
+                'detail.satuanKemasan',
+                'partner',
+                'pembuat',
+                'pemvoid',
+                'alokasiBuffer',
+            ]),
+        ])->render();
+
+        $this->assertStringContainsString($transaksi->nomor_transaksi, $html);
+        $this->assertStringContainsString('4P1044', $html);
+        $this->assertStringContainsString('4.032,00', $html);
+    }
+
+    #[Test]
+    public function daftar_menampilkan_total_kg_dari_detail(): void
+    {
+        $transaksi = $this->draf();
+        $transaksi->detail()->create([
+            'barang_id' => $this->barang->id,
+            'merge' => '4P1044',
+            'grade_id' => $this->grade->id,
+            'jumlah_kemasan' => 7,
+            'berat_kg' => 4032,
+        ]);
+
+        $this->actingAs($this->admin())
+            ->get('/admin/penerimaan-poy')
+            ->assertOk()
+            ->assertSee('4.032,00');
+    }
+
+    #[Test]
+    public function record_jenis_lain_tidak_bisa_dibuka_lewat_resource_yang_salah(): void
+    {
+        $dty = $this->draf([
+            'nomor_transaksi' => 'DTY-ISOLASI',
+            'jenis_masuk' => JenisMasuk::DtyProduksi,
+        ]);
+
+        $this->actingAs($this->admin())
+            ->get("/admin/penerimaan-poy/{$dty->id}/edit")
+            ->assertNotFound();
     }
 
     #[Test]
     public function operator_bisa_membuat_penerimaan_tetapi_manajer_tidak(): void
     {
         $this->actingAs($this->operator())
-            ->get('/admin/transaksi-masuks/create')
+            ->get('/admin/penerimaan-poy/create')
             ->assertOk();
 
         $this->actingAs($this->manajer())
-            ->get('/admin/transaksi-masuks')
+            ->get('/admin/penerimaan-poy')
             ->assertOk();
 
         $this->actingAs($this->manajer())
-            ->get('/admin/transaksi-masuks/create')
+            ->get('/admin/penerimaan-poy/create')
             ->assertForbidden();
     }
 
@@ -130,7 +212,7 @@ class FilamentTransaksiMasukTest extends TestCase
         $trx = $this->draf();
 
         $this->actingAs($this->manajer())
-            ->get("/admin/transaksi-masuks/{$trx->id}/edit")
+            ->get("/admin/penerimaan-poy/{$trx->id}/edit")
             ->assertForbidden();
     }
 
@@ -145,8 +227,8 @@ class FilamentTransaksiMasukTest extends TestCase
 
         $this->actingAs($this->admin());
 
-        $this->get("/admin/transaksi-masuks/{$draf->id}/edit")->assertOk();
-        $this->get("/admin/transaksi-masuks/{$posted->id}/edit")->assertForbidden();
+        $this->get("/admin/penerimaan-poy/{$draf->id}/edit")->assertOk();
+        $this->get("/admin/penerimaan-poy/{$posted->id}/edit")->assertForbidden();
     }
 
     // ------------------------------------------------------------------

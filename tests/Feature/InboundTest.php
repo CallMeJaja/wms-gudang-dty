@@ -26,7 +26,7 @@ use Tests\Concerns\MembuatDataUji;
 use Tests\TestCase;
 
 /**
- * Uji service transaksi masuk F2 (posting/issue, buffer, penomoran, gross DTY).
+ * Uji service transaksi masuk: posting/issue, buffer, penomoran, dan gross DTY.
  *
  * UI legacy sudah dihapus; cakupan bisnis diuji lewat PenerimaanService
  * langsung. Draf dibangun lewat model seperti alur backend.
@@ -125,7 +125,7 @@ class InboundTest extends TestCase
         // Pasokan 1.000 kg < ambang 7 pallet -> buffer dilewati, seluruhnya AKTIF.
         $this->assertSame($berat, (float) $saldo->stok_aktif);
         $this->assertSame(0.0, (float) $saldo->stok_buffer);
-        // Kemasan informatif ikut tercatat (A1: bukan akuntansi).
+        // Kemasan hanya atribut informatif; saldo tetap dihitung dari kg.
         $this->assertSame(63, (int) $saldo->jumlah_bobbin);
         $this->assertSame(2, (int) $saldo->jumlah_box);
 
@@ -179,7 +179,7 @@ class InboundTest extends TestCase
             $this->app->make(PenerimaanService::class)->posting($transaksi->fresh(), $this->operator->id);
             $this->fail('POY tanpa berat kg harus ditolak.');
         } catch (AturanBisnisException $e) {
-            $this->assertSame($pesan, $e->getMessage(), 'Pesan POY wajib kg harus persis sesuai PRD A1b.');
+            $this->assertSame($pesan, $e->getMessage(), 'Pesan POY wajib kg harus sesuai aturan.');
         }
 
         // Status tetap DRAFT & stok tidak bertambah (rollback).

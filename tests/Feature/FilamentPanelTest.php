@@ -85,7 +85,7 @@ class FilamentPanelTest extends TestCase
     }
 
     // ------------------------------------------------------------------
-    // RBAC: Manajer read-only (PRD §2)
+    // Manajer hanya boleh membaca.
     // ------------------------------------------------------------------
 
     #[Test]
@@ -116,13 +116,13 @@ class FilamentPanelTest extends TestCase
     }
 
     // ------------------------------------------------------------------
-    // Aturan bisnis A11
+    // Merge Minggu hanya untuk kategori POY.
     // ------------------------------------------------------------------
 
     #[Test]
     public function model_menolak_merge_minggu_untuk_non_poy_lewat_policy_rule(): void
     {
-        // Aturan A11 ditegakkan di level form Filament; di sini kita
+        // Merge Minggu ditegakkan di level form Filament; di sini kita
         // pastikan data POY boleh ditandai merge, non-POY tidak pernah
         // ditandai oleh seeder/form.
         $poy = $this->barang($this->poy, ['kode_barang' => 'POY-1', 'is_merge_minggu' => true]);

@@ -23,7 +23,7 @@ use Tests\Concerns\MembuatDataUji;
 use Tests\TestCase;
 
 /**
- * Uji matematika laporan F5 (PRD §6).
+ * Uji matematika laporan: mutasi keluar-masuk, kartu stok, dan rendemen.
  *
  * UI legacy sudah dihapus; cakupan bisnis diuji lewat LaporanService.
  * UI Filament diuji oleh FilamentLaporanTest dan endpoint export oleh

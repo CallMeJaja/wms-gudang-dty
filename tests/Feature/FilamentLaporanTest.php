@@ -24,7 +24,7 @@ use Tests\Concerns\MembuatDataUji;
 use Tests\TestCase;
 
 /**
- * Uji halaman laporan F4 di panel Filament.
+ * Uji halaman laporan di panel Filament.
  *
  * DB: SQLite :memory: (phpunit.xml) — MySQL dev TIDAK tersentuh.
  */

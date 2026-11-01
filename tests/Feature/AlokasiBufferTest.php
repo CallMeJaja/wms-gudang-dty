@@ -20,7 +20,7 @@ use Tests\Concerns\MembuatDataUji;
 use Tests\TestCase;
 
 /**
- * Uji alokasi buffer Minggu (PRD §5.2.2 / A11–A13).
+ * Uji alokasi buffer Minggu: hanya merge bertanda buffer, pasokan kurang dari 7 pallet dilewati, dan kuota total gudang dijaga.
  *
  * Prasyarat yang disimulasikan sama seperti alur posting penerimaan:
  *   1. stok AKTIF sudah ditambah dari berat kg detail (StokService::tambahStok)

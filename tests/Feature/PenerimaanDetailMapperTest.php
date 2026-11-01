@@ -16,7 +16,7 @@ use Tests\TestCase;
  * Uji transformasi state form Filament -> kolom transaksi_masuk_detail.
  *
  * Fokus: box/gross/batch tidak boleh mengubah arti KG sebagai single source
- * of truth (PRD A1, A1b, §3.3).
+ * of truth; satuan kg tetap menjadi dasar perhitungan.
  */
 class PenerimaanDetailMapperTest extends TestCase
 {

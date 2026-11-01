@@ -13,7 +13,7 @@ use Tests\Concerns\MembuatDataUji;
 use Tests\TestCase;
 
 /**
- * Uji resource Stok Barang (F4) — baca-saja untuk semua role aktif.
+ * Uji resource Stok Barang — baca-saja untuk semua role aktif.
  */
 class FilamentStokBarangTest extends TestCase
 {

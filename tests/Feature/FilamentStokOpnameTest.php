@@ -19,7 +19,7 @@ use Tests\Concerns\MembuatDataUji;
 use Tests\TestCase;
 
 /**
- * Uji resource Stok Opname (F6) di panel Filament.
+ * Uji resource Stok Opname di panel Filament.
  *
  * Mutasi stok tetap sepenuhnya lewat StokOpnameService — test memastikan
  * form hanya menjadi pintu input dan RBAC Admin tetap berlaku.

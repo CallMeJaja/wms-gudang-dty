@@ -19,7 +19,7 @@ use Tests\Concerns\MembuatDataUji;
 use Tests\TestCase;
 
 /**
- * Uji service buffer Minggu (F4, PRD §5.2.3–§5.2.4).
+ * Uji service buffer Minggu: status buffer, rilis buffer, dan perintah terjadwal.
  *
  * UI dashboard diuji oleh FilamentDashboardWidgetsTest; file ini
  * mempertahankan cakupan service (status buffer, rilis service, perintah

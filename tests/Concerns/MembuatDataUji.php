@@ -57,7 +57,7 @@ trait MembuatDataUji
 
         // Grade netral item pendukung (Gate Pass tidak memuat grade),
         // tetapi transaksi_masuk_detail.grade_id NOT NULL. Wajib ada di
-        // master karena grade bersifat tertutup (A7).
+        // master karena grade bersifat tertutup dan wajib terdaftar.
         $this->gradePendukungStd = Grade::create([
             'kode' => (string) config('wms.grade_pendukung_default', 'STD'),
             'kategori_id' => $this->kategoriPendukung->id,

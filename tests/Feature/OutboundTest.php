@@ -25,7 +25,7 @@ use Tests\Concerns\MembuatDataUji;
 use Tests\TestCase;
 
 /**
- * Uji service transaksi keluar F3 (posting/issue, policy, void).
+ * Uji service transaksi keluar: posting/issue, policy, dan void.
  *
  * UI legacy sudah dihapus; cakupan bisnis diuji lewat
  * PengeluaranService/VoidTransaksiService dan Gate policy langsung.

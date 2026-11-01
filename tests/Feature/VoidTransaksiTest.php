@@ -30,7 +30,7 @@ use Tests\Concerns\MembuatDataUji;
 use Tests\TestCase;
 
 /**
- * Uji void transaksi masuk (F6): POY / Gate Pass / DTY + cerminan keluar.
+ * Uji void transaksi masuk: POY, Gate Pass, DTY, dan cerminan keluar.
  *
  * UI legacy sudah dihapus; void diuji lewat VoidTransaksiService dan
  * otorisasi diperiksa lewat Gate policy.

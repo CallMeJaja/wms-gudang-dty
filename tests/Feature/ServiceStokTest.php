@@ -172,7 +172,7 @@ class ServiceStokTest extends TestCase
 
         $this->assertSame(400.0, $this->stok->totalBufferMinggu());
 
-        // Merge berbeda pada barang merge Minggu tetap dijumlah (lintas merge, A12).
+        // Merge berbeda pada barang merge Minggu tetap dijumlah lintas merge.
         $this->stok->tambahStok($poyMinggu, 'M-3', $this->gradePoyAl->id, 600.0);
         $this->stok->alokasiKeBuffer($poyMinggu, 'M-3', $this->gradePoyAl->id, 200.0, 'REF-2');
 
@@ -289,7 +289,7 @@ class ServiceStokTest extends TestCase
 
         $this->assertSame(330.0, $service->hitungKgDariKemasan($tanpaLangsung, 10, $this->satuanBox->id));
 
-        // POY: tidak ada konversi tersedia (A1b).
+        // POY tidak memiliki konversi otomatis.
         $this->assertNull($service->hitungKgDariKemasan($poy, 10, $this->satuanBobbin->id));
 
         // Auto-fill DTY dari config.

@@ -23,7 +23,7 @@ use Tests\Concerns\MembuatDataUji;
 use Tests\TestCase;
 
 /**
- * Uji dashboard Filament (F4): widget, subheading, dan aksi rilis buffer.
+ * Uji dashboard Filament: widget, subheading, dan aksi rilis buffer.
  *
  * DB memakai SQLite :memory: dari phpunit.xml sehingga database dev
  * tidak tersentuh.

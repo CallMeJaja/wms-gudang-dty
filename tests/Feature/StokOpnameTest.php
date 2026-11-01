@@ -19,7 +19,7 @@ use Tests\Concerns\MembuatDataUji;
 use Tests\TestCase;
 
 /**
- * Uji service stock opname (F6).
+ * Uji service stock opname: pencatatan selisih, penyesuaian stok, dan recalculate.
  *
  * UI legacy sudah dihapus; cakupan bisnis diuji lewat StokOpnameService
  * langsung. UI Filament diuji terpisah oleh FilamentStokOpnameTest.

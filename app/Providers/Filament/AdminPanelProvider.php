@@ -14,6 +14,7 @@ use Filament\PanelProvider;
 use Filament\Support\Assets\Css;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\Width;
+use Filament\View\PanelsRenderHook;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
@@ -46,6 +47,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->maxContentWidth(Width::SevenExtraLarge)
             ->simplePageMaxContentWidth(Width::Medium)
+            ->renderHook(PanelsRenderHook::SIDEBAR_NAV_START, fn () => view('filament.sidebar-search'))
             ->colors([
                 'primary' => Color::Blue,
             ])

@@ -91,3 +91,13 @@ html { scroll-behavior: smooth; }
 .dark .wms-report-table tbody tr:hover {
     background-color: color-mix(in srgb, var(--gray-900) 90%, white) !important;
 }
+
+/* Pencarian modul di atas menu sidebar */
+.wms-sidebar-search {
+    padding: 0 1rem 0.75rem;
+    border-bottom: 1px solid var(--gray-200);
+    margin-bottom: 0.5rem;
+}
+.dark .wms-sidebar-search {
+    border-color: color-mix(in srgb, var(--color-white) 10%, transparent);
+}

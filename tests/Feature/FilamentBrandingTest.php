@@ -121,6 +121,15 @@ class FilamentBrandingTest extends TestCase
     }
 
     #[Test]
+    public function sidebar_memuat_pencarian_menu(): void
+    {
+        $this->actingAs(User::factory()->admin()->create())
+            ->get('/admin')
+            ->assertOk()
+            ->assertSee('Cari menu');
+    }
+
+    #[Test]
     public function badge_navigasi_penerimaan_poy_menghitung_draf(): void
     {
         $this->assertNull(PenerimaanPoyResource::getNavigationBadge());

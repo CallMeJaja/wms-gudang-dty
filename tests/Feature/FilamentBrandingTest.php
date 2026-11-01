@@ -80,8 +80,8 @@ class FilamentBrandingTest extends TestCase
     {
         $dashboard = app(Dashboard::class);
 
-        $this->assertSame('Dashboard', Dashboard::getNavigationLabel());
-        $this->assertSame('Dashboard', $dashboard->getTitle());
+        $this->assertSame('Beranda', Dashboard::getNavigationLabel());
+        $this->assertSame('Beranda', $dashboard->getTitle());
     }
 
     #[Test]

@@ -20,7 +20,7 @@ ketersediaan stok dapat dipantau secara akurat dan mendukung kelancaran proses p
 
 ## Fitur Utama
 
-- **Dashboard** — ringkasan stok aktif, status buffer Minggu beserta aksi rilis buffer,
+- **Beranda** — ringkasan stok aktif, status buffer Minggu beserta aksi rilis buffer,
   grafik stok 30 hari, ringkasan per kategori, dan alert stok menipis.
 - **Master data** — Barang, Partner, Grade, Kategori Barang, Satuan, dan Konversi Satuan.
 - **Transaksi masuk** — Penerimaan POY, Gate Pass Pendukung, dan Penerimaan DTY.

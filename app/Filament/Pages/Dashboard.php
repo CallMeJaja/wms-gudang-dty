@@ -21,12 +21,12 @@ class Dashboard extends BaseDashboard
 
     public static function getNavigationLabel(): string|Htmlable
     {
-        return 'Dashboard';
+        return 'Beranda';
     }
 
     public function getTitle(): string|Htmlable
     {
-        return 'Dashboard';
+        return 'Beranda';
     }
 
     public function getSubheading(): ?string

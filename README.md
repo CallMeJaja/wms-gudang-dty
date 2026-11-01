@@ -90,7 +90,7 @@ database_backup/       # Backup database `.sql` (wms_gudang_dty.sql)
 tests/                 # Test PHPUnit (Feature & Unit)
 ```
 
-Folder `notes/` **tidak disertakan** di repository ini. Dokumen PRD tersedia terpisah
+Folder `notes/` **tidak disertakan** di repository ini. Dokumen kebutuhan tersedia terpisah
 (lokal/backup), bukan bagian dari repo.
 
 ## Cara Menjalankan

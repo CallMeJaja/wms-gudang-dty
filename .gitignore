@@ -46,7 +46,7 @@ Homestead.yaml
 /.commandcode/
 
 # Backup database (hanya dump siap-impor + panduan yang masuk repo)
-# Lihat DoD F0 di PRD §9.
+# Lihat checklist finalisasi proyek.
 /database_backup/*
 !/database_backup/wms_gudang_dty.sql
 !/database_backup/README.md

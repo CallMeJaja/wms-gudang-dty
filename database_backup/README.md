@@ -1,7 +1,7 @@
 # Backup Database — WMS Gudang DTY
 
 Berkas `wms_gudang_dty.sql` adalah dump struktur + data master (seed)
-untuk diimpor ke Laragon (MySQL 8) atau server lain, sesuai DoD F0 di PRD §9.
+untuk diimpor ke Laragon (MySQL 8) atau server lain, sesuai checklist finalisasi proyek.
 
 ## Cara impor (Laragon / MySQL)
 

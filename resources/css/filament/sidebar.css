@@ -101,3 +101,10 @@ html { scroll-behavior: smooth; }
 .fi-sidebar .fi-global-search-field {
     width: 100%;
 }
+
+.wms-brand-name {
+    color: var(--gray-950);
+}
+.dark .wms-brand-name {
+    color: var(--gray-50);
+}

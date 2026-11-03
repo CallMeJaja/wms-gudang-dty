@@ -11,3 +11,7 @@ Artisan::command('inspire', function () {
 Schedule::command('wms:rilis-buffer-minggu')
     ->sundays()->at('05:45')
     ->timezone((string) config('app.timezone', 'Asia/Jakarta'));
+
+Schedule::command('wms:notifikasi-stok-menipis')
+    ->hourly()
+    ->withoutOverlapping(30);

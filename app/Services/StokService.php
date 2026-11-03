@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\JenisMutasi;
 use App\Enums\PosStok;
+use App\Events\StokBerubah;
 use App\Exceptions\AturanBisnisException;
 use App\Exceptions\StokTidakCukupException;
 use App\Models\Barang;
@@ -88,6 +89,8 @@ class StokService
                 keluar: 0.0,
             );
 
+            StokBerubah::dispatch($barang->id);
+
             return $stok;
         });
     }
@@ -134,6 +137,8 @@ class StokService
                 masuk: 0.0,
                 keluar: $qty,
             );
+
+            StokBerubah::dispatch($barang->id);
 
             return $stok;
         });
@@ -191,6 +196,8 @@ class StokService
                 masuk: $porsi,
                 keluar: 0.0,
             );
+
+            StokBerubah::dispatch($barang->id);
         });
     }
 
@@ -239,6 +246,8 @@ class StokService
                 masuk: $qty,
                 keluar: 0.0,
             );
+
+            StokBerubah::dispatch($barang->id);
         });
     }
 

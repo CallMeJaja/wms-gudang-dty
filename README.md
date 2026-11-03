@@ -34,11 +34,11 @@ laporan operasional dalam satu panel admin.
 | Lapisan | Teknologi | Versi |
 | --- | --- | --- |
 | Bahasa | PHP | 8.3+ |
-| Framework | Laravel | 13.35 |
+| Framework | Laravel | 13.39 |
 | Panel admin | Filament | 5.11 |
 | Reaktivitas | Livewire | 4.4.8 |
 | Database | MySQL 8 / MariaDB | — |
-| Test | PHPUnit | 12.5 |
+| Test | PHPUnit | 12.5.42 |
 | Formatter | Laravel Pint | 1.32 |
 | Export PDF | `barryvdh/laravel-dompdf` | 3.1.2 |
 | Export Excel | `maatwebsite/excel` | 4.0.6 |

@@ -8,13 +8,13 @@ antar layer, dan alur request utama.
 | Lapisan | Teknologi | Versi |
 | --- | --- | --- |
 | Bahasa | PHP | 8.3+ |
-| Framework | Laravel | 13.35 |
+| Framework | Laravel | 13.39 |
 | Panel admin | Filament | 5.11 |
 | Reaktivitas | Livewire | 4.4.8 |
 | Database | MySQL 8 / MariaDB | — |
 | Export Excel | `maatwebsite/excel` | 4.0.6 |
 | Export PDF | `barryvdh/laravel-dompdf` | 3.1.2 |
-| Test | PHPUnit | 12.5 |
+| Test | PHPUnit | 12.5.42 |
 | Formatter | Laravel Pint | 1.32 |
 | Build | Vite + `laravel-vite-plugin` | 8.3 / 3.2 |
 

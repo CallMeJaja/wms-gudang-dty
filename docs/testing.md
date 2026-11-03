@@ -1,6 +1,6 @@
 # Testing
 
-Proyek memakai **PHPUnit 12.5**. Suite saat ini berisi **201 test** dengan
+Proyek memakai **PHPUnit 12.5.42**. Suite saat ini berisi **201 test** dengan
 **1068 assertions** dan seluruhnya lulus.
 
 ## Konfigurasi test

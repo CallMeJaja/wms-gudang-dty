@@ -40,7 +40,6 @@ Homestead.yaml
 # Dokumentasi lokal — tidak masuk repo
 /notes/*
 
-# Catatan asisten AI (lokal saja)
 /CLAUDE.md
 /AGENTS.md
 /HANDOFF.md

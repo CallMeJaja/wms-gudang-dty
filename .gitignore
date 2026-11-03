@@ -50,3 +50,4 @@ Homestead.yaml
 /database_backup/*
 !/database_backup/db_wms_gudang_dty.sql
 !/database_backup/README.md
+/presentation

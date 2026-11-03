@@ -43,6 +43,7 @@ Homestead.yaml
 # Catatan asisten AI (lokal saja)
 /CLAUDE.md
 /AGENTS.md
+/HANDOFF.md
 /.commandcode/
 
 # Backup database (hanya dump siap-impor + panduan yang masuk repo)

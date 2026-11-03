@@ -619,11 +619,6 @@ CREATE TABLE `notifications` (
   KEY `notifications_notifiable_type_notifiable_id_index` (`notifiable_type`,`notifiable_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO `notifications` (`id`, `type`, `notifiable_type`, `notifiable_id`, `data`, `read_at`, `created_at`, `updated_at`) VALUES
-('2109b2ac-9c1c-4a17-b237-cf35c18ca800', 'Filament\\Notifications\\DatabaseNotification', 'App\\Models\\User', 1, '{"actions":[],"body":"Buffer baru 1 dari 6 pallet. Sisa 6 hari kerja.","color":null,"duration":"persistent","icon":"heroicon-o-exclamation-triangle","iconColor":"warning","iconSize":null,"status":"warning","title":"Buffer Minggu belum siap","view":null,"viewData":[],"format":"filament"}', NULL, '2026-11-02 03:27:26', '2026-11-02 03:27:26'),
-('28e07519-d7ba-43db-8d93-6781fdd4d00e', 'Filament\\Notifications\\DatabaseNotification', 'App\\Models\\User', 1, '{"actions":[],"body":"Sisa 195 kg dari minimum 200 kg.","color":null,"duration":"persistent","icon":"heroicon-o-exclamation-triangle","iconColor":"warning","iconSize":null,"status":"warning","title":"Stok DTY Coning Oil menipis","view":null,"viewData":[],"format":"filament"}', NULL, '2026-11-02 03:27:25', '2026-11-02 03:27:25'),
-('3b062ed1-37f2-4563-a07c-3cbb1f4c2551', 'Filament\\Notifications\\DatabaseNotification', 'App\\Models\\User', 1, '{"actions":[],"body":"Stok aktif di bawah kebutuhan 1 hari kerja.","color":null,"duration":"persistent","icon":"heroicon-o-exclamation-triangle","iconColor":"danger","iconSize":null,"status":"danger","title":"Stok aktif POY kritis","view":null,"viewData":[],"format":"filament"}', NULL, '2026-11-02 03:27:27', '2026-11-02 03:27:27');
-
 CREATE TABLE `password_reset_tokens` (
   `email` varchar(255) NOT NULL,
   `token` varchar(255) NOT NULL,

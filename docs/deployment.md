@@ -145,7 +145,7 @@ php artisan queue:restart
 ```
 
 Bila aplikasi tidak memakai job asynchronous, worker tetap disarankan agar
-notifikasi atau job bawaan tidak menumpuk.
+job bawaan tidak menumpuk.
 
 ## 9. Web server dan HTTPS
 
@@ -170,9 +170,14 @@ restore harus ke database yang benar.
 ## 11. Notifikasi
 
 - Tabel `notifications` harus ada.
-- Notifikasi database tampil di sidebar.
-- Seeder notifikasi demo hanya berjalan di environment lokal.
-- Setelah migrasi, verifikasi dengan membuka drawer notifikasi.
+- Notifikasi database tampil di sidebar dan dikirim langsung (sinkron),
+  sehingga tidak memerlukan queue worker.
+- Pemeriksaan stok menipis berjalan otomatis setelah mutasi stok dan lewat
+  command terjadwal `wms:notifikasi-stok-menipis` setiap jam.
+- `NotifikasiDemoSeeder` menjalankan pemeriksaan stok yang sebenarnya; tidak
+  membuat notifikasi statis.
+- Setelah migrasi, verifikasi dengan memicu mutasi stok atau menjalankan
+  `php artisan wms:notifikasi-stok-menipis`, lalu buka drawer notifikasi.
 
 ## 12. Keamanan akun
 

@@ -150,11 +150,17 @@ aktif tidak cukup, transaksi ditolak dan seluruh perubahan dibatalkan.
 
 ## Notifikasi
 
-- Notifikasi memakai tabel `notifications` bawaan Laravel.
-- Panel menampilkan drawer notifikasi database di sidebar.
-- Seeder demo hanya membuat notifikasi pada environment lokal.
-- Aksi bisnis tertentu mengirim notifikasi Filament setelah berhasil,
-  misalnya rilis buffer dan proses transaksi.
+- Notifikasi memakai tabel `notifications` bawaan Laravel dan tampil di
+  drawer sidebar.
+- Setiap perubahan stok memicu event `StokBerubah` yang dikirim setelah
+  transaksi commit (`ShouldDispatchAfterCommit`).
+- Listener `PeriksaStokMenipis` memanggil `StokMenipisService` untuk
+  memeriksa stok item dan stok aktif POY, lalu mengirim notifikasi ke Admin
+  dan Manajer aktif.
+- Pemeriksaan yang sama dijadwalkan setiap jam sebagai fallback lewat
+  command `wms:notifikasi-stok-menipis`.
+- Notifikasi dikirim langsung (sinkron) sehingga tidak memerlukan queue
+  worker.
 
 ## Global search
 

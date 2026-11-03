@@ -8,7 +8,7 @@ laporan operasional dalam satu panel admin.
 ![PHP](https://img.shields.io/badge/PHP-8.3%2B-777BB4?logo=php&logoColor=white)
 ![Laravel](https://img.shields.io/badge/Laravel-13-red?logo=laravel&logoColor=white)
 ![Filament](https://img.shields.io/badge/Filament-5-FDAE4B)
-![Tests](https://img.shields.io/badge/tests-201%20lulus-brightgreen)
+![Tests](https://img.shields.io/badge/tests-208%20lulus-brightgreen)
 ![Status](https://img.shields.io/badge/status-finalisasi%20%26%20QA-blue)
 
 ![Beranda WMS Gudang DTY](docs/assets/beranda.png)
@@ -23,7 +23,8 @@ laporan operasional dalam satu panel admin.
 - **Persediaan** — Stok Barang dan Stok Opname.
 - **Laporan** — Keluar-Masuk, Kartu Stok, dan Rendemen dengan ekspor
   Excel/PDF serta cetak.
-- **Notifikasi database** di sidebar untuk peringatan stok dan buffer.
+- **Notifikasi database** di sidebar untuk peringatan stok menipis setelah
+  mutasi stok; status buffer Minggu tampil di Beranda.
 - **Global search** dengan shortcut **Ctrl+K** atau **⌘K**.
 - **Pengguna dan riwayat aktivitas** untuk manajemen akun dan audit trail.
 - **Cetak dokumen** Gate Pass dan Surat Jalan siap cetak.
@@ -108,7 +109,7 @@ Dokumentasi lengkap berada di [`docs/`](docs/README.md).
 | [Features](docs/features.md) | Modul, URL, role matrix, lifecycle, screenshot |
 | [Business Rules](docs/business-rules.md) | KG, buffer Minggu, rendemen, void, opname |
 | [Database](docs/database.md) | 26 tabel, relasi, enum, ERD, data demo |
-| [Testing](docs/testing.md) | 201 test, struktur, perintah, menambah test |
+| [Testing](docs/testing.md) | 208 test, struktur, perintah, menambah test |
 | [Deployment](docs/deployment.md) | Checklist produksi, scheduler, queue, backup |
 | [Troubleshooting](docs/troubleshooting.md) | Masalah umum dan langkah diagnosis |
 | [Contributing](docs/contributing.md) | Conventional Commits, branch, kualitas kode |
@@ -137,7 +138,7 @@ tests/              # PHPUnit feature dan unit test
 ## Testing
 
 ```bash
-php artisan test       # 201 test lulus, 1068 assertions
+php artisan test       # 208 test lulus, 1084 assertions
 vendor/bin/pint        # format kode PHP
 npm run build          # build aset frontend
 ```

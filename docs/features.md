@@ -206,10 +206,21 @@ Keduanya hanya dapat diakses Admin.
 
 ![Notifikasi sidebar](assets/notifikasi.png)
 
-- Notifikasi disimpan di tabel `notifications`.
-- Drawer notifikasi tersedia di sidebar.
-- Notifikasi contoh dibuat oleh seeder demo pada environment lokal.
-- Notifikasi juga dikirim setelah aksi tertentu, misalnya rilis buffer.
+- Notifikasi disimpan di tabel `notifications` dan tersedia di drawer sidebar.
+- Notifikasi dikirim langsung (sinkron) sehingga tetap tampil tanpa worker
+  queue.
+- Notifikasi stok menipis dikirim otomatis setelah mutasi stok (penerimaan,
+  pengeluaran, alokasi buffer, dan rilis buffer) serta oleh pemeriksaan
+  terjadwal setiap jam.
+- Pemeriksaan memakai total `stok_aktif + stok_buffer` untuk barang aktif yang
+  memiliki `stok_minimum`. Stok aktif POY juga diperiksa terhadap ambang
+  6 pallet.
+- Penerima hanya pengguna aktif dengan role Admin dan Manajer.
+- Notifikasi yang sama tidak dikirim berulang selama kondisi masih menipis.
+  Kunci dedup dilepas saat stok kembali aman sehingga peringatan dapat
+  terkirim lagi bila kondisi memburuk.
+- Seeder demo `NotifikasiDemoSeeder` menjalankan pemeriksaan nyata ini, bukan
+  membuat notifikasi contoh palsu.
 
 ## Global search
 

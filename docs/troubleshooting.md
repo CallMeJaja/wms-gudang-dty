@@ -102,8 +102,8 @@ php artisan migrate --force
 php artisan optimize:clear
 ```
 
-Pastikan tabel `notifications` ada. Notifikasi demo hanya dibuat pada
-environment lokal; untuk produksi, notifikasi muncul dari aksi aplikasi.
+Pastikan tabel `notifications` ada. Notifikasi dibuat saat runtime setelah
+mutasi stok atau saat menjalankan `php artisan wms:notifikasi-stok-menipis`.
 
 ## Shortcut pencarian tidak berfungsi
 

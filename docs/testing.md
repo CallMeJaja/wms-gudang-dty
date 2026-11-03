@@ -1,7 +1,7 @@
 # Testing
 
-Proyek memakai **PHPUnit 12.5.42**. Suite saat ini berisi **201 test** dengan
-**1068 assertions** dan seluruhnya lulus.
+Proyek memakai **PHPUnit 12.5.42**. Suite saat ini berisi **208 test** dengan
+**1084 assertions** dan seluruhnya lulus.
 
 ## Konfigurasi test
 
@@ -27,6 +27,8 @@ tests/
 │   ├── InboundTest.php
 │   ├── OutboundTest.php
 │   ├── ServiceStokTest.php
+│   ├── StokBerubahEventTest.php
+│   ├── StokMenipisServiceTest.php
 │   ├── AlokasiBufferTest.php
 │   ├── StokOpnameTest.php
 │   ├── VoidTransaksiTest.php
@@ -65,6 +67,7 @@ Kelompok cakupan:
 | Void | Pembalikan mutasi, alasan wajib, role Admin |
 | Opname | Selisih, transaksi penyesuaian, duplikat harian |
 | Laporan | Agregasi, rendemen, ekspor Excel/PDF |
+| Notifikasi stok | Event after commit, dedup, penerima Admin/Manajer, ambang POY, command manual |
 | Filament | Akses panel, resource, widget, cetak, pengguna |
 | Seeder | Konsistensi data demo |
 

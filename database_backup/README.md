@@ -1,10 +1,11 @@
 # Backup Database — WMS Gudang DTY
 
 `db_wms_gudang_dty.sql` adalah dump manual siap-impor untuk aplikasi WMS
-Gudang DTY. Dump memuat **26 tabel**: struktur lengkap, data master, data
-demo, dan notifikasi contoh. Dump **tidak** menyertakan `CREATE DATABASE`/
-`USE` dan **tidak** memakai `DROP TABLE`, sehingga database tujuan harus
-dibuat terlebih dahulu dan dalam keadaan kosong.
+Gudang DTY. Dump memuat **26 tabel**: struktur lengkap, data master, dan
+data demo. Notifikasi tidak disertakan dan dibuat saat runtime oleh
+pemeriksaan stok. Dump **tidak** menyertakan `CREATE DATABASE`/`USE` dan
+**tidak** memakai `DROP TABLE`, sehingga database tujuan harus dibuat
+terlebih dahulu dan dalam keadaan kosong.
 
 ## Isi dump
 
@@ -17,7 +18,7 @@ dibuat terlebih dahulu dan dalam keadaan kosong.
   - 41 transaksi keluar
   - 156 mutasi stok
   - 143 activity log
-  - 3 notifikasi
+  - 0 notifikasi (dibuat saat runtime oleh pemeriksaan stok)
 - Database tujuan: `db_wms_gudang_dty`
 - Character set: `utf8mb4`
 - Collation: `utf8mb4_general_ci`
@@ -58,9 +59,11 @@ Gunakan migrasi dan seeder Laravel:
 php artisan migrate --seed
 ```
 
-Data demo transaksi dan notifikasi hanya dijalankan ketika
-`APP_ENV=local`. Pada environment lain, seeder tetap membuat master data
-dan akun default tanpa data transaksi demo.
+Data transaksi demo hanya dijalankan ketika `APP_ENV=local`.
+`NotifikasiDemoSeeder` ikut berjalan di lokal dan menjalankan pemeriksaan
+stok menipis yang sebenarnya; notifikasi tidak dibuat sebagai data contoh.
+Pada environment lain, seeder tetap membuat master data dan akun default
+tanpa data transaksi demo.
 
 ## Akun default
 

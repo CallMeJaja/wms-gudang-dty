@@ -12,6 +12,7 @@ use App\Models\TransaksiMasukDetail;
 use App\Services\KonversiSatuanService;
 use App\Services\NomorDokumenService;
 use App\Services\PenerimaanService;
+use App\Services\ShiftService;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
@@ -65,6 +66,7 @@ class PenerimaanDtyForm
                                 Select::make('shift')
                                     ->label('Shift')
                                     ->options(PenerimaanForm::opsiShift())
+                                    ->default(fn (): int => app(ShiftService::class)->current())
                                     ->required()
                                     ->native(false),
 

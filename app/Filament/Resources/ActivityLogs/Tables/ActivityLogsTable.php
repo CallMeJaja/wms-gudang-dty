@@ -22,6 +22,7 @@ class ActivityLogsTable
                 TextColumn::make('created_at')
                     ->label('Waktu')
                     ->dateTime('d M Y H:i')
+                    ->extraCellAttributes(['class' => 'wms-nowrap'])
                     ->sortable(),
 
                 TextColumn::make('user.name')

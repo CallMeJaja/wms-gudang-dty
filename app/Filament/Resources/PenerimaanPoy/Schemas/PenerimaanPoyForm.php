@@ -9,6 +9,7 @@ use App\Models\Barang;
 use App\Models\KategoriBarang;
 use App\Models\SupplierCustomer;
 use App\Services\NomorDokumenService;
+use App\Services\ShiftService;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
@@ -60,6 +61,7 @@ class PenerimaanPoyForm
                                 Select::make('shift')
                                     ->label('Shift')
                                     ->options(PenerimaanForm::opsiShift())
+                                    ->default(fn (): int => app(ShiftService::class)->current())
                                     ->required()
                                     ->native(false),
 

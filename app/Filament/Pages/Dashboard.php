@@ -7,6 +7,7 @@ use App\Filament\Widgets\GrafikStokWidget;
 use App\Filament\Widgets\RingkasanOperasionalWidget;
 use App\Services\AlokasiBufferService;
 use App\Services\RilisBufferService;
+use App\Services\ShiftService;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Pages\Dashboard as BaseDashboard;
@@ -32,7 +33,7 @@ class Dashboard extends BaseDashboard
         return sprintf(
             '%s · Shift berjalan: %s',
             now()->locale('id')->translatedFormat('l, d F Y'),
-            $this->shiftBerjalan(),
+            app(ShiftService::class)->label(app(ShiftService::class)->current()),
         );
     }
 
@@ -81,33 +82,5 @@ class Dashboard extends BaseDashboard
             GrafikStokWidget::class,
             AlertStokWidget::class,
         ];
-    }
-
-    /**
-     * Shift berjalan dari konfigurasi gudang. Shift 3 melintasi tengah
-     * malam, sehingga rentang 22:00–06:00 dinilai sebagai satu blok.
-     */
-    private function shiftBerjalan(): string
-    {
-        $jam = now()->format('H:i');
-
-        foreach (config('wms.shift', []) as $nomor => $shift) {
-            $mulai = (string) ($shift['mulai'] ?? '');
-            $selesai = (string) ($shift['selesai'] ?? '');
-
-            if ($mulai === '' || $selesai === '') {
-                continue;
-            }
-
-            $cocok = $mulai <= $selesai
-                ? ($jam >= $mulai && $jam < $selesai)
-                : ($jam >= $mulai || $jam < $selesai);
-
-            if ($cocok) {
-                return "Shift {$nomor} ({$mulai}–{$selesai})";
-            }
-        }
-
-        return 'Shift 3 (22:00–06:00)';
     }
 }

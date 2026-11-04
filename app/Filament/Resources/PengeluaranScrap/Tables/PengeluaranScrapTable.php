@@ -29,6 +29,7 @@ class PengeluaranScrapTable
                 TextColumn::make('tanggal')
                     ->label('Tanggal')
                     ->date('d M Y')
+                    ->extraCellAttributes(['class' => 'wms-nowrap'])
                     ->sortable(),
 
                 TextColumn::make('catatan')

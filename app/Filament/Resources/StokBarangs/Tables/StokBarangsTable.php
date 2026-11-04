@@ -76,6 +76,7 @@ class StokBarangsTable
                 TextColumn::make('updated_at')
                     ->label('Diubah')
                     ->dateTime('d M Y H:i')
+                    ->extraCellAttributes(['class' => 'wms-nowrap'])
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

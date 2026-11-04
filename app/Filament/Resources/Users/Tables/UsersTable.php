@@ -54,6 +54,7 @@ class UsersTable
                 TextColumn::make('created_at')
                     ->label('Dibuat')
                     ->dateTime('d M Y H:i')
+                    ->extraCellAttributes(['class' => 'wms-nowrap'])
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

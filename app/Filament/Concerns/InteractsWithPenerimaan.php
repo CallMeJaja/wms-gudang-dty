@@ -182,12 +182,12 @@ trait InteractsWithPenerimaan
         $jenis = static::jenisMasuk();
 
         return Action::make('void')
-            ->label('Void')
+            ->label('Batalkan (Void)')
             ->icon('heroicon-o-x-circle')
             ->color('danger')
             ->requiresConfirmation()
-            ->modalHeading('Void transaksi?')
-            ->modalDescription('Stok akan dikembalikan ke posisi sebelum transaksi. Tindakan ini tercatat di log.')
+            ->modalHeading('Batalkan transaksi (Void)?')
+            ->modalDescription('Stok akan dikembalikan ke posisi sebelum transaksi. Transaksi menjadi VOID dan tidak dapat diaktifkan kembali. Tindakan ini tercatat di audit log.')
             ->schema([
                 Textarea::make('alasan_void')
                     ->label('Alasan Void')

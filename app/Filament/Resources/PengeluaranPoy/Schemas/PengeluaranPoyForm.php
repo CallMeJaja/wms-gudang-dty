@@ -5,6 +5,7 @@ namespace App\Filament\Resources\PengeluaranPoy\Schemas;
 use App\Enums\JenisKeluar;
 use App\Filament\Support\PengeluaranForm;
 use App\Services\NomorDokumenService;
+use App\Services\ShiftService;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
@@ -53,6 +54,7 @@ class PengeluaranPoyForm
                                 Select::make('shift')
                                     ->label('Shift')
                                     ->options(PengeluaranForm::opsiShift())
+                                    ->default(fn (): int => app(ShiftService::class)->current())
                                     ->required()
                                     ->native(false),
 

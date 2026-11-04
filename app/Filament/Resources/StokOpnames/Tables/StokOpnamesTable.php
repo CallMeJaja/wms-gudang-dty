@@ -39,6 +39,7 @@ class StokOpnamesTable
                 TextColumn::make('tanggal')
                     ->label('Tanggal')
                     ->date('d M Y')
+                    ->extraCellAttributes(['class' => 'wms-nowrap'])
                     ->sortable(),
 
                 TextColumn::make('barang.kode_barang')
@@ -104,6 +105,7 @@ class StokOpnamesTable
                 TextColumn::make('created_at')
                     ->label('Dibuat')
                     ->dateTime('d M Y H:i')
+                    ->extraCellAttributes(['class' => 'wms-nowrap'])
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

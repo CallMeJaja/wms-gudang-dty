@@ -1,11 +1,11 @@
 # Backup Database — WMS Gudang DTY
 
 `db_wms_gudang_dty.sql` adalah dump manual siap-impor untuk aplikasi WMS
-Gudang DTY. Dump memuat **26 tabel**: struktur lengkap, data master, dan
-data demo. Notifikasi tidak disertakan dan dibuat saat runtime oleh
-pemeriksaan stok. Dump **tidak** menyertakan `CREATE DATABASE`/`USE` dan
-**tidak** memakai `DROP TABLE`, sehingga database tujuan harus dibuat
-terlebih dahulu dan dalam keadaan kosong.
+Gudang DTY. Dump memuat **26 tabel**: struktur lengkap, data master, data
+demo, dan 2 notifikasi nyata hasil pemeriksaan stok menipis. Dump **tidak**
+menyertakan `CREATE DATABASE`/`USE` dan **tidak** memakai `DROP TABLE`,
+sehingga database tujuan harus dibuat terlebih dahulu dan dalam keadaan
+kosong.
 
 ## Isi dump
 
@@ -14,19 +14,21 @@ terlebih dahulu dan dalam keadaan kosong.
 - **Data demo**:
   - 3 user (Admin, Operator, Manajer)
   - 9 barang
-  - 62 transaksi masuk
-  - 41 transaksi keluar
-  - 156 mutasi stok
-  - 143 activity log
-  - 0 notifikasi (dibuat saat runtime oleh pemeriksaan stok)
+  - 64 transaksi masuk (65 baris detail)
+  - 42 transaksi keluar (42 baris detail)
+  - 160 mutasi stok
+  - 26 alokasi buffer
+  - 3 stok opname
+  - 132 activity log
+  - 2 notifikasi nyata (DTY CONING OIL; Admin + Manajer)
 - Database tujuan: `db_wms_gudang_dty`
 - Character set: `utf8mb4`
 - Collation: `utf8mb4_general_ci`
 
 ## Import
 
-Dump dibuat dengan DBX/MariaDB dan kompatibel dengan MySQL 8 maupun MariaDB
-(collation `utf8mb4_general_ci`). Buat database lalu impor:
+Dump dibuat dengan `mariadb-dump` (MariaDB) dan kompatibel dengan MySQL 8
+maupun MariaDB (collation `utf8mb4_general_ci`). Buat database lalu impor:
 
 ```bash
 mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS db_wms_gudang_dty CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;"
@@ -61,9 +63,9 @@ php artisan migrate --seed
 
 Data transaksi demo hanya dijalankan ketika `APP_ENV=local`.
 `NotifikasiDemoSeeder` ikut berjalan di lokal dan menjalankan pemeriksaan
-stok menipis yang sebenarnya; notifikasi tidak dibuat sebagai data contoh.
-Pada environment lain, seeder tetap membuat master data dan akun default
-tanpa data transaksi demo.
+stok menipis yang sebenarnya, sehingga dump dan seeder demo berisi 2
+notifikasi nyata. Pada environment lain, seeder tetap membuat master data
+dan akun default tanpa data transaksi demo.
 
 ## Akun default
 
@@ -81,8 +83,8 @@ transaksi tetap diisi terpisah.
 
 - MySQL 8 dan MariaDB.
 - InnoDB, `utf8mb4`, dan `CHECK` constraint.
-- Dump dibuat dengan DBX/MariaDB dan memakai SQL standar agar dapat diimpor
-  ke MySQL 8.
+- Dump dibuat dengan `mariadb-dump` dan memakai SQL standar agar dapat
+  diimpor ke MySQL 8.
 - Bila muncul peringatan collation `uca1400`, pastikan database tujuan
   memakai `utf8mb4_general_ci`.
 

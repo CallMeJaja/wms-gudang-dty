@@ -138,6 +138,8 @@ class DemoTransaksiSeeder extends Seeder
             }
         }
 
+        $this->penerimaanPoyHarian($poy, $akhir, $noPoyIn++, false, 1, $userId);
+
         $this->drafPoy($userId);
         $this->drafTambahan($userId);
         $this->opnameDemo((int) $admin->id, $akhir);
@@ -258,7 +260,7 @@ class DemoTransaksiSeeder extends Seeder
         $kodeGrade = $isGradeC ? 'C' : self::GRADE_DTY_SIKLUS[$indeks % count(self::GRADE_DTY_SIKLUS)];
         $grade = $this->grade(KategoriBarang::DTY, $kodeGrade);
         $box = Satuan::query()->where('kode', 'BOX')->firstOrFail();
-        $jumlahBox = $isGradeC ? 10 : 10 + ($indeks % 3);
+        $jumlahBox = $isGradeC ? 10 : 100 + ($indeks % 3);
         $merge = $this->mergeDtyMingguan($tgl);
 
         $trx = TransaksiMasuk::query()->firstOrCreate(

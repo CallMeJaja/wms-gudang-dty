@@ -205,14 +205,17 @@ Dump dan seeder lokal menyiapkan:
 | --- | --- |
 | User | 3 |
 | Barang | 9 |
-| Transaksi masuk | 62 |
-| Transaksi keluar | 41 |
-| Mutasi stok | 156 |
-| Activity log | 143 |
-| Notifikasi | 0 (dibuat saat runtime) |
+| Transaksi masuk | 64 |
+| Transaksi keluar | 42 |
+| Mutasi stok | 160 |
+| Alokasi buffer | 26 |
+| Stok opname | 3 |
+| Activity log | 132 |
+| Notifikasi | 2 (notifikasi stok menipis nyata) |
 
-Data transaksi demo hanya dibuat saat `APP_ENV=local`. Notifikasi tidak
-di-seed; dibuat saat runtime oleh pemeriksaan stok.
+Data transaksi demo hanya dibuat saat `APP_ENV=local`. `NotifikasiDemoSeeder`
+menjalankan pemeriksaan stok menipis yang sebenarnya, sehingga dump dan
+seeder demo menghasilkan 2 notifikasi nyata untuk Admin dan Manajer.
 
 ## Migrasi dan seeder
 
@@ -236,10 +239,10 @@ di-seed; dibuat saat runtime oleh pemeriksaan stok.
 
 - Jika database sudah memiliki tabel, kosongkan atau buat ulang terlebih
   dahulu.
-- Dump memuat 26 tabel dan data demo (3 user, 9 barang, 62 masuk, 41 keluar,
-  156 mutasi, 143 log, 0 notifikasi — notifikasi dibuat saat runtime).
-- Dump dibuat dengan DBX/MariaDB; kompatibel dengan MySQL 8 dan MariaDB,
-  collation `utf8mb4_general_ci`.
+- Dump memuat 26 tabel dan data demo (3 user, 9 barang, 64 masuk, 42 keluar,
+  160 mutasi, 26 alokasi buffer, 3 opname, 132 log, 2 notifikasi).
+- Dump dibuat dengan `mariadb-dump` (MariaDB); kompatibel dengan MySQL 8 dan
+  MariaDB, collation `utf8mb4_general_ci`.
 - Alternatif tanpa dump:
 
   ```bash

@@ -77,9 +77,10 @@ Detail isi dump dan alternatif impor ada di
 php artisan migrate --seed
 ```
 
-Data transaksi demo hanya dibuat saat `APP_ENV=local`. Notifikasi tidak
-di-seed; dibuat saat runtime oleh pemeriksaan stok menipis. Pada environment
-lain, seeder tetap membuat master data dan akun default.
+Data transaksi demo hanya dibuat saat `APP_ENV=local`. `NotifikasiDemoSeeder`
+menjalankan pemeriksaan stok menipis yang sebenarnya, sehingga dump dan
+seeder demo berisi 2 notifikasi nyata. Pada environment lain, seeder tetap
+membuat master data dan akun default.
 
 ## 5. Build aset frontend
 
@@ -139,8 +140,9 @@ pertama.
 5. Coba **Pengeluaran POY** untuk melihat validasi stok aktif dan buffer.
 6. Buka **Laporan → Rendemen** untuk melihat rekonsiliasi POY vs DTY.
 7. Gunakan **Ctrl/⌘+K** untuk mencari data melalui global search.
-8. Buka ikon notifikasi di sidebar. Notifikasi muncul setelah mutasi stok
-   atau setelah menjalankan `php artisan wms:notifikasi-stok-menipis`.
+8. Buka ikon notifikasi di sidebar. Demo sudah berisi 2 notifikasi stok
+   menipis; notifikasi baru juga muncul setelah mutasi stok atau setelah
+   menjalankan `php artisan wms:notifikasi-stok-menipis`.
 
 ## 9. Perintah penting
 

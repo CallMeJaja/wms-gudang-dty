@@ -50,7 +50,6 @@ class FilamentGatePassPrintTest extends TestCase
         $this->pendukung = Barang::create([
             'kategori_id' => $this->kategoriPendukung->id,
             'kode_barang' => 'PPR TUB DTY',
-            'kode_material' => '5003301227',
             'nama_barang' => 'Paper Tube DTY Bullnose',
             'satuan_dasar_id' => $this->pcs->id,
             'is_merge_minggu' => false,
@@ -82,7 +81,6 @@ class FilamentGatePassPrintTest extends TestCase
             ->assertOk()
             ->assertSee('GATE PASS')
             ->assertSee('27041797')
-            ->assertSee('5003301227')
             ->assertSee('GRN-VELVET');
     }
 
@@ -126,7 +124,6 @@ class FilamentGatePassPrintTest extends TestCase
         $this->actingAs($this->admin)
             ->get(PenerimaanPendukungResource::getUrl('cetak', ['record' => $transaksi]))
             ->assertOk()
-            ->assertSee('5003301227')
             ->assertDontSee('TANPA-BATCH');
     }
 

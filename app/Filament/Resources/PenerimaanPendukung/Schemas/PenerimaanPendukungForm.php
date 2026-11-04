@@ -148,13 +148,9 @@ class PenerimaanPendukungForm
                                             ->orderBy('kode_barang'),
                                     )
                                     ->getOptionLabelFromRecordUsing(
-                                        fn (Barang $record) => trim(
-                                            "{$record->kode_barang}"
-                                            .($record->kode_material ? " [{$record->kode_material}]" : '')
-                                            ." — {$record->nama_barang}"
-                                        )
+                                        fn (Barang $record) => "{$record->kode_barang} — {$record->nama_barang}"
                                     )
-                                    ->searchable(['kode_barang', 'kode_material', 'nama_barang'])
+                                    ->searchable(['kode_barang', 'nama_barang'])
                                     ->preload()
                                     ->placeholder('Pilih')
                                     ->required()

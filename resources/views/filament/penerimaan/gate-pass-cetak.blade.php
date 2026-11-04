@@ -92,7 +92,7 @@
                     @endphp
                     <tr>
                         <td class="center">{{ $i + 1 }}</td>
-                        <td class="mono">{{ $detail->barang?->kode_material ?: $detail->barang?->kode_barang }}</td>
+                        <td class="mono">{{ $detail->barang?->kode_barang }}</td>
                         <td>{{ $detail->barang?->nama_barang }}</td>
                         <td class="center">{{ $detail->barang?->satuanDasar?->kode ?? $detail->satuanKemasan?->kode }}</td>
                         <td class="num">{{ number_format((float) $detail->berat_kg, 2, ',', '.') }}</td>

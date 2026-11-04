@@ -109,26 +109,10 @@ html { scroll-behavior: smooth; }
     color: var(--gray-50);
 }
 
-/* Header tabel Filament terpusat, tetap mendukung sorting */
-.fi-ta-header-cell {
-    text-align: center !important;
-}
-
-.fi-ta-header-cell > .fi-ta-header-cell-sort-btn {
-    display: flex !important;
-    width: 100% !important;
-    justify-content: center !important;
-    text-align: center !important;
-}
-
 .wms-nowrap {
     white-space: nowrap !important;
 }
 
-/* Tabel laporan kustom */
-.wms-report-table thead th {
-    text-align: center !important;
-}
 
 .wms-report-table td.wms-date,
 .wms-report-table th.wms-date {

@@ -28,7 +28,6 @@ class BarangSeeder extends Seeder
             // ---------------- POY ----------------
             [
                 'kode_barang' => 'POY-250-48',
-                'kode_material' => null,
                 'nama_barang' => 'POY 250/48',
                 'kategori' => KategoriBarang::POY,
                 'denier' => '250',
@@ -40,7 +39,6 @@ class BarangSeeder extends Seeder
             // ---------------- DTY ----------------
             [
                 'kode_barang' => 'DTY-150-48-1',
-                'kode_material' => null,
                 'nama_barang' => 'DTY 150/48',
                 'kategori' => KategoriBarang::DTY,
                 'denier' => '150',
@@ -52,7 +50,6 @@ class BarangSeeder extends Seeder
             // ---------------- Item Pendukung ----------------
             [
                 'kode_barang' => 'PPR TUB DTY, BULLNOSE',
-                'kode_material' => '5003301227',
                 'nama_barang' => 'PPR TUB DTY,BULLNOSE,212-222GM',
                 'kategori' => KategoriBarang::PENDUKUNG,
                 'denier' => null,
@@ -62,7 +59,6 @@ class BarangSeeder extends Seeder
             ],
             [
                 'kode_barang' => 'CARTON BOX DTY 675x444x278MM, KRAFT 200',
-                'kode_material' => '5000002512',
                 'nama_barang' => 'CARTON BOX DTY 675X444X278MM,KRAFT 200',
                 'kategori' => KategoriBarang::PENDUKUNG,
                 'denier' => null,
@@ -72,7 +68,6 @@ class BarangSeeder extends Seeder
             ],
             [
                 'kode_barang' => 'STRETCH FILM 12MC',
-                'kode_material' => '5003301185',
                 'nama_barang' => 'STRETCH FILM 12MC',
                 'kategori' => KategoriBarang::PENDUKUNG,
                 'denier' => null,
@@ -82,7 +77,6 @@ class BarangSeeder extends Seeder
             ],
             [
                 'kode_barang' => 'PALLET DTY SMALL BOX 1370x1150x140MM',
-                'kode_material' => '5003301241',
                 'nama_barang' => 'PALLET DTY SMALL BOX,1370X1150X140MM',
                 'kategori' => KategoriBarang::PENDUKUNG,
                 'denier' => null,
@@ -92,7 +86,6 @@ class BarangSeeder extends Seeder
             ],
             [
                 'kode_barang' => 'TAPE 250MX3IN, VISTAC TRANSPARENT',
-                'kode_material' => '5003301180',
                 'nama_barang' => 'TAPE,250MX3IN,VISTAC,TRANSPARENT',
                 'kategori' => KategoriBarang::PENDUKUNG,
                 'denier' => null,
@@ -102,7 +95,6 @@ class BarangSeeder extends Seeder
             ],
             [
                 'kode_barang' => 'DTY CONING OIL, TM368 BN',
-                'kode_material' => '1003000201',
                 'nama_barang' => 'DTY CONING OIL,TM368 BN',
                 'kategori' => KategoriBarang::PENDUKUNG,
                 'denier' => null,
@@ -112,7 +104,6 @@ class BarangSeeder extends Seeder
             ],
             [
                 'kode_barang' => 'DTY PLASTIC BAG HDPE VRGN (4%A) 36/42x55 CM',
-                'kode_material' => '5000001861',
                 'nama_barang' => 'DTY PLASTIC BAG-HDPE VRGN (4%A) 36/42X55 CM',
                 'kategori' => KategoriBarang::PENDUKUNG,
                 'denier' => null,
@@ -127,7 +118,6 @@ class BarangSeeder extends Seeder
                 ['kode_barang' => $item['kode_barang']],
                 [
                     'kategori_id' => $kategori[$item['kategori']],
-                    'kode_material' => $item['kode_material'],
                     'nama_barang' => $item['nama_barang'],
                     'denier' => $item['denier'],
                     'filament' => $item['filament'],

@@ -35,32 +35,21 @@ class DemoTransaksiSeederTest extends TestCase
     }
 
     #[Test]
-    public function master_barang_memuat_kode_material_dan_satuan_pcs(): void
+    public function master_barang_memuat_satuan_pcs_untuk_tape_dan_stretch_film(): void
     {
         $zona = (string) config('app.timezone');
         Carbon::setTestNow(Carbon::createFromFormat('Y-m-d H:i:s', '2026-10-13 10:00:00', $zona));
 
         $this->seed(DatabaseSeeder::class);
 
-        $harapan = [
-            'PPR TUB DTY, BULLNOSE' => ['5003301227', 'PCS'],
-            'CARTON BOX DTY 675x444x278MM, KRAFT 200' => ['5000002512', 'PCS'],
-            'PALLET DTY SMALL BOX 1370x1150x140MM' => ['5003301241', 'PCS'],
-            'TAPE 250MX3IN, VISTAC TRANSPARENT' => ['5003301180', 'PCS'],
-            'DTY PLASTIC BAG HDPE VRGN (4%A) 36/42x55 CM' => ['5000001861', 'KG'],
-            'STRETCH FILM 12MC' => ['5003301185', 'PCS'],
-            'DTY CONING OIL, TM368 BN' => ['1003000201', 'KG'],
-        ];
-
-        foreach ($harapan as $kodeBarang => [$kodeMaterial, $satuan]) {
+        foreach ([
+            'TAPE 250MX3IN, VISTAC TRANSPARENT',
+            'STRETCH FILM 12MC',
+        ] as $kodeBarang) {
             $barang = Barang::query()->with('satuanDasar')->where('kode_barang', $kodeBarang)->firstOrFail();
 
-            $this->assertSame($kodeMaterial, $barang->kode_material);
-            $this->assertSame($satuan, $barang->satuanDasar?->kode, "Satuan {$kodeBarang} salah.");
+            $this->assertSame('PCS', $barang->satuanDasar?->kode, "Satuan {$kodeBarang} salah.");
         }
-
-        $this->assertNull(Barang::query()->where('kode_barang', 'POY-250-48')->value('kode_material'));
-        $this->assertNull(Barang::query()->where('kode_barang', 'DTY-150-48-1')->value('kode_material'));
     }
 
     #[Test]

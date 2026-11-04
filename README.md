@@ -138,7 +138,7 @@ tests/              # PHPUnit feature dan unit test
 ## Testing
 
 ```bash
-php artisan test       # 222 test lulus, 1189 assertions
+php artisan test       # 222 test lulus, 1173 assertions
 vendor/bin/pint        # format kode PHP
 npm run build          # build aset frontend
 ```

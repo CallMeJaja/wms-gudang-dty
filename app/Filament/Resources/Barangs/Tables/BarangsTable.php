@@ -31,13 +31,6 @@ class BarangsTable
                     ->weight('semibold')
                     ->copyable(),
 
-                TextColumn::make('kode_material')
-                    ->label('Kode Material')
-                    ->placeholder('—')
-                    ->searchable()
-                    ->sortable()
-                    ->copyable(),
-
                 TextColumn::make('nama_barang')
                     ->label('Nama Barang')
                     ->searchable()

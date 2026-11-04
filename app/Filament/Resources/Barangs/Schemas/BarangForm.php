@@ -37,12 +37,6 @@ class BarangForm
                             ->prefixIcon('heroicon-o-qr-code')
                             ->helperText('Unik. Contoh: POY-150-48, DTY-150-48.'),
 
-                        TextInput::make('kode_material')
-                            ->label('Kode Material')
-                            ->maxLength(30)
-                            ->unique(ignoreRecord: true)
-                            ->helperText('Kode material IPCI (opsional).'),
-
                         TextInput::make('nama_barang')
                             ->label('Nama Barang')
                             ->required()

@@ -118,7 +118,7 @@ class PenerimaanDetailMapperTest extends TestCase
         $this->assertSame($this->gradePendukungStd->id, $data['grade_id']);
         $this->assertSame($pcs->id, $data['satuan_kemasan_id']);
         $this->assertSame('GRN-VELVET', $data['keterangan']);
-        $this->assertSame('', $data['merge']);
+        $this->assertSame('TANPA-BATCH', $data['merge']);
     }
 
     #[Test]

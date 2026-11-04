@@ -50,6 +50,7 @@ class FilamentGatePassPrintTest extends TestCase
         $this->pendukung = Barang::create([
             'kategori_id' => $this->kategoriPendukung->id,
             'kode_barang' => 'PPR TUB DTY',
+            'kode_material' => '5003301227',
             'nama_barang' => 'Paper Tube DTY Bullnose',
             'satuan_dasar_id' => $this->pcs->id,
             'is_merge_minggu' => false,
@@ -81,6 +82,7 @@ class FilamentGatePassPrintTest extends TestCase
             ->assertOk()
             ->assertSee('GATE PASS')
             ->assertSee('27041797')
+            ->assertSee('5003301227')
             ->assertSee('GRN-VELVET');
     }
 
@@ -116,6 +118,19 @@ class FilamentGatePassPrintTest extends TestCase
     }
 
     #[Test]
+    public function gate_pass_menampilkan_batch_kosong_sebagai_dash(): void
+    {
+        $transaksi = $this->buatPendukung('27041803', '', 'TANPA-BATCH');
+        app(PenerimaanService::class)->posting($transaksi, $this->admin->id);
+
+        $this->actingAs($this->admin)
+            ->get(PenerimaanPendukungResource::getUrl('cetak', ['record' => $transaksi]))
+            ->assertOk()
+            ->assertSee('5003301227')
+            ->assertDontSee('TANPA-BATCH');
+    }
+
+    #[Test]
     public function void_gate_pass_tidak_bisa_dicetak(): void
     {
         $transaksi = $this->buatPendukung('27041802', 'GRN-VOID-URL');
@@ -126,7 +141,7 @@ class FilamentGatePassPrintTest extends TestCase
             ->assertForbidden();
     }
 
-    private function buatPendukung(string $nomorGatePass, string $batch): TransaksiMasuk
+    private function buatPendukung(string $nomorGatePass, string $batch, ?string $merge = null): TransaksiMasuk
     {
         $transaksi = TransaksiMasuk::create([
             'nomor_transaksi' => 'IN-GP-'.uniqid(),
@@ -140,12 +155,12 @@ class FilamentGatePassPrintTest extends TestCase
         TransaksiMasukDetail::create([
             'transaksi_masuk_id' => $transaksi->id,
             'barang_id' => $this->pendukung->id,
-            'merge' => 'BATCH-A',
+            'merge' => $merge ?? $batch,
             'grade_id' => $this->gradePendukungStd->id,
             'jumlah_kemasan' => 100,
             'satuan_kemasan_id' => $this->pcs->id,
             'berat_kg' => 100,
-            'keterangan' => $batch,
+            'keterangan' => null,
         ]);
 
         return $transaksi;

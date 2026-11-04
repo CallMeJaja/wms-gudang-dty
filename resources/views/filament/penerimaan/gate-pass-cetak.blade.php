@@ -83,13 +83,20 @@
             </thead>
             <tbody>
                 @foreach ($record->detail as $i => $detail)
+                    @php
+                        $batch = trim((string) $detail->merge);
+                        if ($batch === '' || $batch === 'TANPA-BATCH') {
+                            $batch = (string) \App\Models\TransaksiMasukDetail::batchDariKeterangan($detail->keterangan);
+                        }
+                        $batch = $batch === 'TANPA-BATCH' ? '' : $batch;
+                    @endphp
                     <tr>
                         <td class="center">{{ $i + 1 }}</td>
-                        <td class="mono">{{ $detail->barang?->kode_barang }}</td>
+                        <td class="mono">{{ $detail->barang?->kode_material ?: $detail->barang?->kode_barang }}</td>
                         <td>{{ $detail->barang?->nama_barang }}</td>
                         <td class="center">{{ $detail->barang?->satuanDasar?->kode ?? $detail->satuanKemasan?->kode }}</td>
                         <td class="num">{{ number_format((float) $detail->berat_kg, 2, ',', '.') }}</td>
-                        <td class="mono">{{ \App\Models\TransaksiMasukDetail::batchDariKeterangan($detail->keterangan) ?? '—' }}</td>
+                        <td class="mono">{{ $batch !== '' ? $batch : '—' }}</td>
                     </tr>
                 @endforeach
             </tbody>

@@ -108,6 +108,7 @@ final class PenerimaanDetailMapper
     public static function pendukung(array $data): array
     {
         $data['merge'] = trim((string) ($data['merge'] ?? ''));
+        $data['merge'] = $data['merge'] === '' ? 'TANPA-BATCH' : $data['merge'];
         $data['grade_id'] = self::gradePendukungId();
         $data['jumlah_kemasan'] = self::numericOrNull($data['jumlah_kemasan'] ?? null);
         $data['jumlah_bobbin'] = null;

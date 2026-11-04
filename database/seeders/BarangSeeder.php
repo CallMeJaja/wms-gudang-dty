@@ -28,6 +28,7 @@ class BarangSeeder extends Seeder
             // ---------------- POY ----------------
             [
                 'kode_barang' => 'POY-250-48',
+                'kode_material' => null,
                 'nama_barang' => 'POY 250/48',
                 'kategori' => KategoriBarang::POY,
                 'denier' => '250',
@@ -39,6 +40,7 @@ class BarangSeeder extends Seeder
             // ---------------- DTY ----------------
             [
                 'kode_barang' => 'DTY-150-48-1',
+                'kode_material' => null,
                 'nama_barang' => 'DTY 150/48',
                 'kategori' => KategoriBarang::DTY,
                 'denier' => '150',
@@ -50,7 +52,8 @@ class BarangSeeder extends Seeder
             // ---------------- Item Pendukung ----------------
             [
                 'kode_barang' => 'PPR TUB DTY, BULLNOSE',
-                'nama_barang' => 'Paper Tube DTY Bullnose 212-222GM',
+                'kode_material' => '5003301227',
+                'nama_barang' => 'PPR TUB DTY,BULLNOSE,212-222GM',
                 'kategori' => KategoriBarang::PENDUKUNG,
                 'denier' => null,
                 'filament' => null,
@@ -59,7 +62,8 @@ class BarangSeeder extends Seeder
             ],
             [
                 'kode_barang' => 'CARTON BOX DTY 675x444x278MM, KRAFT 200',
-                'nama_barang' => 'Carton Box DTY 675x444x278mm Kraft 200',
+                'kode_material' => '5000002512',
+                'nama_barang' => 'CARTON BOX DTY 675X444X278MM,KRAFT 200',
                 'kategori' => KategoriBarang::PENDUKUNG,
                 'denier' => null,
                 'filament' => null,
@@ -68,16 +72,18 @@ class BarangSeeder extends Seeder
             ],
             [
                 'kode_barang' => 'STRETCH FILM 12MC',
-                'nama_barang' => 'Stretch Film 12MC',
+                'kode_material' => '5003301185',
+                'nama_barang' => 'STRETCH FILM 12MC',
                 'kategori' => KategoriBarang::PENDUKUNG,
                 'denier' => null,
                 'filament' => null,
-                'satuan' => 'ROLL',
+                'satuan' => 'PCS',
                 'stok_minimum' => null,
             ],
             [
                 'kode_barang' => 'PALLET DTY SMALL BOX 1370x1150x140MM',
-                'nama_barang' => 'Pallet DTY Small Box 1370x1150x140mm',
+                'kode_material' => '5003301241',
+                'nama_barang' => 'PALLET DTY SMALL BOX,1370X1150X140MM',
                 'kategori' => KategoriBarang::PENDUKUNG,
                 'denier' => null,
                 'filament' => null,
@@ -86,16 +92,18 @@ class BarangSeeder extends Seeder
             ],
             [
                 'kode_barang' => 'TAPE 250MX3IN, VISTAC TRANSPARENT',
-                'nama_barang' => 'Tape 250m x 3in Vistac Transparent',
+                'kode_material' => '5003301180',
+                'nama_barang' => 'TAPE,250MX3IN,VISTAC,TRANSPARENT',
                 'kategori' => KategoriBarang::PENDUKUNG,
                 'denier' => null,
                 'filament' => null,
-                'satuan' => 'ROLL',
+                'satuan' => 'PCS',
                 'stok_minimum' => null,
             ],
             [
                 'kode_barang' => 'DTY CONING OIL, TM368 BN',
-                'nama_barang' => 'DTY Coning Oil TM368 BN',
+                'kode_material' => '1003000201',
+                'nama_barang' => 'DTY CONING OIL,TM368 BN',
                 'kategori' => KategoriBarang::PENDUKUNG,
                 'denier' => null,
                 'filament' => null,
@@ -104,7 +112,8 @@ class BarangSeeder extends Seeder
             ],
             [
                 'kode_barang' => 'DTY PLASTIC BAG HDPE VRGN (4%A) 36/42x55 CM',
-                'nama_barang' => 'DTY Plastic Bag HDPE VRGN (4%A) 36/42x55cm',
+                'kode_material' => '5000001861',
+                'nama_barang' => 'DTY PLASTIC BAG-HDPE VRGN (4%A) 36/42X55 CM',
                 'kategori' => KategoriBarang::PENDUKUNG,
                 'denier' => null,
                 'filament' => null,
@@ -118,6 +127,7 @@ class BarangSeeder extends Seeder
                 ['kode_barang' => $item['kode_barang']],
                 [
                     'kategori_id' => $kategori[$item['kategori']],
+                    'kode_material' => $item['kode_material'],
                     'nama_barang' => $item['nama_barang'],
                     'denier' => $item['denier'],
                     'filament' => $item['filament'],

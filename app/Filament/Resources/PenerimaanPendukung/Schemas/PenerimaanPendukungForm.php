@@ -9,6 +9,7 @@ use App\Models\Barang;
 use App\Models\KategoriBarang;
 use App\Models\Satuan;
 use App\Services\NomorDokumenService;
+use App\Services\ShiftService;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
@@ -77,6 +78,7 @@ class PenerimaanPendukungForm
                                 Select::make('shift')
                                     ->label('Shift')
                                     ->options(PenerimaanForm::opsiShift())
+                                    ->default(fn (): int => app(ShiftService::class)->current())
                                     ->native(false),
 
                                 TextInput::make('operator_nama')
@@ -146,9 +148,13 @@ class PenerimaanPendukungForm
                                             ->orderBy('kode_barang'),
                                     )
                                     ->getOptionLabelFromRecordUsing(
-                                        fn (Barang $record) => "{$record->kode_barang} — {$record->nama_barang}"
+                                        fn (Barang $record) => trim(
+                                            "{$record->kode_barang}"
+                                            .($record->kode_material ? " [{$record->kode_material}]" : '')
+                                            ." — {$record->nama_barang}"
+                                        )
                                     )
-                                    ->searchable(['kode_barang', 'nama_barang'])
+                                    ->searchable(['kode_barang', 'kode_material', 'nama_barang'])
                                     ->preload()
                                     ->placeholder('Pilih')
                                     ->required()
@@ -160,11 +166,10 @@ class PenerimaanPendukungForm
                                     }),
 
                                 TextInput::make('merge')
-                                    ->label('Merge / Batch')
-                                    ->required()
+                                    ->label('Batch (opsional)')
                                     ->maxLength(50)
                                     ->placeholder('GRN-VELVET')
-                                    ->helperText('Dipakai sebagai identitas baris stok.'),
+                                    ->helperText('Kosongkan jika tidak ada batch; saat dicetak akan tampil —.'),
 
                                 TextInput::make('jumlah_kemasan')
                                     ->label('Qty')
@@ -200,9 +205,9 @@ class PenerimaanPendukungForm
                                     ->suffix('kg'),
 
                                 TextInput::make('keterangan')
-                                    ->label('Batch')
+                                    ->label('Catatan Baris')
                                     ->maxLength(255)
-                                    ->placeholder('GRN-VELVET'),
+                                    ->placeholder('Catatan tambahan (opsional)'),
                             ]),
                     ]),
 

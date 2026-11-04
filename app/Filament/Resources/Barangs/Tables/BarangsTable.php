@@ -31,6 +31,13 @@ class BarangsTable
                     ->weight('semibold')
                     ->copyable(),
 
+                TextColumn::make('kode_material')
+                    ->label('Kode Material')
+                    ->placeholder('—')
+                    ->searchable()
+                    ->sortable()
+                    ->copyable(),
+
                 TextColumn::make('nama_barang')
                     ->label('Nama Barang')
                     ->searchable()
@@ -82,6 +89,7 @@ class BarangsTable
                 TextColumn::make('updated_at')
                     ->label('Diubah')
                     ->dateTime('d M Y H:i')
+                    ->extraCellAttributes(['class' => 'wms-nowrap'])
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

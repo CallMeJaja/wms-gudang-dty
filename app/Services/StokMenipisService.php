@@ -7,6 +7,7 @@ use App\Models\Barang;
 use App\Models\KategoriBarang;
 use App\Models\StokBarang;
 use App\Models\User;
+use Filament\Notifications\DatabaseNotification;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -41,53 +42,41 @@ class StokMenipisService
             ->get();
 
         foreach ($daftarBarang as $barang) {
-            $kunci = sprintf('%s:barang:%d', self::PREFIX_CACHE, $barang->id);
             $minimum = (float) $barang->stok_minimum;
             $total = (float) $barang->total_stok_aktif + (float) $barang->total_stok_buffer;
 
-            if ($total + 1e-9 >= $minimum) {
-                Cache::forget($kunci);
-
+            if ($total + 1e-9 >= $minimum || $penerima->isEmpty()) {
                 continue;
             }
 
-            if ($penerima->isEmpty() || ! Cache::add($kunci, true)) {
-                continue;
-            }
+            $satuan = $barang->satuanDasar?->kode ?? 'unit';
+            $judul = "Stok {$barang->kode_barang} menipis";
 
-            try {
-                $satuan = $barang->satuanDasar?->kode ?? 'unit';
+            $notifikasi = Notification::make()
+                ->title($judul)
+                ->body(sprintf(
+                    'Sisa %s %s dari minimum %s %s.',
+                    $this->angka($total),
+                    $satuan,
+                    $this->angka($minimum),
+                    $satuan,
+                ))
+                ->icon('heroicon-o-exclamation-triangle')
+                ->warning()
+                ->toDatabase();
 
-                $notifikasi = Notification::make()
-                    ->title("Stok {$barang->kode_barang} menipis")
-                    ->body(sprintf(
-                        'Sisa %s %s dari minimum %s %s.',
-                        $this->angka($total),
-                        $satuan,
-                        $this->angka($minimum),
-                        $satuan,
-                    ))
-                    ->icon('heroicon-o-exclamation-triangle')
-                    ->warning()
-                    ->toDatabase();
-
-                foreach ($penerima as $user) {
-                    $user->notifyNow($notifikasi);
-                }
-            } catch (Throwable $exception) {
-                Cache::forget($kunci);
-
-                Log::warning('Notifikasi stok menipis gagal dikirim.', [
-                    'barang_id' => $barang->id,
-                    'error' => $exception->getMessage(),
-                ]);
-            }
+            $this->kirimPerPenerima(
+                $penerima,
+                $judul,
+                $notifikasi,
+                sprintf('%s:barang:%d', self::PREFIX_CACHE, $barang->id),
+                ['barang_id' => $barang->id],
+            );
         }
     }
 
     private function periksaStokAktifPoy(Collection $penerima): void
     {
-        $kunci = self::PREFIX_CACHE.':poy-aktif';
         $pallet = (int) config('wms.ambang_poy.min_stok_aktif_pallet');
         $kgPerPallet = (float) config('wms.pallet.poy_kg');
         $ambang = $pallet * $kgPerPallet;
@@ -98,38 +87,69 @@ class StokMenipisService
                 ->whereHas('kategori', fn (Builder $kategori) => $kategori->where('kode', KategoriBarang::POY)))
             ->sum('stok_aktif');
 
-        if ($stokAktif + 1e-9 >= $ambang) {
-            Cache::forget($kunci);
-
+        if ($stokAktif + 1e-9 >= $ambang || $penerima->isEmpty()) {
             return;
         }
 
-        if ($penerima->isEmpty() || ! Cache::add($kunci, true)) {
-            return;
-        }
+        $judul = 'Stok aktif POY kritis';
 
-        try {
-            $notifikasi = Notification::make()
-                ->title('Stok aktif POY kritis')
-                ->body(sprintf(
-                    'Stok aktif %s kg di bawah kebutuhan %s kg (%d pallet).',
-                    $this->angka($stokAktif),
-                    $this->angka($ambang),
-                    $pallet,
-                ))
-                ->icon('heroicon-o-exclamation-triangle')
-                ->danger()
-                ->toDatabase();
+        $notifikasi = Notification::make()
+            ->title($judul)
+            ->body(sprintf(
+                'Stok aktif %s kg di bawah kebutuhan %s kg (%d pallet).',
+                $this->angka($stokAktif),
+                $this->angka($ambang),
+                $pallet,
+            ))
+            ->icon('heroicon-o-exclamation-triangle')
+            ->danger()
+            ->toDatabase();
 
-            foreach ($penerima as $user) {
-                $user->notifyNow($notifikasi);
+        $this->kirimPerPenerima(
+            $penerima,
+            $judul,
+            $notifikasi,
+            self::PREFIX_CACHE.':poy-aktif',
+            [],
+        );
+    }
+
+    /**
+     * @param  array<string, mixed>  $konteks
+     */
+    private function kirimPerPenerima(
+        Collection $penerima,
+        string $judul,
+        DatabaseNotification $notifikasi,
+        string $kunciDasar,
+        array $konteks,
+    ): void {
+        foreach ($penerima as $user) {
+            $kunci = sprintf('%s:user:%d', $kunciDasar, $user->id);
+
+            if (! Cache::add($kunci, true, now()->addDay())) {
+                continue;
             }
-        } catch (Throwable $exception) {
-            Cache::forget($kunci);
 
-            Log::warning('Notifikasi stok aktif POY gagal dikirim.', [
-                'error' => $exception->getMessage(),
-            ]);
+            $sudahAda = $user->notifications()
+                ->where('data->title', $judul)
+                ->where('created_at', '>=', now()->subDay())
+                ->exists();
+
+            if ($sudahAda) {
+                continue;
+            }
+
+            try {
+                $user->notifyNow($notifikasi);
+            } catch (Throwable $exception) {
+                Cache::forget($kunci);
+
+                Log::warning('Notifikasi stok menipis gagal dikirim.', array_merge($konteks, [
+                    'user_id' => $user->id,
+                    'error' => $exception->getMessage(),
+                ]));
+            }
         }
     }
 

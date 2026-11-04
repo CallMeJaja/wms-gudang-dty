@@ -31,7 +31,7 @@ class CetakGatePass extends Page
     {
         $this->record = $this->resolveRecord($record);
 
-        abort_unless(Gate::allows('view', [$this->record, JenisMasuk::PendukungGatepass]), 403);
+        abort_unless(static::canAccess(['record' => $this->getRecord()]), 403);
 
         $this->record->loadMissing([
             'detail.barang.satuanDasar',
@@ -48,7 +48,7 @@ class CetakGatePass extends Page
             return false;
         }
 
-        return $record->status !== StatusDokumen::Draft
+        return $record->status === StatusDokumen::Issued
             && Gate::allows('view', [$record, JenisMasuk::PendukungGatepass]);
     }
 

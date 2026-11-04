@@ -92,12 +92,15 @@ class FilamentGatePassPrintTest extends TestCase
         $terbit->refresh();
 
         $draf = $this->buatPendukung('27041800', 'GRN-DRAF-2');
+        $void = $this->buatPendukung('27041801', 'GRN-VOID');
+        $void->update(['status' => StatusDokumen::Void]);
 
         $this->actingAs($this->admin);
 
         Livewire::test(ListPenerimaanPendukung::class)
             ->assertActionVisible(TestAction::make('cetak')->table($terbit))
-            ->assertActionHidden(TestAction::make('cetak')->table($draf));
+            ->assertActionHidden(TestAction::make('cetak')->table($draf))
+            ->assertActionHidden(TestAction::make('cetak')->table($void));
     }
 
     #[Test]
@@ -106,6 +109,17 @@ class FilamentGatePassPrintTest extends TestCase
         $transaksi = $this->buatPendukung('27041798', 'GRN-DRAF');
 
         $this->assertSame(StatusDokumen::Draft, $transaksi->status);
+
+        $this->actingAs($this->admin)
+            ->get(PenerimaanPendukungResource::getUrl('cetak', ['record' => $transaksi]))
+            ->assertForbidden();
+    }
+
+    #[Test]
+    public function void_gate_pass_tidak_bisa_dicetak(): void
+    {
+        $transaksi = $this->buatPendukung('27041802', 'GRN-VOID-URL');
+        $transaksi->update(['status' => StatusDokumen::Void]);
 
         $this->actingAs($this->admin)
             ->get(PenerimaanPendukungResource::getUrl('cetak', ['record' => $transaksi]))

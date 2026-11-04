@@ -151,7 +151,7 @@ class PengeluaranService
             $userId ??= $terkunci->created_by !== null ? (int) $terkunci->created_by : null;
 
             if ($generateNomorSj && trim((string) $terkunci->nomor_surat_jalan) === '') {
-                $terkunci->nomor_surat_jalan = $this->nomorService->generate('SURAT_JALAN_DTY');
+                $terkunci->nomor_surat_jalan = $this->nomorService->generate('SURAT_JALAN_DTY', $terkunci->tanggal);
                 $terkunci->save();
             }
 
@@ -168,9 +168,10 @@ class PengeluaranService
                         userId: $userId,
                         tanggal: $terkunci->tanggal,
                     );
-                } catch (StokTidakCukupException) {
+                } catch (StokTidakCukupException $exception) {
                     throw new AturanBisnisException(
-                        AturanBisnisException::PESAN_BUFFER_TIDAK_BOLEH_DIPAKAI
+                        $exception->getMessage()
+                        .' Stok cadangan (untuk hari Minggu) tidak dapat digunakan pada hari kerja.'
                     );
                 }
             }
@@ -259,9 +260,13 @@ class PengeluaranService
             $aktif = $saldo === null ? 0.0 : (float) $saldo->stok_aktif;
 
             if ($aktif + 1e-9 < (float) $detail->berat_netto_kg) {
-                throw new AturanBisnisException(
-                    AturanBisnisException::PESAN_BUFFER_TIDAK_BOLEH_DIPAKAI
-                );
+                throw new AturanBisnisException(sprintf(
+                    '%s untuk %s tidak cukup: diminta %s, tersedia %s. Stok cadangan (untuk hari Minggu) tidak dapat digunakan pada hari kerja.',
+                    PosStok::Aktif->label(),
+                    $barang->kode_barang,
+                    number_format((float) $detail->berat_netto_kg, 2, ',', '.'),
+                    number_format($aktif, 2, ',', '.'),
+                ));
             }
         }
     }

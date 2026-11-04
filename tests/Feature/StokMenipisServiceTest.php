@@ -11,6 +11,7 @@ use Filament\Notifications\DatabaseNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\Concerns\MembuatDataUji;
 use Tests\TestCase;
@@ -96,7 +97,7 @@ class StokMenipisServiceTest extends TestCase
     }
 
     #[Test]
-    public function stok_yang_pulih_lalu_menipis_lagi_mengirim_notifikasi_baru(): void
+    public function stok_yang_pulih_lalu_menipis_lagi_hanya_mengirim_setelah_cooldown_sehari(): void
     {
         $barang = $this->barangPendukung();
         $this->aturStok($barang, $this->gradePendukungStd->id, 50.0);
@@ -109,8 +110,34 @@ class StokMenipisServiceTest extends TestCase
         $this->aturStok($barang, $this->gradePendukungStd->id, 50.0);
         $this->service->periksa();
 
+        Notification::assertSentToTimes($this->admin, DatabaseNotification::class, 1);
+        Notification::assertSentToTimes($this->manajer, DatabaseNotification::class, 1);
+
+        $this->travel(25)->hours();
+
+        $this->service->periksa();
+
         Notification::assertSentToTimes($this->admin, DatabaseNotification::class, 2);
         Notification::assertSentToTimes($this->manajer, DatabaseNotification::class, 2);
+    }
+
+    #[Test]
+    public function admin_yang_sudah_menerima_tidak_menghalangi_manajer_menerima_notifikasi(): void
+    {
+        $barang = $this->barangPendukung();
+        $this->aturStok($barang, $this->gradePendukungStd->id, 50.0);
+
+        $this->admin->notifications()->create([
+            'id' => (string) Str::uuid(),
+            'type' => DatabaseNotification::class,
+            'data' => ['title' => 'Stok PAPER-TUBE menipis'],
+            'read_at' => null,
+        ]);
+
+        $this->service->periksa();
+
+        Notification::assertNotSentTo($this->admin, DatabaseNotification::class);
+        Notification::assertSentToTimes($this->manajer, DatabaseNotification::class, 1);
     }
 
     #[Test]

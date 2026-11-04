@@ -113,8 +113,9 @@ class OutboundTest extends TestCase
             $this->app->make(PengeluaranService::class)->posting($transaksi, $this->operator->id);
             $this->fail('Pengeluaran melebihi stok aktif harus ditolak.');
         } catch (AturanBisnisException $e) {
-            $this->assertSame(
-                AturanBisnisException::PESAN_BUFFER_TIDAK_BOLEH_DIPAKAI,
+            $this->assertStringContainsString('diminta 200,00, tersedia 100,00', $e->getMessage());
+            $this->assertStringContainsString(
+                'tidak dapat digunakan pada hari kerja',
                 $e->getMessage(),
             );
         }
@@ -140,6 +141,18 @@ class OutboundTest extends TestCase
             '#^\d+/DTY/PEI/[IVX]+/\d{4}$#',
             (string) $transaksi->nomor_surat_jalan,
         );
+    }
+
+    #[Test]
+    public function issue_surat_jalan_tanggal_mundur_memakai_periode_tanggal_transaksi(): void
+    {
+        $this->isiStok($this->dty, '4D9160', $this->gradeDtyA->id, 1000);
+
+        $transaksi = $this->buatDrafSj([], ['tanggal' => '2026-09-15']);
+
+        $this->app->make(PengeluaranService::class)->issue($transaksi, $this->operator->id);
+
+        $this->assertStringContainsString('/IX/2026', (string) $transaksi->fresh()->nomor_surat_jalan);
     }
 
     #[Test]

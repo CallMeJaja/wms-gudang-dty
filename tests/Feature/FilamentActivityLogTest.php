@@ -90,6 +90,32 @@ class FilamentActivityLogTest extends TestCase
     }
 
     #[Test]
+    public function label_modul_ramah_dibaca_dan_filter_tetap_memakai_kunci_mentah(): void
+    {
+        $this->actingAs($this->admin);
+
+        $poy = ActivityLog::catat('CREATE', 'TRANSAKSI_MASUK_POY', 31, 'Buat penerimaan POY', [
+            'user_id' => $this->admin->getKey(),
+            'created_at' => now(),
+        ]);
+        $alokasi = ActivityLog::catat('RELEASE_BUFFER', 'ALOKASIBUFFER', 32, 'Alokasi buffer', [
+            'user_id' => $this->admin->getKey(),
+            'created_at' => now()->subMinute(),
+        ]);
+
+        Livewire::test(ListActivityLogs::class)
+            ->assertSee('Penerimaan POY')
+            ->assertSee('Alokasi Buffer')
+            ->assertTableColumnFormattedStateSet('modul', 'Penerimaan POY', $poy)
+            ->assertTableColumnFormattedStateNotSet('modul', 'TRANSAKSI_MASUK_POY', $poy)
+            ->assertTableColumnFormattedStateSet('modul', 'Alokasi Buffer', $alokasi)
+            ->assertTableColumnFormattedStateNotSet('modul', 'ALOKASIBUFFER', $alokasi)
+            ->filterTable('modul', 'TRANSAKSI_MASUK_POY')
+            ->assertCanSeeTableRecords([$poy])
+            ->assertCanNotSeeTableRecords([$alokasi]);
+    }
+
+    #[Test]
     public function filter_event_modul_user_dan_tanggal_menyaring_tabel(): void
     {
         [$login, $create, $update] = $this->buatLog();

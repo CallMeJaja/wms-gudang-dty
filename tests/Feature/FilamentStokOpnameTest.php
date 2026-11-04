@@ -11,6 +11,7 @@ use App\Models\StokOpname;
 use App\Models\User;
 use App\Services\StokOpnameService;
 use App\Services\StokService;
+use Carbon\Carbon;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -80,7 +81,7 @@ class FilamentStokOpnameTest extends TestCase
     public function selisih_positif_membuat_adjustment_in_dan_menaikkan_stok(): void
     {
         $barang = $this->barangDty('DTY-OPN-1');
-        app(StokService::class)->tambahStok($barang, 'M1', $this->gradeDtyA->id, 100);
+        app(StokService::class)->tambahStok($barang, 'M1', $this->gradeDtyA->id, 100, tanggal: Carbon::parse('2026-10-31'));
 
         $this->actingAs($this->admin);
 
@@ -110,8 +111,8 @@ class FilamentStokOpnameTest extends TestCase
         $barang = $this->barangPoy(true, 'POY-OPN-1');
         $stok = app(StokService::class);
 
-        $stok->tambahStok($barang, 'M1', $this->gradePoyAl->id, 500, PosStok::Aktif, JenisMutasi::Masuk, 'UJI-AKTIF');
-        $stok->tambahStok($barang, 'M1', $this->gradePoyAl->id, 400, PosStok::Buffer, JenisMutasi::Masuk, 'UJI-BUFFER');
+        $stok->tambahStok($barang, 'M1', $this->gradePoyAl->id, 500, PosStok::Aktif, JenisMutasi::Masuk, 'UJI-AKTIF', tanggal: Carbon::parse('2026-10-31'));
+        $stok->tambahStok($barang, 'M1', $this->gradePoyAl->id, 400, PosStok::Buffer, JenisMutasi::Masuk, 'UJI-BUFFER', tanggal: Carbon::parse('2026-10-31'));
 
         $this->actingAs($this->admin);
 
@@ -140,7 +141,7 @@ class FilamentStokOpnameTest extends TestCase
     public function selisih_nol_tidak_membuat_transaksi(): void
     {
         $barang = $this->barangDty('DTY-OPN-2');
-        app(StokService::class)->tambahStok($barang, 'M1', $this->gradeDtyA->id, 100);
+        app(StokService::class)->tambahStok($barang, 'M1', $this->gradeDtyA->id, 100, tanggal: Carbon::parse('2026-10-31'));
 
         $this->actingAs($this->admin);
 
@@ -163,7 +164,7 @@ class FilamentStokOpnameTest extends TestCase
     public function opname_duplikat_tanggal_sama_ditolak_di_form(): void
     {
         $barang = $this->barangDty('DTY-OPN-3');
-        app(StokService::class)->tambahStok($barang, 'M1', $this->gradeDtyA->id, 100);
+        app(StokService::class)->tambahStok($barang, 'M1', $this->gradeDtyA->id, 100, tanggal: Carbon::parse('2026-10-31'));
 
         $this->actingAs($this->admin);
 
@@ -211,7 +212,7 @@ class FilamentStokOpnameTest extends TestCase
     public function partial_ringkasan_merender_nomor_dan_selisih(): void
     {
         $barang = $this->barangDty('DTY-OPN-4');
-        app(StokService::class)->tambahStok($barang, 'M1', $this->gradeDtyA->id, 100);
+        app(StokService::class)->tambahStok($barang, 'M1', $this->gradeDtyA->id, 100, tanggal: Carbon::parse('2026-10-31'));
 
         $opname = app(StokOpnameService::class)->proses(
             $barang,

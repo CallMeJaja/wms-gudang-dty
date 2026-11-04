@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Enums\StatusDokumen;
 use App\Models\AlokasiBuffer;
+use App\Models\Barang;
 use App\Models\MutasiStok;
 use App\Models\StokBarang;
 use App\Models\TransaksiKeluar;
@@ -60,10 +61,19 @@ class DemoTransaksiSeederTest extends TestCase
 
         $this->assertGreaterThan(0, $this->app->make(StokService::class)->totalBufferMinggu());
 
+        $poy = Barang::query()->where('kode_barang', 'POY-250-48')->firstOrFail();
+        $this->assertGreaterThan(
+            0.0,
+            (float) StokBarang::query()->where('barang_id', $poy->id)->sum('stok_aktif'),
+            'Stok aktif POY harus tersedia untuk demo pengeluaran.'
+        );
+
         $hasil = $this->app->make(LaporanService::class)->rendemen(
             now()->startOfMonth()->toDateString(), now()->endOfMonth()->toDateString()
         );
         $this->assertNotNull($hasil['rendemen']);
+        $this->assertGreaterThanOrEqual(90.0, (float) $hasil['rendemen']);
+        $this->assertLessThanOrEqual(105.0, (float) $hasil['rendemen']);
 
         $draf = TransaksiMasuk::where('nomor_transaksi', 'DEMO-POY-DRAFT-01')->firstOrFail();
         $this->assertSame(StatusDokumen::Draft, $draf->status);

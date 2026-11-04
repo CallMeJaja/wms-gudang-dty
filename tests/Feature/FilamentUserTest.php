@@ -149,6 +149,41 @@ class FilamentUserTest extends TestCase
     }
 
     #[Test]
+    public function pesan_validasi_form_memakai_bahasa_indonesia(): void
+    {
+        $this->actingAs($this->admin);
+
+        Livewire::test(CreateUser::class)
+            ->fillForm([
+                'name' => 'Duplikat',
+                'username' => $this->operator->username,
+                'email' => $this->operator->email,
+                'role' => Role::Operator->value,
+                'password' => 'rahasia123',
+                'password_confirmation' => 'rahasia123',
+            ])
+            ->call('create')
+            ->assertHasFormErrors([
+                'username' => 'unique',
+                'email' => 'unique',
+            ])
+            ->assertSee('sudah digunakan')
+            ->assertDontSee('validation.unique');
+
+        Livewire::test(CreateUser::class)
+            ->call('create')
+            ->assertHasFormErrors([
+                'name' => 'required',
+                'username' => 'required',
+                'email' => 'required',
+                'role' => 'required',
+                'password' => 'required',
+            ])
+            ->assertSee('wajib diisi')
+            ->assertDontSee('validation.required');
+    }
+
+    #[Test]
     public function pengguna_tidak_bisa_menurunkan_role_atau_menonaktifkan_dirinya_sendiri(): void
     {
         $this->actingAs($this->admin);

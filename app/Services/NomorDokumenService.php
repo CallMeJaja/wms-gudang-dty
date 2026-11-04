@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\NomorDokumen;
+use DateTimeInterface;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -23,12 +24,12 @@ class NomorDokumenService
     /**
      * Generate nomor berikutnya (menaikkan counter) dan kembalikan string terformat.
      */
-    public function generate(string $jenis): string
+    public function generate(string $jenis, ?DateTimeInterface $tanggal = null): string
     {
         $this->pastikanJenisValid($jenis);
 
-        return DB::transaction(function () use ($jenis): string {
-            $periode = NomorDokumen::periodeUntuk($jenis);
+        return DB::transaction(function () use ($jenis, $tanggal): string {
+            $periode = NomorDokumen::periodeUntuk($jenis, $tanggal);
 
             // Baris untuk periode berjalan harus ada agar bisa dikunci.
             NomorDokumen::firstOrCreate(
@@ -46,7 +47,7 @@ class NomorDokumenService
             $baris->last_number = (int) $baris->last_number + 1;
             $baris->save();
 
-            return $this->format($jenis, (int) $baris->last_number);
+            return $this->format($jenis, (int) $baris->last_number, $tanggal);
         });
     }
 
@@ -56,28 +57,28 @@ class NomorDokumenService
      * Dipakai form untuk menampilkan nomor yang akan dipakai.
      * Tidak mengunci baris karena tidak ada penulisan.
      */
-    public function peek(string $jenis): string
+    public function peek(string $jenis, ?DateTimeInterface $tanggal = null): string
     {
         $this->pastikanJenisValid($jenis);
 
-        $periode = NomorDokumen::periodeUntuk($jenis);
+        $periode = NomorDokumen::periodeUntuk($jenis, $tanggal);
 
         $terakhir = (int) (NomorDokumen::query()
             ->where('jenis', $jenis)
             ->where('periode', $periode)
             ->value('last_number') ?? 0);
 
-        return $this->format($jenis, $terakhir + 1);
+        return $this->format($jenis, $terakhir + 1, $tanggal);
     }
 
     /**
      * Format nomor sesuai config/wms.php (SSOT, tanpa angka hardcode).
      */
-    public function format(string $jenis, int $nomor): string
+    public function format(string $jenis, int $nomor, ?DateTimeInterface $tanggal = null): string
     {
         $template = (string) config("wms.format_nomor.{$jenis}");
 
-        $saat = now();
+        $saat = $tanggal ?? now();
 
         return strtr($template, [
             '{nomor}' => (string) $nomor,

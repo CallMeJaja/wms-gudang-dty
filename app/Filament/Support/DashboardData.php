@@ -2,6 +2,7 @@
 
 namespace App\Filament\Support;
 
+use App\Enums\JenisMutasi;
 use App\Enums\StatusDokumen;
 use App\Models\Barang;
 use App\Models\KategoriBarang;
@@ -92,6 +93,7 @@ final class DashboardData
 
         $agregat = MutasiStok::query()
             ->periode($awal, $akhir->copy()->endOfDay())
+            ->whereIn('jenis_transaksi', [JenisMutasi::Masuk->value, JenisMutasi::Keluar->value])
             ->with('barang.kategori')
             ->get()
             ->groupBy(fn (MutasiStok $m): string => $m->tanggal->format('Y-m-d').'|'.($m->barang->kategori->kode ?? '?'));

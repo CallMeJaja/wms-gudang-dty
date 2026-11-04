@@ -236,7 +236,7 @@ trait InteractsWithPenerimaan
             ->color('gray')
             ->url(fn (TransaksiMasuk $record): string => static::getUrl('cetak', ['record' => $record]))
             ->openUrlInNewTab()
-            ->visible(fn (TransaksiMasuk $record): bool => $record->status !== StatusDokumen::Draft
+            ->visible(fn (TransaksiMasuk $record): bool => $record->status === StatusDokumen::Issued
                 && static::canView($record));
     }
 

@@ -215,6 +215,22 @@ class ServiceStokTest extends TestCase
     }
 
     #[Test]
+    public function nomor_dokumen_peek_dan_format_memakai_tanggal_opsional(): void
+    {
+        $service = $this->app->make(NomorDokumenService::class);
+        $tanggal = Carbon::parse('2026-09-15');
+
+        $this->assertSame(
+            '1/DTY/PEI/IX/2026',
+            $service->peek(NomorDokumen::SURAT_JALAN_DTY, $tanggal)
+        );
+        $this->assertSame(
+            '7/DTY/PEI/IX/2026',
+            $service->format(NomorDokumen::SURAT_JALAN_DTY, 7, $tanggal)
+        );
+    }
+
+    #[Test]
     public function validasi_berat_poy_melempar_pesan_persis_bila_kg_kosong(): void
     {
         $service = $this->app->make(KonversiSatuanService::class);

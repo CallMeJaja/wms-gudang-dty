@@ -254,7 +254,7 @@ trait InteractsWithPengeluaran
                 fn (TransaksiKeluar $record): string => static::getUrl('cetak', ['record' => $record]),
                 shouldOpenInNewTab: true,
             )
-            ->visible(fn (TransaksiKeluar $record): bool => $record->status !== StatusDokumen::Draft
+            ->visible(fn (TransaksiKeluar $record): bool => $record->status === StatusDokumen::Issued
                 && static::canView($record));
     }
 

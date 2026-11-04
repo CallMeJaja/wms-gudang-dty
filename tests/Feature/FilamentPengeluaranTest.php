@@ -13,6 +13,7 @@ use App\Filament\Resources\PengeluaranScrap\Pages\CreatePengeluaranScrap;
 use App\Filament\Resources\PengeluaranScrap\PengeluaranScrapResource;
 use App\Filament\Resources\SuratJalanDty\Pages\CreateSuratJalanDty;
 use App\Filament\Resources\SuratJalanDty\Pages\EditSuratJalanDty;
+use App\Filament\Resources\SuratJalanDty\Pages\ListSuratJalanDty;
 use App\Filament\Resources\SuratJalanDty\SuratJalanDtyResource;
 use App\Models\Barang;
 use App\Models\Grade;
@@ -499,6 +500,37 @@ class FilamentPengeluaranTest extends TestCase
             ->assertOk()
             ->assertSee('SURAT JALAN')
             ->assertSee((string) $transaksi->nomor_surat_jalan);
+    }
+
+    #[Test]
+    public function draf_dan_void_surat_jalan_tidak_bisa_dicetak_dan_aksi_cetak_hanya_untuk_terbit(): void
+    {
+        $this->isiStok($this->dty, '4D9160', $this->gradeDtyA->id, 1000);
+
+        $draf = $this->buatDrafSj();
+        $void = $this->buatDrafSj();
+        $terbit = $this->buatDrafSj();
+
+        $service = app(PengeluaranService::class);
+        $service->issue($void, $this->admin->id);
+        $void->refresh()->update(['status' => StatusDokumen::Void]);
+        $service->issue($terbit, $this->admin->id);
+        $terbit->refresh();
+
+        $this->actingAs($this->admin);
+
+        $this->get(SuratJalanDtyResource::getUrl('cetak', ['record' => $draf]))
+            ->assertForbidden();
+        $this->get(SuratJalanDtyResource::getUrl('cetak', ['record' => $void]))
+            ->assertForbidden();
+        $this->get(SuratJalanDtyResource::getUrl('cetak', ['record' => $terbit]))
+            ->assertOk()
+            ->assertSee('SURAT JALAN');
+
+        Livewire::test(ListSuratJalanDty::class)
+            ->assertActionVisible(TestAction::make('cetak')->table($terbit))
+            ->assertActionHidden(TestAction::make('cetak')->table($draf))
+            ->assertActionHidden(TestAction::make('cetak')->table($void));
     }
 
     /*

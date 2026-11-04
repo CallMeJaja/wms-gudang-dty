@@ -82,6 +82,10 @@ class AlokasiBufferTest extends TestCase
         $this->assertSame($transaksi->id, $catatan->sumber_transaksi_masuk_id);
         $this->assertSame($barang->id, $catatan->barang_id);
         $this->assertSame('M-MINGGU-1', $catatan->merge);
+        $this->assertDatabaseHas('activity_logs', [
+            'event' => 'ALOKASI_BUFFER',
+            'modul' => 'ALOKASI_BUFFER',
+        ]);
     }
 
     #[Test]

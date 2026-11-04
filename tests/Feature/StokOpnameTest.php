@@ -12,6 +12,7 @@ use App\Models\StokOpname;
 use App\Models\User;
 use App\Services\StokOpnameService;
 use App\Services\StokService;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use PHPUnit\Framework\Attributes\Test;
@@ -49,7 +50,11 @@ class StokOpnameTest extends TestCase
     private function stokAwal(float $qty): void
     {
         $this->app->make(StokService::class)->tambahStok(
-            $this->barang, 'M1', $this->gradeDtyA->id, $qty,
+            $this->barang,
+            'M1',
+            $this->gradeDtyA->id,
+            $qty,
+            tanggal: Carbon::parse('2026-10-31'),
         );
     }
 
@@ -185,6 +190,25 @@ class StokOpnameTest extends TestCase
         $this->assertSame(100.0, (float) MutasiStok::findOrFail($target->id)->saldo_akhir_qty);
         $akhir = MutasiStok::query()->orderByDesc('id')->firstOrFail();
         $this->assertSame(150.0, (float) $akhir->saldo_akhir_qty);
+    }
+
+    #[Test]
+    public function opname_tanggal_mundur_ditolak_bila_ada_mutasi_setelahnya(): void
+    {
+        $this->stokAwal(100);
+
+        $this->app->make(StokService::class)->tambahStok(
+            $this->barang,
+            'M1',
+            $this->gradeDtyA->id,
+            10,
+            tanggal: Carbon::parse('2026-11-03'),
+        );
+
+        $this->expectException(AturanBisnisException::class);
+        $this->expectExceptionMessage('Opname tanggal mundur tidak diizinkan');
+
+        $this->proses(100, '2026-11-02');
     }
 
     #[Test]

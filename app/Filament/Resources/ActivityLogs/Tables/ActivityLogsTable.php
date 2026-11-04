@@ -5,6 +5,7 @@ namespace App\Filament\Resources\ActivityLogs\Tables;
 use App\Models\ActivityLog;
 use Filament\Forms\Components\DatePicker;
 use Filament\Support\Enums\FontFamily;
+use Filament\Support\Enums\TextSize;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -46,6 +47,7 @@ class ActivityLogsTable
                     ->badge()
                     ->formatStateUsing(fn (?string $state): string => ActivityLog::labelModul($state))
                     ->color('gray')
+                    ->size(TextSize::Small)
                     ->searchable(),
 
                 TextColumn::make('ref_id')

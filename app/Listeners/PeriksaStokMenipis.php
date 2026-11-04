@@ -11,6 +11,10 @@ class PeriksaStokMenipis
 
     public function handle(StokBerubah $event): void
     {
+        if (app()->runningInConsole() && ! app()->runningUnitTests()) {
+            return;
+        }
+
         $this->stokMenipis->periksa($event->barangId);
     }
 }

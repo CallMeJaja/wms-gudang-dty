@@ -11,6 +11,7 @@ use App\Exceptions\AturanBisnisException;
 use App\Models\ActivityLog;
 use App\Models\Barang;
 use App\Models\Grade;
+use App\Models\MutasiStok;
 use App\Models\NomorDokumen;
 use App\Models\StokBarang;
 use App\Models\StokOpname;
@@ -67,6 +68,17 @@ class StokOpnameService
 
             if (! $sesuai) {
                 throw AturanBisnisException::gradeTidakSesuaiKategori((string) $barang->kode_barang);
+            }
+
+            if ($tgl < now()->toDateString() && MutasiStok::query()
+                ->where('barang_id', $barang->id)
+                ->where('merge', $merge)
+                ->where('grade_id', $gradeId)
+                ->whereDate('tanggal', '>', $tgl)
+                ->exists()) {
+                throw new AturanBisnisException(
+                    'Opname tanggal mundur tidak diizinkan karena sudah ada mutasi stok setelah tanggal tersebut.'
+                );
             }
 
             StokBarang::firstOrCreate(

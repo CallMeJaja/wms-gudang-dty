@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\SuratJalanDty\Pages;
 
 use App\Enums\JenisKeluar;
+use App\Enums\StatusDokumen;
 use App\Filament\Resources\SuratJalanDty\SuratJalanDtyResource;
 use App\Models\TransaksiKeluar;
 use Filament\Resources\Pages\Concerns\InteractsWithRecord;
@@ -48,7 +49,8 @@ class CetakSuratJalan extends Page
             return false;
         }
 
-        return Gate::allows('view', [$record, JenisKeluar::DtySuratJalan]);
+        return $record->status === StatusDokumen::Issued
+            && Gate::allows('view', [$record, JenisKeluar::DtySuratJalan]);
     }
 
     public function getTitle(): string|Htmlable

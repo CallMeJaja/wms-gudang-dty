@@ -256,7 +256,7 @@ class AlokasiBufferService
         );
 
         ActivityLog::catat(
-            'RELEASE_BUFFER',
+            'ALOKASI_BUFFER',
             self::MODUL,
             $transaksi->id,
             sprintf(

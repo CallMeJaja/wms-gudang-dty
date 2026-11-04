@@ -15,10 +15,14 @@ class CreateUser extends CreateRecord
 
     protected function afterCreate(): void
     {
+        $aktif = (bool) $this->getRecord()->is_active;
+
         Notification::make()
             ->success()
             ->title('Pengguna berhasil ditambahkan')
-            ->body('Akun baru sudah dapat digunakan untuk masuk ke panel.')
+            ->body($aktif
+                ? 'Akun baru sudah dapat digunakan untuk masuk ke panel.'
+                : 'Akun dibuat tidak aktif dan belum dapat masuk sampai diaktifkan.')
             ->send();
     }
 }

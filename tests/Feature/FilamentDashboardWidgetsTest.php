@@ -9,6 +9,8 @@ use App\Enums\PosStok;
 use App\Enums\StatusDokumen;
 use App\Filament\Pages\Dashboard;
 use App\Filament\Support\DashboardData;
+use App\Models\Barang;
+use App\Models\MutasiStok;
 use App\Models\StokBarang;
 use App\Models\TransaksiKeluar;
 use App\Models\TransaksiMasuk;
@@ -129,6 +131,47 @@ class FilamentDashboardWidgetsTest extends TestCase
             ->get('/admin')
             ->assertOk()
             ->assertSee('Penerimaan 1 · Pengeluaran 1');
+    }
+
+    #[Test]
+    public function grafik_harian_hanya_menghitung_mutasi_masuk_dan_keluar(): void
+    {
+        $this->kunciTanggal('2026-10-13');
+        $barang = $this->barangPoy(false);
+
+        $this->catatMutasi($barang, JenisMutasi::Masuk, 100.0, 0.0);
+        $this->catatMutasi($barang, JenisMutasi::Keluar, 0.0, 40.0);
+
+        foreach ([
+            JenisMutasi::AlokasiBuffer,
+            JenisMutasi::RilisBuffer,
+            JenisMutasi::AdjustmentIn,
+            JenisMutasi::AdjustmentOut,
+            JenisMutasi::Void,
+        ] as $jenis) {
+            $this->catatMutasi($barang, $jenis, 1000.0, 1000.0);
+        }
+
+        $grafik = DashboardData::grafikHarian();
+
+        $this->assertSame(100.0, $grafik['masukPoy'][29]);
+        $this->assertSame(40.0, $grafik['keluarPoy'][29]);
+    }
+
+    private function catatMutasi(Barang $barang, JenisMutasi $jenis, float $masuk, float $keluar): void
+    {
+        MutasiStok::create([
+            'barang_id' => $barang->id,
+            'merge' => 'M-GRAFIK',
+            'grade_id' => $this->gradePoyAl->id,
+            'tanggal' => now()->toDateString(),
+            'jenis_transaksi' => $jenis,
+            'pos' => PosStok::Aktif,
+            'ref_nomor' => 'GRAFIK-'.$jenis->value,
+            'masuk_qty' => $masuk,
+            'keluar_qty' => $keluar,
+            'saldo_akhir_qty' => 0,
+        ]);
     }
 
     #[Test]

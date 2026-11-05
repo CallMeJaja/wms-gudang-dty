@@ -91,7 +91,6 @@
                     <th>Item Code</th>
                     <th>Merge</th>
                     <th>Grade</th>
-                    <th class="num">Packing</th>
                     <th class="num">Units (Bobbin)</th>
                     <th class="num">Netto (Kg)</th>
                     <th class="num">Gross (Kg)</th>
@@ -104,10 +103,6 @@
                         <td class="mono">{{ $detail->barang?->kode_barang }}</td>
                         <td class="mono">{{ $detail->merge }}</td>
                         <td class="center">{{ $detail->grade?->kode }}</td>
-                        <td class="num">
-                            {{ $detail->jumlah_kemasan !== null ? number_format((float) $detail->jumlah_kemasan, 0, ',', '.') : '—' }}
-                            {{ $detail->satuanKemasan?->kode ? ' '.$detail->satuanKemasan->kode : '' }}
-                        </td>
                         <td class="num">{{ $detail->jumlah_bobbin !== null ? number_format((int) $detail->jumlah_bobbin, 0, ',', '.') : '—' }}</td>
                         <td class="num">{{ number_format((float) $detail->berat_netto_kg, 2, ',', '.') }}</td>
                         <td class="num">{{ $detail->berat_gross_kg !== null ? number_format((float) $detail->berat_gross_kg, 2, ',', '.') : '—' }}</td>
@@ -116,7 +111,7 @@
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="5" class="num">Total</td>
+                    <td colspan="4" class="num">Total</td>
                     <td class="num">{{ number_format($totalBobbin, 0, ',', '.') }}</td>
                     <td class="num">{{ number_format($totalNetto, 2, ',', '.') }}</td>
                     <td class="num">{{ number_format($totalGross, 2, ',', '.') }}</td>

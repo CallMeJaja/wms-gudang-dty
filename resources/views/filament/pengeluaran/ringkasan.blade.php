@@ -2,6 +2,7 @@
     /** @var \App\Models\TransaksiKeluar $transaksi */
     $totalNetto = (float) $transaksi->detail->sum(fn (\App\Models\TransaksiKeluarDetail $d) => (float) $d->berat_netto_kg);
     $totalGross = (float) $transaksi->detail->sum(fn (\App\Models\TransaksiKeluarDetail $d) => (float) $d->berat_gross_kg);
+    $isSuratJalan = $transaksi->jenis_keluar === \App\Enums\JenisKeluar::DtySuratJalan;
 
     $warnaStatus = match ($transaksi->status) {
         \App\Enums\StatusDokumen::Draft => ['bg' => 'var(--gray-100)', 'text' => 'var(--gray-700)'],
@@ -68,11 +69,15 @@
                     <th style="padding: 0.5rem 0.625rem;">Barang</th>
                     <th style="padding: 0.5rem 0.625rem;">Merge</th>
                     <th style="padding: 0.5rem 0.625rem;">Grade</th>
-                    <th style="padding: 0.5rem 0.625rem; text-align: right;">Kemasan</th>
+                    @if (! $isSuratJalan)
+                        <th style="padding: 0.5rem 0.625rem; text-align: right;">Kemasan</th>
+                    @endif
                     <th style="padding: 0.5rem 0.625rem; text-align: right;">Bobbin</th>
                     <th style="padding: 0.5rem 0.625rem; text-align: right;">Netto (KG)</th>
                     <th style="padding: 0.5rem 0.625rem; text-align: right;">Gross (KG)</th>
-                    <th style="padding: 0.5rem 0.625rem;">Keterangan</th>
+                    @if (! $isSuratJalan)
+                        <th style="padding: 0.5rem 0.625rem;">Keterangan</th>
+                    @endif
                 </tr>
             </thead>
             <tbody>
@@ -85,14 +90,16 @@
                         </td>
                         <td style="padding: 0.5rem 0.625rem; font-family: ui-monospace, monospace;">{{ $detail->merge ?: '—' }}</td>
                         <td style="padding: 0.5rem 0.625rem;">{{ $detail->grade?->kode ?? '—' }}</td>
-                        <td style="padding: 0.5rem 0.625rem; text-align: right;">
-                            @if ($detail->jumlah_kemasan !== null)
-                                {{ number_format((float) $detail->jumlah_kemasan, 2, ',', '.') }}
-                                <span style="color: var(--gray-500);">{{ $detail->satuanKemasan?->kode }}</span>
-                            @else
-                                —
-                            @endif
-                        </td>
+                        @if (! $isSuratJalan)
+                            <td style="padding: 0.5rem 0.625rem; text-align: right;">
+                                @if ($detail->jumlah_kemasan !== null)
+                                    {{ number_format((float) $detail->jumlah_kemasan, 2, ',', '.') }}
+                                    <span style="color: var(--gray-500);">{{ $detail->satuanKemasan?->kode }}</span>
+                                @else
+                                    —
+                                @endif
+                            </td>
+                        @endif
                         <td style="padding: 0.5rem 0.625rem; text-align: right;">{{ $detail->jumlah_bobbin ?? '—' }}</td>
                         <td style="padding: 0.5rem 0.625rem; text-align: right; font-weight: 600;">
                             {{ number_format((float) $detail->berat_netto_kg, 2, ',', '.') }}
@@ -100,16 +107,20 @@
                         <td style="padding: 0.5rem 0.625rem; text-align: right;">
                             {{ $detail->berat_gross_kg !== null ? number_format((float) $detail->berat_gross_kg, 2, ',', '.') : '—' }}
                         </td>
-                        <td style="padding: 0.5rem 0.625rem;">{{ $detail->keterangan ?: '—' }}</td>
+                        @if (! $isSuratJalan)
+                            <td style="padding: 0.5rem 0.625rem;">{{ $detail->keterangan ?: '—' }}</td>
+                        @endif
                     </tr>
                 @endforeach
             </tbody>
             <tfoot style="background: var(--gray-50);">
                 <tr>
-                    <th colspan="6" style="padding: 0.5rem 0.625rem; text-align: right;">Total</th>
+                    <th colspan="{{ $isSuratJalan ? 5 : 6 }}" style="padding: 0.5rem 0.625rem; text-align: right;">Total</th>
                     <th style="padding: 0.5rem 0.625rem; text-align: right;">{{ number_format($totalNetto, 2, ',', '.') }}</th>
                     <th style="padding: 0.5rem 0.625rem; text-align: right;">{{ number_format($totalGross, 2, ',', '.') }}</th>
-                    <th></th>
+                    @if (! $isSuratJalan)
+                        <th></th>
+                    @endif
                 </tr>
             </tfoot>
         </table>

@@ -87,7 +87,7 @@ class PenerimaanPoyForm
                                     ->preload(),
 
                                 TextInput::make('ref_dokumen')
-                                    ->label('No. Dokumen Sumber (opsional)')
+                                    ->label('Ref. Dokumen (opsional)')
                                     ->maxLength(100)
                                     ->helperText('Nomor DO/surat jalan IPCI; tidak wajib.'),
 

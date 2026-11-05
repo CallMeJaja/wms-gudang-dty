@@ -18,7 +18,7 @@
         'Mitra' => $transaksi->partner?->nama,
         'Sumber internal' => $transaksi->sumber_internal,
         'Merge POY asal' => $transaksi->merge_poy_asal,
-        'Ref. dokumen' => $transaksi->ref_dokumen,
+        'Ref. Dokumen' => $transaksi->ref_dokumen,
         'Nomor Gate Pass' => $transaksi->nomor_gate_pass,
         'Shift' => $transaksi->shift ? 'Shift '.$transaksi->shift : null,
         'Operator' => $transaksi->operator_nama,

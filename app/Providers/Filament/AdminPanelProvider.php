@@ -51,6 +51,7 @@ class AdminPanelProvider extends PanelProvider
             ->navigationGroups([
                 NavigationGroup::make('Data Induk'),
                 NavigationGroup::make('Penerimaan'),
+                NavigationGroup::make('Produksi'),
                 NavigationGroup::make('Pengeluaran'),
                 NavigationGroup::make('Persediaan'),
                 NavigationGroup::make('Laporan'),

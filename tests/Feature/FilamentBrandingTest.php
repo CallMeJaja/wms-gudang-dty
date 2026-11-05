@@ -50,13 +50,13 @@ class FilamentBrandingTest extends TestCase
     {
         $groups = array_values(Filament::getPanel('admin')->getNavigationGroups());
 
-        $this->assertCount(6, $groups);
+        $this->assertCount(7, $groups);
         $this->assertSame(
-            ['Data Induk', 'Penerimaan', 'Pengeluaran', 'Persediaan', 'Laporan', 'Pengaturan'],
+            ['Data Induk', 'Penerimaan', 'Produksi', 'Pengeluaran', 'Persediaan', 'Laporan', 'Pengaturan'],
             array_map(fn ($group): string|Htmlable => $group->getLabel(), $groups),
         );
         $this->assertSame(
-            [null, null, null, null, null, null],
+            [null, null, null, null, null, null, null],
             array_map(fn ($group) => $group->getIcon(), $groups),
         );
     }
@@ -64,10 +64,10 @@ class FilamentBrandingTest extends TestCase
     #[Test]
     public function label_navigasi_memakai_istilah_yang_ringkas(): void
     {
-        $this->assertSame('POY', PenerimaanPoyResource::getNavigationLabel());
-        $this->assertSame('DTY', PenerimaanDtyResource::getNavigationLabel());
-        $this->assertSame('POY', PengeluaranPoyResource::getNavigationLabel());
-        $this->assertSame('Surat Jalan', SuratJalanDtyResource::getNavigationLabel());
+        $this->assertSame('POY (IPCI)', PenerimaanPoyResource::getNavigationLabel());
+        $this->assertSame('DTY dari Produksi', PenerimaanDtyResource::getNavigationLabel());
+        $this->assertSame('POY ke Produksi', PengeluaranPoyResource::getNavigationLabel());
+        $this->assertSame('DTY (Surat Jalan)', SuratJalanDtyResource::getNavigationLabel());
         $this->assertSame('Kategori', KategoriResource::getNavigationLabel());
         $this->assertSame('Konversi', KonversiSatuanResource::getNavigationLabel());
         $this->assertSame('Gate Pass', PenerimaanPendukungResource::getNavigationLabel());
@@ -91,7 +91,7 @@ class FilamentBrandingTest extends TestCase
 
         $response->assertOk();
 
-        foreach (['Data Induk', 'Penerimaan', 'Pengeluaran', 'Persediaan', 'Laporan', 'Pengaturan'] as $label) {
+        foreach (['Data Induk', 'Penerimaan', 'Produksi', 'Pengeluaran', 'Persediaan', 'Laporan', 'Pengaturan'] as $label) {
             $response->assertSee($label);
         }
     }

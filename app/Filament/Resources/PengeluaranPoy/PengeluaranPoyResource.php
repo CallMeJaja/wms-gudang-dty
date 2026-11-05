@@ -27,15 +27,15 @@ class PengeluaranPoyResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedArrowUpTray;
 
-    protected static ?string $navigationLabel = 'POY';
+    protected static ?string $navigationLabel = 'POY ke Produksi';
 
-    protected static ?string $modelLabel = 'Pengeluaran POY';
+    protected static ?string $modelLabel = 'Pengeluaran POY ke Produksi';
 
-    protected static ?string $pluralModelLabel = 'Pengeluaran POY';
+    protected static ?string $pluralModelLabel = 'Pengeluaran POY ke Produksi';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Pengeluaran';
+    protected static string|UnitEnum|null $navigationGroup = 'Produksi';
 
-    protected static ?int $navigationSort = 110;
+    protected static ?int $navigationSort = 100;
 
     protected static ?string $recordTitleAttribute = 'nomor_transaksi';
 

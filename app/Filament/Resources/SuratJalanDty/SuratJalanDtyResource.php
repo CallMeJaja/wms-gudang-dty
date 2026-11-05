@@ -28,15 +28,15 @@ class SuratJalanDtyResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedTruck;
 
-    protected static ?string $navigationLabel = 'Surat Jalan';
+    protected static ?string $navigationLabel = 'DTY (Surat Jalan)';
 
-    protected static ?string $modelLabel = 'Surat Jalan DTY';
+    protected static ?string $modelLabel = 'Pengeluaran DTY (Surat Jalan)';
 
-    protected static ?string $pluralModelLabel = 'Surat Jalan DTY';
+    protected static ?string $pluralModelLabel = 'Pengeluaran DTY (Surat Jalan)';
 
     protected static string|UnitEnum|null $navigationGroup = 'Pengeluaran';
 
-    protected static ?int $navigationSort = 111;
+    protected static ?int $navigationSort = 110;
 
     protected static ?string $recordTitleAttribute = 'nomor_transaksi';
 

@@ -27,15 +27,15 @@ class PenerimaanDtyResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedArrowDownTray;
 
-    protected static ?string $navigationLabel = 'DTY';
+    protected static ?string $navigationLabel = 'DTY dari Produksi';
 
-    protected static ?string $modelLabel = 'Penerimaan DTY';
+    protected static ?string $modelLabel = 'Penerimaan DTY dari Produksi';
 
-    protected static ?string $pluralModelLabel = 'Penerimaan DTY';
+    protected static ?string $pluralModelLabel = 'Penerimaan DTY dari Produksi';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Penerimaan';
+    protected static string|UnitEnum|null $navigationGroup = 'Produksi';
 
-    protected static ?int $navigationSort = 102;
+    protected static ?int $navigationSort = 101;
 
     protected static ?string $recordTitleAttribute = 'nomor_transaksi';
 

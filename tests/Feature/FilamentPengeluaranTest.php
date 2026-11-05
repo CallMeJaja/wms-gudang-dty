@@ -258,6 +258,7 @@ class FilamentPengeluaranTest extends TestCase
         $this->actingAs($this->admin);
 
         Livewire::test(CreateSuratJalanDty::class)
+            ->assertFormFieldDisabled('nomor_surat_jalan')
             ->fillForm([
                 'tanggal' => now()->toDateString(),
                 'partner_id' => $this->ipci->id,

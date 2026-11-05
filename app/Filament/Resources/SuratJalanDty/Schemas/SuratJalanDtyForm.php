@@ -20,8 +20,7 @@ use Illuminate\Database\Eloquent\Builder;
 /**
  * Form Surat Jalan DTY.
  *
- * Nomor Surat Jalan boleh diisi manual sesuai dokumen fisik; bila kosong,
- * PengeluaranService::issue() akan generate otomatis saat Terbitkan.
+ * Nomor Surat Jalan digenerate otomatis saat Terbitkan.
  */
 class SuratJalanDtyForm
 {
@@ -47,12 +46,10 @@ class SuratJalanDtyForm
                                 TextInput::make('nomor_surat_jalan')
                                     ->label('Nomor Surat Jalan')
                                     ->maxLength(50)
-                                    ->unique(ignoreRecord: true)
+                                    ->disabled()
+                                    ->dehydrated(false)
                                     ->placeholder(fn () => app(NomorDokumenService::class)->peek('SURAT_JALAN_DTY'))
-                                    ->helperText('Kosongkan untuk generate otomatis saat Terbitkan.')
-                                    ->dehydrateStateUsing(
-                                        fn (?string $state): ?string => filled($state) ? trim($state) : null
-                                    ),
+                                    ->helperText('Digenerate otomatis saat Terbitkan.'),
 
                                 DatePicker::make('tanggal')
                                     ->label('Tanggal Kirim')

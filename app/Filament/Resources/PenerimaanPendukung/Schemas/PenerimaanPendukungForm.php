@@ -50,12 +50,14 @@ class PenerimaanPendukungForm
                                     ->maxLength(50)
                                     ->unique(ignoreRecord: true)
                                     ->default(fn () => app(NomorDokumenService::class)->peek('GATE_PASS'))
-                                    ->helperText('Kosongkan untuk generate otomatis.'),
+                                    ->placeholder(fn () => app(NomorDokumenService::class)->peek('GATE_PASS'))
+                                    ->helperText('Otomatis; boleh disesuaikan dengan dokumen fisik.'),
 
                                 TextInput::make('nomor_transaksi')
                                     ->label('Nomor Transaksi')
                                     ->disabled()
                                     ->dehydrated(false)
+                                    ->placeholder(fn () => app(NomorDokumenService::class)->peek('TRX_MASUK'))
                                     ->helperText('Digenerate otomatis saat disimpan.'),
 
                                 DatePicker::make('tanggal')
@@ -83,10 +85,6 @@ class PenerimaanPendukungForm
 
                                 TextInput::make('operator_nama')
                                     ->label('Nama Operator')
-                                    ->maxLength(100),
-
-                                TextInput::make('ref_dokumen')
-                                    ->label('Ref. Dokumen')
                                     ->maxLength(100),
 
                                 TextInput::make('pengirim')

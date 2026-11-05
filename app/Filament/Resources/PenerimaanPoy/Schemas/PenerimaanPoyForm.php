@@ -27,8 +27,8 @@ use Illuminate\Database\Eloquent\Builder;
 /**
  * Form Penerimaan POY dari IPCI.
  *
- * POY memakai berat timbangan (Kg), bukan konversi bobbin: Berat Netto KG
- * wajib input manual. Box & bobbin hanya atribut pelengkap.
+ * POY memakai berat timbangan (Kg). Box/Pallet dan Bobbin saling mengisi
+ * otomatis sebagai bantuan input; nilai aktual tetap dapat diubah manual.
  */
 class PenerimaanPoyForm
 {
@@ -83,8 +83,9 @@ class PenerimaanPoyForm
                                     ->preload(),
 
                                 TextInput::make('ref_dokumen')
-                                    ->label('Ref. Dokumen')
-                                    ->maxLength(100),
+                                    ->label('No. Dokumen Sumber (opsional)')
+                                    ->maxLength(100)
+                                    ->helperText('Nomor DO/surat jalan IPCI; tidak wajib.'),
 
                                 TextInput::make('pengirim')
                                     ->label('Pengirim')
@@ -182,15 +183,38 @@ class PenerimaanPoyForm
                                     ->required(),
 
                                 TextInput::make('jumlah_kemasan')
-                                    ->label('Box')
+                                    ->label('Box / Pallet')
                                     ->numeric()
-                                    ->minValue(0),
+                                    ->minValue(0)
+                                    ->live(onBlur: true)
+                                    ->helperText('1 box/pallet = 36 bobbin = 576 kg')
+                                    ->afterStateUpdated(function (Set $set, $state): void {
+                                        $box = (float) $state;
+
+                                        if ($box <= 0) {
+                                            return;
+                                        }
+
+                                        $set('jumlah_bobbin', (int) round($box * (float) config('wms.satuan.poy_pallet_bobbin')));
+                                        $set('berat_kg', round($box * (float) config('wms.satuan.poy_pallet_kg'), 2));
+                                    }),
 
                                 TextInput::make('jumlah_bobbin')
                                     ->label('Bobbin')
                                     ->numeric()
                                     ->integer()
-                                    ->minValue(0),
+                                    ->minValue(0)
+                                    ->live(onBlur: true)
+                                    ->afterStateUpdated(function (Set $set, $state): void {
+                                        $bobbin = (float) $state;
+
+                                        if ($bobbin <= 0) {
+                                            return;
+                                        }
+
+                                        $set('jumlah_kemasan', round($bobbin / (float) config('wms.satuan.poy_pallet_bobbin'), 2));
+                                        $set('berat_kg', round($bobbin * (float) config('wms.satuan.poy_bobbin_kg'), 2));
+                                    }),
 
                                 TextInput::make('berat_kg')
                                     ->label('Berat (KG)')
@@ -199,6 +223,7 @@ class PenerimaanPoyForm
                                     ->minValue(0.01)
                                     ->step('0.01')
                                     ->suffix('kg')
+                                    ->helperText('Otomatis dari box/bobbin; sesuaikan dengan timbangan.')
                                     ->live(onBlur: true),
                             ]),
                     ]),

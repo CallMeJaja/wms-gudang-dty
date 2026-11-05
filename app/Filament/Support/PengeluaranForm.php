@@ -59,6 +59,45 @@ final class PengeluaranForm
     {
         $kodeKategori = PengeluaranService::kodeKategori($jenis);
 
+        $komponen = [
+            self::pilihBarang($kodeKategori),
+
+            TextInput::make('merge')
+                ->label('Merge')
+                ->required()
+                ->maxLength(50)
+                ->placeholder('4P1044'),
+
+            self::pilihGrade(),
+        ];
+
+        if ($jenis === JenisKeluar::PoyProduksi) {
+            $komponen[] = self::inputKemasanPoy();
+            $komponen[] = self::inputBobbinPoy();
+        } elseif ($jenis === JenisKeluar::DtySuratJalan) {
+            $komponen[] = self::inputBobbinDty();
+        } else {
+            $komponen[] = TextInput::make('jumlah_kemasan')
+                ->label('Kemasan')
+                ->numeric()
+                ->minValue(0);
+
+            $komponen[] = TextInput::make('jumlah_bobbin')
+                ->label('Bobbin')
+                ->numeric()
+                ->integer()
+                ->minValue(0);
+        }
+
+        $komponen[] = self::inputNetto();
+        $komponen[] = self::inputGross();
+
+        if ($jenis !== JenisKeluar::DtySuratJalan) {
+            $komponen[] = TextInput::make('keterangan')
+                ->label('Keterangan')
+                ->maxLength(255);
+        }
+
         return Repeater::make('detail')
             ->relationship()
             ->label('')
@@ -76,61 +115,107 @@ final class PengeluaranForm
             ->mutateRelationshipDataBeforeSaveUsing(
                 fn (array $data): array => PengeluaranDetailMapper::normalisasi($data)
             )
-            ->schema([
-                self::pilihBarang($kodeKategori),
+            ->schema($komponen);
+    }
 
-                TextInput::make('merge')
-                    ->label('Merge')
-                    ->required()
-                    ->maxLength(50)
-                    ->placeholder('4P1044'),
+    private static function inputKemasanPoy(): TextInput
+    {
+        return TextInput::make('jumlah_kemasan')
+            ->label('Box / Pallet')
+            ->numeric()
+            ->minValue(0)
+            ->live(onBlur: true)
+            ->helperText('1 box/pallet = 36 bobbin = 576 kg')
+            ->afterStateUpdated(function (Set $set, $state): void {
+                $box = (float) $state;
 
-                self::pilihGrade(),
+                if ($box <= 0) {
+                    return;
+                }
 
-                TextInput::make('jumlah_kemasan')
-                    ->label('Kemasan')
-                    ->numeric()
-                    ->minValue(0),
+                $set('jumlah_bobbin', (int) round($box * (float) config('wms.satuan.poy_pallet_bobbin')));
+                $set('berat_netto_kg', round($box * (float) config('wms.satuan.poy_pallet_kg'), 2));
+            });
+    }
 
-                TextInput::make('jumlah_bobbin')
-                    ->label('Bobbin')
-                    ->numeric()
-                    ->integer()
-                    ->minValue(0),
+    private static function inputBobbinPoy(): TextInput
+    {
+        return TextInput::make('jumlah_bobbin')
+            ->label('Bobbin')
+            ->numeric()
+            ->integer()
+            ->minValue(0)
+            ->live(onBlur: true)
+            ->afterStateUpdated(function (Set $set, $state): void {
+                $bobbin = (float) $state;
 
-                TextInput::make('berat_netto_kg')
-                    ->label('Netto (KG)')
-                    ->numeric()
-                    ->required()
-                    ->minValue(0.01)
-                    ->step('0.01')
-                    ->suffix('kg')
-                    ->live(onBlur: true),
+                if ($bobbin <= 0) {
+                    return;
+                }
 
-                TextInput::make('berat_gross_kg')
-                    ->label('Gross (KG)')
-                    ->numeric()
-                    ->minValue(0.01)
-                    ->step('0.01')
-                    ->suffix('kg')
-                    ->live(onBlur: true)
-                    ->rules([
-                        fn (Get $get): \Closure => function (string $attribute, mixed $value, \Closure $fail) use ($get): void {
-                            if ($value === null || $value === '' || ! is_numeric($value)) {
-                                return;
-                            }
+                $set('jumlah_kemasan', round($bobbin / (float) config('wms.satuan.poy_pallet_bobbin'), 2));
+                $set('berat_netto_kg', round($bobbin * (float) config('wms.satuan.poy_bobbin_kg'), 2));
+            });
+    }
 
-                            $netto = $get('berat_netto_kg');
+    private static function inputBobbinDty(): TextInput
+    {
+        return TextInput::make('jumlah_bobbin')
+            ->label('Bobbin')
+            ->numeric()
+            ->integer()
+            ->minValue(0)
+            ->live(onBlur: true)
+            ->afterStateUpdated(function (Set $set, $state): void {
+                $bobbin = (float) $state;
 
-                            if (is_numeric($netto) && (float) $value < (float) $netto) {
-                                $fail('Berat Gross (Kg) tidak boleh lebih kecil dari Berat Netto (Kg).');
-                            }
-                        },
-                    ]),
+                if ($bobbin <= 0) {
+                    return;
+                }
 
-                TextInput::make('keterangan')
-                    ->label('Keterangan')
-                    ->maxLength(255),
+                $grossPerBobbin = (float) config('wms.satuan.dty_box_gross_kg')
+                    / max(1, (float) config('wms.satuan.dty_box_bobbin'));
+
+                $set('berat_netto_kg', round($bobbin * (float) config('wms.satuan.dty_bobbin_kg'), 2));
+                $set('berat_gross_kg', round($bobbin * $grossPerBobbin, 2));
+            });
+    }
+
+    private static function inputNetto(): TextInput
+    {
+        return TextInput::make('berat_netto_kg')
+            ->label('Netto (KG)')
+            ->numeric()
+            ->required()
+            ->minValue(0.01)
+            ->step('0.01')
+            ->suffix('kg')
+            ->helperText('Otomatis dari box/bobbin; sesuaikan dengan timbangan.')
+            ->live(onBlur: true);
+    }
+
+    private static function inputGross(): TextInput
+    {
+        return TextInput::make('berat_gross_kg')
+            ->label('Gross (KG)')
+            ->numeric()
+            ->minValue(0.01)
+            ->step('0.01')
+            ->suffix('kg')
+            ->helperText('Otomatis dari bobbin; sesuaikan dengan timbangan.')
+            ->live(onBlur: true)
+            ->rules([
+                fn (Get $get): \Closure => function (string $attribute, mixed $value, \Closure $fail) use ($get): void {
+                    if ($value === null || $value === '' || ! is_numeric($value)) {
+                        return;
+                    }
+
+                    $netto = $get('berat_netto_kg');
+
+                    if (is_numeric($netto) && (float) $value < (float) $netto) {
+                        $fail('Berat Gross (Kg) tidak boleh lebih kecil dari Berat Netto (Kg).');
+                    }
+                },
             ]);
     }
 

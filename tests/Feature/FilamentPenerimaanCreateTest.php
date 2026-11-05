@@ -16,6 +16,7 @@ use App\Models\SupplierCustomer;
 use App\Models\TransaksiMasuk;
 use App\Models\TransaksiMasukDetail;
 use App\Models\User;
+use App\Services\NomorDokumenService;
 use App\Services\PenerimaanService;
 use Carbon\Carbon;
 use Filament\Actions\Testing\TestAction;
@@ -234,7 +235,7 @@ class FilamentPenerimaanCreateTest extends TestCase
     }
 
     #[Test]
-    public function box_dty_hanya_mengisi_bobbin_dan_netto_gross_tetap_manual(): void
+    public function box_dty_mengisi_bobbin_netto_dan_gross_otomatis(): void
     {
         $dty = $this->barangDty();
 
@@ -264,9 +265,58 @@ class FilamentPenerimaanCreateTest extends TestCase
 
         $component->assertFormSet([
             'detail.0.jumlah_bobbin' => 12,
-            'detail.0.berat_kg' => 33,
-            'detail.0.berat_gross_kg' => 35.74,
+            'detail.0.berat_kg' => 66,
+            'detail.0.berat_gross_kg' => 71.48,
         ]);
+    }
+
+    #[Test]
+    public function box_dan_bobbin_poy_saling_mengisi_otomatis(): void
+    {
+        $poy = $this->barangPoy();
+
+        $this->actingAs($this->admin);
+
+        $component = Livewire::test(CreatePenerimaanPoy::class)
+            ->fillForm([
+                'tanggal' => now()->toDateString(),
+                'shift' => 1,
+                'operator_nama' => 'Operator POY',
+                'detail' => [
+                    [
+                        'barang_id' => $poy->id,
+                        'merge' => '4P1044',
+                        'grade_id' => $this->gradePoyAl->id,
+                        'jumlah_kemasan' => 1,
+                        'jumlah_bobbin' => 36,
+                        'berat_kg' => 576,
+                    ],
+                ],
+            ]);
+
+        $component->set('data.detail.0.jumlah_kemasan', 2);
+        $component->assertFormSet([
+            'detail.0.jumlah_bobbin' => 72,
+            'detail.0.berat_kg' => 1152,
+        ]);
+
+        $component->set('data.detail.0.jumlah_bobbin', 36);
+        $component->assertFormSet([
+            'detail.0.jumlah_kemasan' => 1,
+            'detail.0.berat_kg' => 576,
+        ]);
+    }
+
+    #[Test]
+    public function gate_pass_tidak_memakai_ref_dokumen_dan_nomor_gate_pass_otomatis(): void
+    {
+        $this->actingAs($this->admin);
+
+        $peek = app(NomorDokumenService::class)->peek('GATE_PASS');
+
+        Livewire::test(CreatePenerimaanPendukung::class)
+            ->assertFormFieldDoesNotExist('ref_dokumen')
+            ->assertFormSet(['nomor_gate_pass' => $peek]);
     }
 
     #[Test]

@@ -30,8 +30,8 @@ use Illuminate\Database\Eloquent\Builder;
 /**
  * Form Penerimaan DTY hasil produksi.
  *
- * Box hanya mengisi bobbin otomatis. Netto dan gross wajib ditimbang
- * manual. Gross disimpan sebagai penanda [GROSS=..] pada `keterangan`
+ * Box mengisi bobbin, netto, dan gross otomatis sebagai bantuan input;
+ * nilainya tetap dapat disesuaikan dengan timbangan. Gross disimpan sebagai penanda [GROSS=..] pada `keterangan`
  * karena skema detail masuk tidak punya kolom gross (lihat
  * TransaksiMasukDetail).
  */
@@ -108,7 +108,7 @@ class PenerimaanDtyForm
                     ]),
 
                 Section::make('Rincian Barang')
-                    ->description('Satu baris = satu kombinasi barang + merge + grade. Isi Box untuk mengisi bobbin otomatis; netto dan gross ditimbang manual.')
+                    ->description('Satu baris = satu kombinasi barang + merge + grade. Isi Box untuk mengisi bobbin, netto, dan gross otomatis; sesuaikan dengan timbangan.')
                     ->columnSpanFull()
                     ->schema([
                         Repeater::make('detail')
@@ -198,6 +198,8 @@ class PenerimaanDtyForm
 
                                         $isi = app(KonversiSatuanService::class)->autoFillDty($box);
                                         $set('jumlah_bobbin', $isi['bobbin']);
+                                        $set('berat_kg', $isi['netto_kg']);
+                                        $set('berat_gross_kg', $isi['gross_kg']);
                                     }),
 
                                 TextInput::make('jumlah_bobbin')
@@ -213,6 +215,7 @@ class PenerimaanDtyForm
                                     ->minValue(0.01)
                                     ->step('0.01')
                                     ->suffix('kg')
+                                    ->helperText('Otomatis dari box; sesuaikan dengan timbangan.')
                                     ->live(onBlur: true),
 
                                 TextInput::make('berat_gross_kg')
@@ -222,6 +225,7 @@ class PenerimaanDtyForm
                                     ->minValue(0.01)
                                     ->step('0.01')
                                     ->suffix('kg')
+                                    ->helperText('Otomatis dari box; sesuaikan dengan timbangan.')
                                     ->live(onBlur: true)
                                     ->hint(fn (Get $get): ?string => self::hintGross($get)),
 

@@ -41,7 +41,7 @@ class PenerimaanPoyTable
                     ->toggleable(),
 
                 TextColumn::make('ref_dokumen')
-                    ->label('Ref. Dokumen')
+                    ->label('No. Dokumen Sumber')
                     ->placeholder('—')
                     ->toggleable(isToggledHiddenByDefault: true),
 

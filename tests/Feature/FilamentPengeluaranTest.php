@@ -183,8 +183,8 @@ class FilamentPengeluaranTest extends TestCase
                         'merge' => '  M-POY-1  ',
                         'grade_id' => $this->gradePoyAl->id,
                         'jumlah_kemasan' => '3',
-                        'jumlah_bobbin' => '12',
-                        'berat_netto_kg' => '100',
+                        'jumlah_bobbin' => '108',
+                        'berat_netto_kg' => '1728',
                         'berat_gross_kg' => '',
                         'keterangan' => '  baris uji  ',
                     ],
@@ -208,12 +208,46 @@ class FilamentPengeluaranTest extends TestCase
         $this->assertSame(3.0, (float) $detail->jumlah_kemasan);
         $this->assertNull($detail->berat_gross_kg);
         $this->assertNull($detail->satuan_kemasan_id);
-        $this->assertSame(100.0, (float) $detail->berat_netto_kg);
+        $this->assertSame(1728.0, (float) $detail->berat_netto_kg);
         $this->assertSame('baris uji', $detail->keterangan);
-        $this->assertSame(12, $detail->jumlah_bobbin);
+        $this->assertSame(108, $detail->jumlah_bobbin);
 
         $this->assertSame(0, StokBarang::query()->count(), 'DRAFT tidak boleh membuat saldo stok.');
         $this->assertSame(0, MutasiStok::query()->count(), 'DRAFT tidak boleh menulis mutasi.');
+    }
+
+    #[Test]
+    public function surat_jalan_hanya_memakai_bobbin_netto_gross_dan_bobbin_mengisi_otomatis(): void
+    {
+        $this->isiStok($this->dty, '4D9160', $this->gradeDtyA->id, 1000);
+
+        $this->actingAs($this->admin);
+
+        $component = Livewire::test(CreateSuratJalanDty::class)
+            ->fillForm([
+                'tanggal' => now()->toDateString(),
+                'no_kendaraan' => 'B 1234 CD',
+                'nama_sopir' => 'Joko',
+                'pic_pengirim' => 'R. Jamal',
+                'pic_mengetahui' => 'Budi',
+                'detail' => [
+                    [
+                        'barang_id' => $this->dty->id,
+                        'merge' => '4D9160',
+                        'grade_id' => $this->gradeDtyA->id,
+                        'jumlah_bobbin' => 1,
+                    ],
+                ],
+            ]);
+
+        $component
+            ->assertFormFieldDoesNotExist('detail.0.jumlah_kemasan')
+            ->assertFormFieldDoesNotExist('detail.0.keterangan')
+            ->set('data.detail.0.jumlah_bobbin', 12)
+            ->assertFormSet([
+                'detail.0.berat_netto_kg' => 66,
+                'detail.0.berat_gross_kg' => 71.48,
+            ]);
     }
 
     #[Test]

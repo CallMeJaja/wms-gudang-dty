@@ -78,6 +78,24 @@ class PenerimaanDetailMapperTest extends TestCase
     }
 
     #[Test]
+    public function dty_merge_kosong_menjadi_strip(): void
+    {
+        $dty = $this->barangDty();
+
+        $data = PenerimaanDetailMapper::dty([
+            'barang_id' => $dty->id,
+            'merge' => '   ',
+            'grade_id' => $this->gradeDtyA->id,
+            'jumlah_kemasan' => '2',
+            'jumlah_bobbin' => '12',
+            'berat_kg' => '66.00',
+            'berat_gross_kg' => '71.48',
+        ]);
+
+        $this->assertSame('-', $data['merge']);
+    }
+
+    #[Test]
     public function dty_menolak_gross_kurang_dari_netto(): void
     {
         $dty = $this->barangDty();
@@ -109,16 +127,18 @@ class PenerimaanDetailMapperTest extends TestCase
 
         $data = PenerimaanDetailMapper::pendukung([
             'barang_id' => $barang->id,
+            'batch' => 'GRN-VELVET',
             'jumlah_kemasan' => '10',
             'satuan_kemasan_id' => $pcs->id,
-            'keterangan' => 'GRN-VELVET',
+            'keterangan' => 'Catatan baris',
         ]);
 
         $this->assertSame(10.0, $data['berat_kg']);
         $this->assertSame($this->gradePendukungStd->id, $data['grade_id']);
         $this->assertSame($pcs->id, $data['satuan_kemasan_id']);
-        $this->assertSame('GRN-VELVET', $data['keterangan']);
-        $this->assertSame('TANPA-BATCH', $data['merge']);
+        $this->assertSame('GRN-VELVET', $data['batch']);
+        $this->assertSame('Catatan baris', $data['keterangan']);
+        $this->assertSame('-', $data['merge']);
     }
 
     #[Test]

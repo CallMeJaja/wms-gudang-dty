@@ -92,6 +92,7 @@ final class PenerimaanDetailMapper
         unset($data['berat_gross_kg']);
 
         $data['merge'] = trim((string) ($data['merge'] ?? ''));
+        $data['merge'] = $data['merge'] === '' ? '-' : $data['merge'];
         $data['satuan_kemasan_id'] = self::satuanBoxId();
         $data['jumlah_kemasan'] = self::numericOrNull($data['jumlah_kemasan'] ?? null);
         $data['jumlah_bobbin'] = self::integerOrNull($data['jumlah_bobbin'] ?? null);
@@ -107,8 +108,9 @@ final class PenerimaanDetailMapper
      */
     public static function pendukung(array $data): array
     {
-        $data['merge'] = trim((string) ($data['merge'] ?? ''));
-        $data['merge'] = $data['merge'] === '' ? 'TANPA-BATCH' : $data['merge'];
+        $batch = trim((string) ($data['batch'] ?? $data['merge'] ?? ''));
+        $data['batch'] = self::teksAtauNull($batch);
+        $data['merge'] = '-';
         $data['grade_id'] = self::gradePendukungId();
         $data['jumlah_kemasan'] = self::numericOrNull($data['jumlah_kemasan'] ?? null);
         $data['jumlah_bobbin'] = null;

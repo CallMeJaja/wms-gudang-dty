@@ -12,10 +12,9 @@ use Illuminate\Database\Seeder;
  *
  * Catatan:
  * - POY dan DTY memakai satuan dasar KG agar saldo mengikuti timbangan.
- * - Item pendukung memakai PCS, ROLL, atau KG sesuai satuan dasarnya.
+ * - Item pendukung memakai PCS atau KG sesuai satuan dasarnya.
  * - Barang master bersifat generik; merge baru dibuat saat transaksi.
- *   Karena itu is_merge_minggu default-nya false dan penandaan merge
- *   Minggu dilakukan lewat CRUD master data.
+ * - Hanya POY-250-48 yang ditandai is_merge_minggu = true.
  */
 class BarangSeeder extends Seeder
 {
@@ -49,7 +48,7 @@ class BarangSeeder extends Seeder
 
             // ---------------- Item Pendukung ----------------
             [
-                'kode_barang' => 'PPR TUB DTY, BULLNOSE',
+                'kode_barang' => '5003301227',
                 'nama_barang' => 'PPR TUB DTY,BULLNOSE,212-222GM',
                 'kategori' => KategoriBarang::PENDUKUNG,
                 'denier' => null,
@@ -58,7 +57,7 @@ class BarangSeeder extends Seeder
                 'stok_minimum' => config('wms.ambang_pendukung.PAPER_TUBE'),
             ],
             [
-                'kode_barang' => 'CARTON BOX DTY 675x444x278MM, KRAFT 200',
+                'kode_barang' => '5000002512',
                 'nama_barang' => 'CARTON BOX DTY 675X444X278MM,KRAFT 200',
                 'kategori' => KategoriBarang::PENDUKUNG,
                 'denier' => null,
@@ -67,7 +66,7 @@ class BarangSeeder extends Seeder
                 'stok_minimum' => config('wms.ambang_pendukung.CARTON_BOX'),
             ],
             [
-                'kode_barang' => 'STRETCH FILM 12MC',
+                'kode_barang' => '5003301185',
                 'nama_barang' => 'STRETCH FILM 12MC',
                 'kategori' => KategoriBarang::PENDUKUNG,
                 'denier' => null,
@@ -76,7 +75,7 @@ class BarangSeeder extends Seeder
                 'stok_minimum' => null,
             ],
             [
-                'kode_barang' => 'PALLET DTY SMALL BOX 1370x1150x140MM',
+                'kode_barang' => '5003301241',
                 'nama_barang' => 'PALLET DTY SMALL BOX,1370X1150X140MM',
                 'kategori' => KategoriBarang::PENDUKUNG,
                 'denier' => null,
@@ -85,7 +84,7 @@ class BarangSeeder extends Seeder
                 'stok_minimum' => null,
             ],
             [
-                'kode_barang' => 'TAPE 250MX3IN, VISTAC TRANSPARENT',
+                'kode_barang' => '5003301180',
                 'nama_barang' => 'TAPE,250MX3IN,VISTAC,TRANSPARENT',
                 'kategori' => KategoriBarang::PENDUKUNG,
                 'denier' => null,
@@ -94,7 +93,7 @@ class BarangSeeder extends Seeder
                 'stok_minimum' => null,
             ],
             [
-                'kode_barang' => 'DTY CONING OIL, TM368 BN',
+                'kode_barang' => '1003000201',
                 'nama_barang' => 'DTY CONING OIL,TM368 BN',
                 'kategori' => KategoriBarang::PENDUKUNG,
                 'denier' => null,
@@ -103,7 +102,7 @@ class BarangSeeder extends Seeder
                 'stok_minimum' => config('wms.ambang_pendukung.CONING_OIL'),
             ],
             [
-                'kode_barang' => 'DTY PLASTIC BAG HDPE VRGN (4%A) 36/42x55 CM',
+                'kode_barang' => '5000001861',
                 'nama_barang' => 'DTY PLASTIC BAG-HDPE VRGN (4%A) 36/42X55 CM',
                 'kategori' => KategoriBarang::PENDUKUNG,
                 'denier' => null,
@@ -123,7 +122,7 @@ class BarangSeeder extends Seeder
                     'filament' => $item['filament'],
                     'satuan_dasar_id' => $satuan[$item['satuan']],
                     'stok_minimum' => $item['stok_minimum'],
-                    'is_merge_minggu' => false,
+                    'is_merge_minggu' => $item['kategori'] === KategoriBarang::POY,
                     'is_active' => true,
                 ]
             );

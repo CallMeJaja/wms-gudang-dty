@@ -13,6 +13,7 @@ class TransaksiMasukDetail extends Model
         'transaksi_masuk_id',
         'barang_id',
         'merge',
+        'batch',
         'grade_id',
         'jumlah_kemasan',
         'satuan_kemasan_id',

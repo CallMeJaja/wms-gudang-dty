@@ -37,5 +37,14 @@ class GradeSeeder extends Seeder
                 );
             }
         }
+
+        $dty = KategoriBarang::where('kode', 'DTY')->first();
+
+        if ($dty !== null) {
+            Grade::updateOrCreate(
+                ['kode' => 'WE', 'kategori_id' => $dty->id],
+                ['keterangan' => 'DTY grade WE', 'is_active' => true],
+            );
+        }
     }
 }

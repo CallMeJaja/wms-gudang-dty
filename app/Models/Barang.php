@@ -101,7 +101,7 @@ class Barang extends Model
     }
 
     /**
-     * Item pendukung & DTY memakai satuan PCS/ROLL/KG; hanya POY yang
+     * Item pendukung & DTY memakai satuan PCS/KG; hanya POY yang
      * memakai pemisahan stok aktif vs buffer.
      */
     public function memakaiBuffer(): bool

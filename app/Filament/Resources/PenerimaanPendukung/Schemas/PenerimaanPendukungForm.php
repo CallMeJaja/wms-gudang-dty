@@ -161,11 +161,11 @@ class PenerimaanPendukungForm
                                         self::hitungBerat($set, $get);
                                     }),
 
-                                TextInput::make('merge')
+                                TextInput::make('batch')
                                     ->label('Batch (opsional)')
                                     ->maxLength(50)
                                     ->placeholder('GRN-VELVET')
-                                    ->helperText('Kosongkan jika tidak ada batch; saat dicetak akan tampil —.'),
+                                    ->helperText('Batch hanya informasi; stok item pendukung selalu memakai merge -.'),
 
                                 TextInput::make('jumlah_kemasan')
                                     ->label('Qty')

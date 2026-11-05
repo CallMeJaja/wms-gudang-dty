@@ -76,6 +76,11 @@ class FilamentGatePassPrintTest extends TestCase
 
         $this->assertSame(StatusDokumen::Issued, $transaksi->status);
 
+        /** @var TransaksiMasukDetail $detail */
+        $detail = $transaksi->detail()->firstOrFail();
+        $this->assertSame('-', $detail->merge);
+        $this->assertSame('GRN-VELVET', $detail->batch);
+
         $this->actingAs($this->admin)
             ->get(PenerimaanPendukungResource::getUrl('cetak', ['record' => $transaksi]))
             ->assertOk()
@@ -116,15 +121,15 @@ class FilamentGatePassPrintTest extends TestCase
     }
 
     #[Test]
-    public function gate_pass_menampilkan_batch_kosong_sebagai_dash(): void
+    public function gate_pass_batch_kosong_tetap_bisa_dicetak(): void
     {
-        $transaksi = $this->buatPendukung('27041803', '', 'TANPA-BATCH');
+        $transaksi = $this->buatPendukung('27041803', '');
         app(PenerimaanService::class)->posting($transaksi, $this->admin->id);
 
         $this->actingAs($this->admin)
             ->get(PenerimaanPendukungResource::getUrl('cetak', ['record' => $transaksi]))
             ->assertOk()
-            ->assertDontSee('TANPA-BATCH');
+            ->assertSee('PPR TUB DTY');
     }
 
     #[Test]
@@ -138,7 +143,7 @@ class FilamentGatePassPrintTest extends TestCase
             ->assertForbidden();
     }
 
-    private function buatPendukung(string $nomorGatePass, string $batch, ?string $merge = null): TransaksiMasuk
+    private function buatPendukung(string $nomorGatePass, string $batch): TransaksiMasuk
     {
         $transaksi = TransaksiMasuk::create([
             'nomor_transaksi' => 'IN-GP-'.uniqid(),
@@ -152,7 +157,8 @@ class FilamentGatePassPrintTest extends TestCase
         TransaksiMasukDetail::create([
             'transaksi_masuk_id' => $transaksi->id,
             'barang_id' => $this->pendukung->id,
-            'merge' => $merge ?? $batch,
+            'merge' => '-',
+            'batch' => $batch !== '' ? $batch : null,
             'grade_id' => $this->gradePendukungStd->id,
             'jumlah_kemasan' => 100,
             'satuan_kemasan_id' => $this->pcs->id,

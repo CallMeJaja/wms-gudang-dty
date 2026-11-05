@@ -231,20 +231,20 @@ class FilamentMasterDataTest extends TestCase
 
         Livewire::test(CreateSatuan::class)
             ->fillForm([
-                'kode' => 'ROLL',
-                'nama' => 'Roll',
+                'kode' => 'RIM',
+                'nama' => 'Rim',
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
-        $satuan = Satuan::query()->where('kode', 'ROLL')->firstOrFail();
+        $satuan = Satuan::query()->where('kode', 'RIM')->firstOrFail();
 
         Livewire::test(EditSatuan::class, ['record' => $satuan->getKey()])
-            ->fillForm(['nama' => 'Roll Besar'])
+            ->fillForm(['nama' => 'Rim Besar'])
             ->call('save')
             ->assertHasNoFormErrors();
 
-        $this->assertSame('Roll Besar', $satuan->fresh()->nama);
+        $this->assertSame('Rim Besar', $satuan->fresh()->nama);
     }
 
     #[Test]

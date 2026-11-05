@@ -234,6 +234,80 @@ class FilamentPenerimaanCreateTest extends TestCase
     }
 
     #[Test]
+    public function box_dty_hanya_mengisi_bobbin_dan_netto_gross_tetap_manual(): void
+    {
+        $dty = $this->barangDty();
+
+        $this->actingAs($this->admin);
+
+        $component = Livewire::test(CreatePenerimaanDty::class)
+            ->fillForm([
+                'tanggal' => now()->toDateString(),
+                'shift' => 2,
+                'operator_nama' => 'Operator DTY',
+                'sumber_internal' => 'AREA PRODUKSI',
+                'merge_poy_asal' => '4P1044',
+                'detail' => [
+                    [
+                        'barang_id' => $dty->id,
+                        'merge' => '4D9160',
+                        'grade_id' => $this->gradeDtyA->id,
+                        'jumlah_kemasan' => 1,
+                        'jumlah_bobbin' => 6,
+                        'berat_kg' => 33,
+                        'berat_gross_kg' => 35.74,
+                    ],
+                ],
+            ]);
+
+        $component->set('data.detail.0.jumlah_kemasan', 2);
+
+        $component->assertFormSet([
+            'detail.0.jumlah_bobbin' => 12,
+            'detail.0.berat_kg' => 33,
+            'detail.0.berat_gross_kg' => 35.74,
+        ]);
+    }
+
+    #[Test]
+    public function create_dty_merge_kosong_disimpan_sebagai_strip(): void
+    {
+        $dty = $this->barangDty();
+
+        $this->actingAs($this->admin);
+
+        Livewire::test(CreatePenerimaanDty::class)
+            ->fillForm([
+                'tanggal' => now()->toDateString(),
+                'shift' => 2,
+                'operator_nama' => 'Operator DTY',
+                'sumber_internal' => 'AREA PRODUKSI',
+                'merge_poy_asal' => '4P1044',
+                'detail' => [
+                    [
+                        'barang_id' => $dty->id,
+                        'merge' => '',
+                        'grade_id' => $this->gradeDtyA->id,
+                        'jumlah_kemasan' => 2,
+                        'jumlah_bobbin' => 12,
+                        'berat_kg' => 66,
+                        'berat_gross_kg' => 71.48,
+                    ],
+                ],
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $detail = TransaksiMasuk::query()
+            ->where('jenis_masuk', JenisMasuk::DtyProduksi->value)
+            ->firstOrFail()
+            ->detail()
+            ->firstOrFail();
+
+        $this->assertSame('-', $detail->merge);
+    }
+
+    #[Test]
     public function create_pendukung_menghitung_kg_dan_memakai_grade_std(): void
     {
         $pcs = Satuan::create(['kode' => Satuan::PCS, 'nama' => 'Pieces']);
@@ -255,10 +329,10 @@ class FilamentPenerimaanCreateTest extends TestCase
                 'detail' => [
                     [
                         'barang_id' => $barang->id,
-                        'merge' => 'GRN-VELVET',
+                        'batch' => 'GRN-VELVET',
                         'jumlah_kemasan' => 10,
                         'satuan_kemasan_id' => $pcs->id,
-                        'keterangan' => 'GRN-VELVET',
+                        'keterangan' => 'Catatan baris',
                     ],
                 ],
             ])
@@ -278,7 +352,8 @@ class FilamentPenerimaanCreateTest extends TestCase
         $this->assertSame(10.0, (float) $detail->berat_kg);
         $this->assertSame($this->gradePendukungStd->id, $detail->grade_id);
         $this->assertSame($pcs->id, $detail->satuan_kemasan_id);
-        $this->assertSame('GRN-VELVET', $detail->merge);
-        $this->assertSame('GRN-VELVET', $detail->keterangan);
+        $this->assertSame('-', $detail->merge);
+        $this->assertSame('GRN-VELVET', $detail->batch);
+        $this->assertSame('Catatan baris', $detail->keterangan);
     }
 }

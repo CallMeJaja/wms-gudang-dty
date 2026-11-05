@@ -30,9 +30,9 @@ use Illuminate\Database\Eloquent\Builder;
 /**
  * Form Penerimaan DTY hasil produksi.
  *
- * Box -> bobbin/netto/gross di-auto-fill dari config/wms.php, tetapi tetap
- * dapat dioverride manual. Gross disimpan sebagai penanda [GROSS=..] pada
- * `keterangan` karena skema detail masuk tidak punya kolom gross (lihat
+ * Box hanya mengisi bobbin otomatis. Netto dan gross wajib ditimbang
+ * manual. Gross disimpan sebagai penanda [GROSS=..] pada `keterangan`
+ * karena skema detail masuk tidak punya kolom gross (lihat
  * TransaksiMasukDetail).
  */
 class PenerimaanDtyForm
@@ -77,7 +77,7 @@ class PenerimaanDtyForm
                                     ->helperText('Akun dipakai bersama per shift.'),
 
                                 TextInput::make('sumber_internal')
-                                    ->label('Sumber Internal')
+                                    ->label('Pengirim')
                                     ->maxLength(100)
                                     ->default(fn () => config('wms.inbound.sumber_internal_dty'))
                                     ->helperText('Area asal produksi (default AREA PRODUKSI).'),
@@ -87,7 +87,7 @@ class PenerimaanDtyForm
                                     ->required()
                                     ->maxLength(50)
                                     ->placeholder('4P1044')
-                                    ->helperText('Wajib untuk laporan rendemen POY vs DTY.'),
+                                    ->helperText('Wajib untuk identitas produksi.'),
                             ]),
                         Section::make('Ringkasan')
                             ->columnSpan(1)
@@ -108,7 +108,7 @@ class PenerimaanDtyForm
                     ]),
 
                 Section::make('Rincian Barang')
-                    ->description('Satu baris = satu kombinasi barang + merge + grade. Isi Box untuk mengisi bobbin/netto/gross otomatis.')
+                    ->description('Satu baris = satu kombinasi barang + merge + grade. Isi Box untuk mengisi bobbin otomatis; netto dan gross ditimbang manual.')
                     ->columnSpanFull()
                     ->schema([
                         Repeater::make('detail')
@@ -156,10 +156,10 @@ class PenerimaanDtyForm
                                     ->afterStateUpdated(fn (Set $set) => $set('grade_id', null)),
 
                                 TextInput::make('merge')
-                                    ->label('Merge')
-                                    ->required()
+                                    ->label('Batch (opsional)')
                                     ->maxLength(50)
-                                    ->placeholder('4D9160'),
+                                    ->placeholder('4D9160')
+                                    ->helperText('Kosongkan untuk menyimpan sebagai -.'),
 
                                 Select::make('grade_id')
                                     ->label('Grade')
@@ -198,8 +198,6 @@ class PenerimaanDtyForm
 
                                         $isi = app(KonversiSatuanService::class)->autoFillDty($box);
                                         $set('jumlah_bobbin', $isi['bobbin']);
-                                        $set('berat_kg', $isi['netto_kg']);
-                                        $set('berat_gross_kg', $isi['gross_kg']);
                                     }),
 
                                 TextInput::make('jumlah_bobbin')

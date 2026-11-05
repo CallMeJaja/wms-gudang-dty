@@ -205,6 +205,21 @@ class InboundTest extends TestCase
     }
 
     #[Test]
+    public function issue_gate_pass_dengan_batch_strip_tetap_membuat_kunci_stok(): void
+    {
+        $transaksi = $this->buatDrafPendukung(10, '-');
+
+        $this->app->make(PenerimaanService::class)->posting($transaksi, $this->operator->id);
+
+        $this->assertDatabaseHas('stok_barang', [
+            'barang_id' => $this->pendukung->id,
+            'merge' => '-',
+            'grade_id' => $this->gradePendukungStd->id,
+            'stok_aktif' => 10.0,
+        ]);
+    }
+
+    #[Test]
     public function nomor_gate_pass_service_mengikuti_format_dan_naik(): void
     {
         $nomor = $this->app->make(NomorDokumenService::class);
@@ -348,7 +363,7 @@ class InboundTest extends TestCase
         return $transaksi;
     }
 
-    private function buatDrafPendukung(float $qty): TransaksiMasuk
+    private function buatDrafPendukung(float $qty, string $merge = 'BATCH-A'): TransaksiMasuk
     {
         $pcs = Satuan::query()->where('kode', Satuan::PCS)->value('id');
 
@@ -365,7 +380,7 @@ class InboundTest extends TestCase
 
         $transaksi->detail()->create([
             'barang_id' => $this->pendukung->id,
-            'merge' => 'BATCH-A',
+            'merge' => $merge,
             'grade_id' => $this->gradePendukungStd->id,
             'jumlah_kemasan' => $qty,
             'satuan_kemasan_id' => $pcs,

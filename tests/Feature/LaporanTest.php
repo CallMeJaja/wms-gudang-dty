@@ -135,10 +135,8 @@ class LaporanTest extends TestCase
     #[Test]
     public function rendemen_angka_sesuai_rumus(): void
     {
-        $this->buatMasukPoy('4P1065', 1200, '2026-10-11');
-        $keluar = $this->buatDrafKeluarPoy('4P1065', 1000, '2026-10-12');
-        $this->app->make(PengeluaranService::class)->posting($keluar, $this->operator->id);
-        $this->buatMasukDty('4P1065', 950, '2026-10-13');
+        $this->buatMasukPoy('4P1065', 1000, '2026-10-11');
+        $this->buatSuratJalanDtyIssued(950, '2026-10-13');
 
         $hasil = $this->laporan->rendemen('2026-10-01', '2026-10-31');
 
@@ -146,6 +144,8 @@ class LaporanTest extends TestCase
         $this->assertSame(950.0, $hasil['totalDty']);
         $this->assertSame(95.0, $hasil['rendemen']);
         $this->assertSame(5.0, $hasil['waste']);
+        $this->assertSame(50.0, $hasil['wasteKg']);
+        $this->assertFalse($hasil['surplus']);
     }
 
     #[Test]
@@ -154,31 +154,41 @@ class LaporanTest extends TestCase
         $hasil = $this->laporan->rendemen('2026-10-01', '2026-10-31');
 
         $this->assertSame(0.0, $hasil['totalPoy']);
+        $this->assertSame(0.0, $hasil['totalDty']);
         $this->assertNull($hasil['rendemen']);
         $this->assertNull($hasil['waste']);
+        $this->assertSame(0.0, $hasil['wasteKg']);
+        $this->assertSame(100000.0, $hasil['targetKg']);
+        $this->assertSame(0.0, $hasil['pencapaianTarget']);
+        $this->assertSame(-100000.0, $hasil['selisihTargetKg']);
+        $this->assertFalse($hasil['surplus']);
     }
 
     #[Test]
-    public function rendemen_per_merge_poy_asal_terpisah(): void
+    public function rendemen_surplus_saat_dty_melebihi_poy(): void
     {
-        $this->buatMasukPoy('MERGE-A', 1200, '2026-10-11');
-        $this->buatMasukPoy('MERGE-B', 800, '2026-10-11');
-        $k1 = $this->buatDrafKeluarPoy('MERGE-A', 1000, '2026-10-12');
-        $this->app->make(PengeluaranService::class)->posting($k1, $this->operator->id);
-        $k2 = $this->buatDrafKeluarPoy('MERGE-B', 500, '2026-10-12');
-        $this->app->make(PengeluaranService::class)->posting($k2, $this->operator->id);
-        $this->buatMasukDty('MERGE-A', 900, '2026-10-13');
-        $this->buatMasukDty('MERGE-B', 400, '2026-10-13');
+        $this->buatMasukPoy('4P1065', 1000, '2026-10-11');
+        $this->buatSuratJalanDtyIssued(1200, '2026-10-13');
 
         $hasil = $this->laporan->rendemen('2026-10-01', '2026-10-31');
 
-        $mergeA = $hasil['perMerge']->firstWhere('merge', 'MERGE-A');
-        $mergeB = $hasil['perMerge']->firstWhere('merge', 'MERGE-B');
+        $this->assertTrue($hasil['surplus']);
+        $this->assertSame(120.0, $hasil['rendemen']);
+        $this->assertSame(-20.0, $hasil['waste']);
+        $this->assertSame(-200.0, $hasil['wasteKg']);
+    }
 
-        $this->assertNotNull($mergeA);
-        $this->assertNotNull($mergeB);
-        $this->assertSame(90.0, $mergeA['rendemen']);
-        $this->assertSame(80.0, $mergeB['rendemen']);
+    #[Test]
+    public function rendemen_mengembalikan_target_dan_pencapaian(): void
+    {
+        $this->buatMasukPoy('4P1065', 1000, '2026-10-11');
+        $this->buatSuratJalanDtyIssued(50000, '2026-10-13');
+
+        $hasil = $this->laporan->rendemen('2026-10-01', '2026-10-31');
+
+        $this->assertSame(100000.0, $hasil['targetKg']);
+        $this->assertSame(50.0, $hasil['pencapaianTarget']);
+        $this->assertSame(-50000.0, $hasil['selisihTargetKg']);
     }
 
     /*
@@ -238,28 +248,24 @@ class LaporanTest extends TestCase
         return $transaksi;
     }
 
-    private function buatMasukDty(string $mergePoyAsal, float $berat, string $tanggal): TransaksiMasuk
+    private function buatSuratJalanDtyIssued(float $berat, string $tanggal): TransaksiKeluar
     {
-        $transaksi = TransaksiMasuk::create([
-            'nomor_transaksi' => 'IN-DTY-'.$mergePoyAsal.'-'.uniqid(),
-            'jenis_masuk' => JenisMasuk::DtyProduksi,
+        $transaksi = TransaksiKeluar::create([
+            'nomor_transaksi' => 'SJ-TEST-'.uniqid(),
+            'jenis_keluar' => JenisKeluar::DtySuratJalan,
             'tanggal' => $tanggal,
-            'merge_poy_asal' => $mergePoyAsal,
-            'status' => StatusDokumen::Draft,
+            'status' => StatusDokumen::Issued,
             'created_by' => $this->operator->id,
         ]);
 
-        TransaksiMasukDetail::create([
-            'transaksi_masuk_id' => $transaksi->id,
+        TransaksiKeluarDetail::create([
+            'transaksi_keluar_id' => $transaksi->id,
             'barang_id' => $this->dty->id,
             'merge' => '4D9160',
             'grade_id' => $this->gradeDtyA->id,
-            'jumlah_kemasan' => 2,
-            'berat_kg' => $berat,
+            'berat_netto_kg' => $berat,
         ]);
 
-        $this->app->make(PenerimaanService::class)->posting($transaksi, $this->operator->id);
-
-        return $transaksi->fresh();
+        return $transaksi;
     }
 }

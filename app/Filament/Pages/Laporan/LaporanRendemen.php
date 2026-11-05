@@ -10,7 +10,7 @@ use Filament\Support\Icons\Heroicon;
 use UnitEnum;
 
 /**
- * Rekonsiliasi POY vs DTY di panel Filament.
+ * Rendemen POY masuk vs DTY keluar di panel Filament.
  */
 class LaporanRendemen extends Page
 {
@@ -24,7 +24,7 @@ class LaporanRendemen extends Page
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedChartBar;
 
-    protected static ?string $title = 'Rendemen POY vs DTY';
+    protected static ?string $title = 'Rendemen POY Masuk vs DTY Keluar';
 
     protected string $view = 'filament.pages.laporan.rendemen';
 
@@ -33,7 +33,7 @@ class LaporanRendemen extends Page
      */
     public function filter(): array
     {
-        $default = LaporanService::defaultPeriode();
+        $default = LaporanService::defaultPeriodeRendemen();
 
         return [
             'dari' => (string) request()->query('dari', $default['dari']),
@@ -47,6 +47,11 @@ class LaporanRendemen extends Page
     public function exportFilter(): array
     {
         return $this->filter();
+    }
+
+    public function memakaiPeriodeDefault(): bool
+    {
+        return ! request()->filled('dari') && ! request()->filled('sampai');
     }
 
     protected function getHeaderActions(): array
@@ -79,6 +84,7 @@ class LaporanRendemen extends Page
         return [
             'filter' => $filter,
             'hasil' => app(LaporanService::class)->rendemen($filter['dari'], $filter['sampai']),
+            'periodeDefault' => $this->memakaiPeriodeDefault(),
             'disclaimerRingkas' => (string) config('wms.rendemen.disclaimer_ringkas'),
             'disclaimerLengkap' => (string) config('wms.rendemen.disclaimer_lengkap'),
         ];

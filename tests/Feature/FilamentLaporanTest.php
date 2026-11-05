@@ -16,7 +16,6 @@ use App\Models\TransaksiMasuk;
 use App\Models\TransaksiMasukDetail;
 use App\Models\User;
 use App\Services\PenerimaanService;
-use App\Services\PengeluaranService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
@@ -165,23 +164,27 @@ class FilamentLaporanTest extends TestCase
     }
 
     #[Test]
-    public function rendemen_menampilkan_total_persentase_baris_per_merge_dan_disclaimer(): void
+    public function rendemen_menampilkan_poy_masuk_dty_keluar_target_dan_disclaimer(): void
     {
-        $this->buatMasukPoy('MERGE-A', 1200, '2026-10-11');
-        $keluar = $this->buatDrafKeluarPoy('MERGE-A', 1000, '2026-10-12');
-        $this->app->make(PengeluaranService::class)->posting($keluar, $this->operator->id);
-        $this->buatMasukDty('MERGE-A', 950, '2026-10-13');
+        $this->buatMasukPoy('MERGE-A', 1000, '2026-10-11');
+        $this->buatSuratJalanDtyIssued(950, '2026-10-13');
 
         $this->actingAs($this->operator)
             ->get('/admin/laporan/rendemen?dari=2026-10-01&sampai=2026-10-31')
             ->assertOk()
-            ->assertSee('Total POY Keluar')
-            ->assertSee('Total DTY Masuk')
+            ->assertSee('POY Masuk')
+            ->assertSee('DTY Keluar')
+            ->assertSee('Rendemen')
+            ->assertSee('Waste / Selisih')
+            ->assertSee('Target Bulanan')
+            ->assertSee('Pencapaian')
             ->assertSee('1.000,00')
             ->assertSee('950,00')
             ->assertSee('95,00%')
             ->assertSee('5,00%')
-            ->assertSee('MERGE-A')
+            ->assertSee('100,00 ton')
+            ->assertSee('0,95%')
+            ->assertDontSee('Per Merge POY Asal')
             ->assertSee((string) config('wms.rendemen.disclaimer_ringkas'))
             ->assertSee((string) config('wms.rendemen.disclaimer_lengkap'))
             ->assertSee('Selengkapnya');
@@ -298,28 +301,24 @@ class FilamentLaporanTest extends TestCase
         return $transaksi;
     }
 
-    private function buatMasukDty(string $mergePoyAsal, float $berat, string $tanggal): TransaksiMasuk
+    private function buatSuratJalanDtyIssued(float $berat, string $tanggal): TransaksiKeluar
     {
-        $transaksi = TransaksiMasuk::create([
-            'nomor_transaksi' => 'IN-DTY-'.$mergePoyAsal.'-'.uniqid(),
-            'jenis_masuk' => JenisMasuk::DtyProduksi,
+        $transaksi = TransaksiKeluar::create([
+            'nomor_transaksi' => 'SJ-TEST-'.uniqid(),
+            'jenis_keluar' => JenisKeluar::DtySuratJalan,
             'tanggal' => $tanggal,
-            'merge_poy_asal' => $mergePoyAsal,
-            'status' => StatusDokumen::Draft,
+            'status' => StatusDokumen::Issued,
             'created_by' => $this->operator->id,
         ]);
 
-        TransaksiMasukDetail::create([
-            'transaksi_masuk_id' => $transaksi->id,
+        TransaksiKeluarDetail::create([
+            'transaksi_keluar_id' => $transaksi->id,
             'barang_id' => $this->dty->id,
             'merge' => '4D9160',
             'grade_id' => $this->gradeDtyA->id,
-            'jumlah_kemasan' => 2,
-            'berat_kg' => $berat,
+            'berat_netto_kg' => $berat,
         ]);
 
-        $this->app->make(PenerimaanService::class)->posting($transaksi, $this->operator->id);
-
-        return $transaksi->fresh();
+        return $transaksi;
     }
 }

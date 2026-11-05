@@ -8,7 +8,7 @@ use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 
 /**
- * Export Excel rendemen POY vs DTY — total + per merge POY asal.
+ * Export Excel rendemen POY masuk vs DTY keluar.
  */
 class RendemenExport implements FromCollection, WithHeadings
 {
@@ -21,17 +21,21 @@ class RendemenExport implements FromCollection, WithHeadings
     {
         $hasil = app(LaporanService::class)->rendemen($this->filter['dari'], $this->filter['sampai']);
 
-        $baris = $hasil['perMerge']->map(fn (array $r): array => [
-            $r['merge'], $r['poy'], $r['dty'],
-            $r['rendemen'] ?? '-', $r['waste'] ?? '-',
-        ])->values();
-
-        $baris->push([
-            'TOTAL', $hasil['totalPoy'], $hasil['totalDty'],
-            $hasil['rendemen'] ?? '-', $hasil['waste'] ?? '-',
+        return collect([
+            ['POY Masuk (kg)', $hasil['totalPoy']],
+            ['POY Masuk (ton)', $hasil['totalPoy'] / 1000],
+            ['DTY Keluar (kg)', $hasil['totalDty']],
+            ['DTY Keluar (ton)', $hasil['totalDty'] / 1000],
+            ['Rendemen (%)', $hasil['rendemen'] ?? '-'],
+            ['Waste / Selisih (kg)', $hasil['wasteKg']],
+            ['Waste / Selisih (ton)', $hasil['wasteKg'] / 1000],
+            ['Waste (%)', $hasil['waste'] ?? '-'],
+            ['Target Bulanan (kg)', $hasil['targetKg']],
+            ['Target Bulanan (ton)', $hasil['targetKg'] / 1000],
+            ['Pencapaian Target (%)', $hasil['pencapaianTarget'] ?? '-'],
+            ['Selisih Target (kg)', $hasil['selisihTargetKg']],
+            ['Status', $hasil['surplus'] ? 'Surplus / data tidak valid' : 'Normal'],
         ]);
-
-        return $baris;
     }
 
     /**
@@ -39,6 +43,6 @@ class RendemenExport implements FromCollection, WithHeadings
      */
     public function headings(): array
     {
-        return ['Merge POY Asal', 'POY Keluar (Kg)', 'DTY Masuk (Kg)', 'Rendemen (%)', 'Waste (%)'];
+        return ['Metrik', 'Nilai'];
     }
 }

@@ -1,11 +1,11 @@
 <x-filament-panels::page>
     <p style="font-size: 0.8rem; color: var(--gray-500); margin: 0;">
-        Rendemen = (DTY masuk ÷ POY keluar) × 100.
+        Rendemen = (DTY keluar via Surat Jalan ÷ POY masuk dari IPCI) × 100%.
     </p>
 
     <x-filament::section
         icon="heroicon-o-funnel"
-        description="Sesuaikan periode dan parameter laporan."
+        description="{{ $periodeDefault ? 'Default: 30 hari terakhir. Sesuaikan periode bila perlu.' : 'Periode terpilih. Sesuaikan bila perlu.' }}"
     >
         <x-slot name="heading">Filter</x-slot>
 
@@ -40,21 +40,27 @@
 
     <x-filament::section
         heading="Ringkasan Rendemen"
-        description="Perbandingan total POY keluar dan DTY masuk pada periode terpilih."
+        description="{{ $periodeDefault ? 'POY masuk dari IPCI dibandingkan dengan DTY keluar lewat Surat Jalan pada 30 hari terakhir.' : 'POY masuk dari IPCI dibandingkan dengan DTY keluar lewat Surat Jalan pada periode terpilih.' }}"
         icon="heroicon-o-chart-bar"
     >
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 0.75rem; margin-bottom: 1rem;">
             <div style="border: 1px solid var(--gray-200); border-radius: 0.5rem; padding: 0.75rem;">
-                <div style="font-size: 0.75rem; color: var(--gray-500);">Total POY Keluar</div>
+                <div style="font-size: 0.75rem; color: var(--gray-500);">POY Masuk</div>
                 <div style="font-size: 1.1rem; font-weight: 600;">
                     {{ number_format($hasil['totalPoy'], 2, ',', '.') }} kg
+                </div>
+                <div style="font-size: 0.72rem; color: var(--gray-500);">
+                    {{ number_format($hasil['totalPoy'] / 1000, 2, ',', '.') }} ton
                 </div>
             </div>
 
             <div style="border: 1px solid var(--gray-200); border-radius: 0.5rem; padding: 0.75rem;">
-                <div style="font-size: 0.75rem; color: var(--gray-500);">Total DTY Masuk</div>
+                <div style="font-size: 0.75rem; color: var(--gray-500);">DTY Keluar</div>
                 <div style="font-size: 1.1rem; font-weight: 600;">
                     {{ number_format($hasil['totalDty'], 2, ',', '.') }} kg
+                </div>
+                <div style="font-size: 0.72rem; color: var(--gray-500);">
+                    {{ number_format($hasil['totalDty'] / 1000, 2, ',', '.') }} ton
                 </div>
             </div>
 
@@ -66,14 +72,49 @@
             </div>
 
             <div style="border: 1px solid var(--gray-200); border-radius: 0.5rem; padding: 0.75rem;">
-                <div style="font-size: 0.75rem; color: var(--gray-500);">Waste</div>
+                <div style="font-size: 0.75rem; color: var(--gray-500);">Waste / Selisih</div>
                 <div style="font-size: 1.1rem; font-weight: 600;">
+                    {{ number_format($hasil['wasteKg'], 2, ',', '.') }} kg
+                </div>
+                <div style="font-size: 0.72rem; color: var(--gray-500);">
                     {{ $hasil['waste'] === null ? '-' : number_format($hasil['waste'], 2, ',', '.').'%' }}
+                </div>
+            </div>
+
+            <div style="border: 1px solid var(--gray-200); border-radius: 0.5rem; padding: 0.75rem;">
+                <div style="font-size: 0.75rem; color: var(--gray-500);">Target Bulanan</div>
+                <div style="font-size: 1.1rem; font-weight: 600;">
+                    {{ number_format($hasil['targetKg'] / 1000, 2, ',', '.') }} ton
+                </div>
+                <div style="font-size: 0.72rem; color: var(--gray-500);">
+                    {{ number_format($hasil['targetKg'], 2, ',', '.') }} kg
+                </div>
+            </div>
+
+            <div style="border: 1px solid var(--gray-200); border-radius: 0.5rem; padding: 0.75rem;">
+                <div style="font-size: 0.75rem; color: var(--gray-500);">Pencapaian</div>
+                <div style="font-size: 1.1rem; font-weight: 600;">
+                    {{ $hasil['pencapaianTarget'] === null ? '-' : number_format($hasil['pencapaianTarget'], 2, ',', '.').'%' }}
+                </div>
+                <div style="font-size: 0.72rem; color: var(--gray-500);">
+                    Selisih target: {{ $hasil['selisihTargetKg'] > 0 ? '+' : '' }}{{ number_format($hasil['selisihTargetKg'], 2, ',', '.') }} kg
                 </div>
             </div>
         </div>
 
-        <div style="display: flex; align-items: flex-start; gap: 0.5rem; border: 1px solid var(--gray-200); background: var(--gray-50); color: var(--gray-600); border-radius: 0.5rem; padding: 0.75rem; font-size: 0.75rem; line-height: 1.5; margin-bottom: 1rem;">
+        @if ($hasil['surplus'])
+            <div style="display: flex; align-items: flex-start; gap: 0.5rem; border: 1px solid var(--danger-200); background: var(--danger-50); color: var(--danger-700); border-radius: 0.5rem; padding: 0.75rem; font-size: 0.78rem; line-height: 1.5; margin-bottom: 1rem;">
+                <x-filament::icon
+                    icon="heroicon-o-exclamation-triangle"
+                    style="width: 1.1rem; height: 1.1rem; flex-shrink: 0;"
+                />
+                <div>
+                    DTY keluar lebih besar dari POY masuk. Data surplus/tidak valid — periksa transaksi pada periode ini.
+                </div>
+            </div>
+        @endif
+
+        <div style="display: flex; align-items: flex-start; gap: 0.5rem; border: 1px solid var(--gray-200); background: var(--gray-50); color: var(--gray-600); border-radius: 0.5rem; padding: 0.75rem; font-size: 0.75rem; line-height: 1.5;">
             <x-filament::icon
                 icon="heroicon-o-information-circle"
                 style="width: 1.1rem; height: 1.1rem; flex-shrink: 0; color: var(--primary-600);"
@@ -85,66 +126,6 @@
                     <div style="margin-top: 0.25rem;">{{ $disclaimerLengkap }}</div>
                 </details>
             </div>
-        </div>
-
-        <h3 style="font-size: 0.9rem; font-weight: 600; margin: 0 0 0.5rem;">Per Merge POY Asal</h3>
-
-        <div style="overflow-x: auto; border: 1px solid var(--gray-200); border-radius: 0.5rem;">
-            <table class="wms-report-table" style="width: 100%; border-collapse: collapse; font-size: 0.8rem;">
-                <thead style="background: var(--gray-50); color: var(--gray-500); text-align: left;">
-                    <tr>
-                        <th style="padding: 0.5rem 0.625rem;">Merge POY Asal</th>
-                        <th style="padding: 0.5rem 0.625rem; text-align: right;">POY Keluar (Kg)</th>
-                        <th style="padding: 0.5rem 0.625rem; text-align: right;">DTY Masuk (Kg)</th>
-                        <th style="padding: 0.5rem 0.625rem; text-align: right;">Rendemen</th>
-                        <th style="padding: 0.5rem 0.625rem; text-align: right;">Waste</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($hasil['perMerge'] as $baris)
-                        <tr style="border-top: 1px solid var(--gray-100);">
-                            <td style="padding: 0.5rem 0.625rem; font-family: ui-monospace, monospace;">
-                                {{ $baris['merge'] === '' ? '— (tanpa merge)' : $baris['merge'] }}
-                            </td>
-                            <td style="padding: 0.5rem 0.625rem; text-align: right;">
-                                {{ number_format($baris['poy'], 2, ',', '.') }}
-                            </td>
-                            <td style="padding: 0.5rem 0.625rem; text-align: right;">
-                                {{ number_format($baris['dty'], 2, ',', '.') }}
-                            </td>
-                            <td style="padding: 0.5rem 0.625rem; text-align: right;">
-                                {{ $baris['rendemen'] === null ? '-' : number_format($baris['rendemen'], 2, ',', '.').'%' }}
-                            </td>
-                            <td style="padding: 0.5rem 0.625rem; text-align: right;">
-                                {{ $baris['waste'] === null ? '-' : number_format($baris['waste'], 2, ',', '.').'%' }}
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="5" style="padding: 1.5rem; text-align: center; color: var(--gray-500);">
-                                Belum ada data pada periode ini.
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-                <tfoot style="background: var(--gray-50); font-weight: 600;">
-                    <tr>
-                        <td style="padding: 0.5rem 0.625rem; text-align: right;">Total</td>
-                        <td style="padding: 0.5rem 0.625rem; text-align: right;">
-                            {{ number_format($hasil['totalPoy'], 2, ',', '.') }}
-                        </td>
-                        <td style="padding: 0.5rem 0.625rem; text-align: right;">
-                            {{ number_format($hasil['totalDty'], 2, ',', '.') }}
-                        </td>
-                        <td style="padding: 0.5rem 0.625rem; text-align: right;">
-                            {{ $hasil['rendemen'] === null ? '-' : number_format($hasil['rendemen'], 2, ',', '.').'%' }}
-                        </td>
-                        <td style="padding: 0.5rem 0.625rem; text-align: right;">
-                            {{ $hasil['waste'] === null ? '-' : number_format($hasil['waste'], 2, ',', '.').'%' }}
-                        </td>
-                    </tr>
-                </tfoot>
-            </table>
         </div>
 
     </x-filament::section>

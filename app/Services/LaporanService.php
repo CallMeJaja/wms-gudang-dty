@@ -17,8 +17,7 @@ use Illuminate\Support\Collection;
  *
  * Laporan keluar-masuk & kartu stok membaca `mutasi_stok` (otomatis hanya
  * berisi transaksi POSTED/ISSUED + baris VOID bertipe VOID). Rendemen
- * membaca detail transaksi langsung dan membandingkan POY keluar produksi
- * dengan DTY yang masuk.
+ * membandingkan POY masuk dari IPCI dengan DTY keluar via Surat Jalan.
  */
 class LaporanService
 {
@@ -30,6 +29,21 @@ class LaporanService
         return [
             'dari' => now()->startOfMonth()->toDateString(),
             'sampai' => now()->endOfMonth()->toDateString(),
+        ];
+    }
+
+    /**
+     * Periode 30 hari terakhir termasuk hari ini, dipakai khusus rendemen.
+     *
+     * @return array{dari: string, sampai: string}
+     */
+    public static function defaultPeriodeRendemen(): array
+    {
+        $sampai = now()->startOfDay();
+
+        return [
+            'dari' => $sampai->copy()->subDays(29)->toDateString(),
+            'sampai' => $sampai->toDateString(),
         ];
     }
 
@@ -138,55 +152,45 @@ class LaporanService
 
     /*
     |--------------------------------------------------------------------------
-    | C. Rekonsiliasi POY vs DTY
+    | C. Rendemen POY Masuk vs DTY Keluar
     |--------------------------------------------------------------------------
     */
 
     /**
-     * @return array{totalPoy: float, totalDty: float, rendemen: ?float, waste: ?float, perMerge: Collection<int, array{merge: string, poy: float, dty: float, rendemen: ?float, waste: ?float}>}
+     * @return array{totalPoy: float, totalDty: float, rendemen: ?float, waste: ?float, wasteKg: float, targetKg: float, pencapaianTarget: ?float, selisihTargetKg: float, surplus: bool, perMerge: Collection<int, array<string, mixed>>}
      */
     public function rendemen(string $dari, string $sampai): array
     {
-        $poyPerMerge = TransaksiKeluarDetail::query()
+        $totalPoy = round((float) TransaksiMasukDetail::query()
             ->whereHas('transaksi', fn (Builder $q) => $q
-                ->where('jenis_keluar', JenisKeluar::PoyProduksi->value)
+                ->where('jenis_masuk', JenisMasuk::PoyIpci->value)
                 ->where('status', StatusDokumen::Posted->value)
                 ->whereDate('tanggal', '>=', $dari)
                 ->whereDate('tanggal', '<=', $sampai))
-            ->groupBy('merge')
-            ->selectRaw('merge, SUM(berat_netto_kg) AS total')
-            ->pluck('total', 'merge')
-            ->map(fn ($v): float => (float) $v);
+            ->sum('berat_kg'), 2);
 
-        $dtyPerMerge = TransaksiMasukDetail::query()
-            ->join('transaksi_masuk AS tm', 'tm.id', '=', 'transaksi_masuk_detail.transaksi_masuk_id')
-            ->where('tm.jenis_masuk', JenisMasuk::DtyProduksi->value)
-            ->where('tm.status', StatusDokumen::Posted->value)
-            ->whereDate('tm.tanggal', '>=', $dari)
-            ->whereDate('tm.tanggal', '<=', $sampai)
-            ->groupBy('tm.merge_poy_asal')
-            ->selectRaw('tm.merge_poy_asal AS merge, SUM(transaksi_masuk_detail.berat_kg) AS total')
-            ->pluck('total', 'merge')
-            ->map(fn ($v): float => (float) $v);
+        $totalDty = round((float) TransaksiKeluarDetail::query()
+            ->whereHas('transaksi', fn (Builder $q) => $q
+                ->where('jenis_keluar', JenisKeluar::DtySuratJalan->value)
+                ->where('status', StatusDokumen::Issued->value)
+                ->whereDate('tanggal', '>=', $dari)
+                ->whereDate('tanggal', '<=', $sampai))
+            ->sum('berat_netto_kg'), 2);
 
-        $perMerge = collect($poyPerMerge->keys()->merge($dtyPerMerge->keys())->unique()->sort()->values())
-            ->map(fn (string $merge): array => [
-                'merge' => $merge,
-                'poy' => round($poyPerMerge->get($merge, 0.0), 2),
-                'dty' => round($dtyPerMerge->get($merge, 0.0), 2),
-                'rendemen' => self::persenRendemen($poyPerMerge->get($merge, 0.0), $dtyPerMerge->get($merge, 0.0)),
-                'waste' => self::persenWaste($poyPerMerge->get($merge, 0.0), $dtyPerMerge->get($merge, 0.0)),
-            ]);
-
-        $totalPoy = round($poyPerMerge->sum(), 2);
-        $totalDty = round($dtyPerMerge->sum(), 2);
+        $targetKg = round((float) config('wms.rendemen.target_bulanan_ton', 100.0) * 1000, 2);
+        $wasteKg = round($totalPoy - $totalDty, 2);
 
         return [
             'totalPoy' => $totalPoy,
             'totalDty' => $totalDty,
             'rendemen' => self::persenRendemen($totalPoy, $totalDty),
             'waste' => self::persenWaste($totalPoy, $totalDty),
-            'perMerge' => $perMerge,
+            'wasteKg' => $wasteKg,
+            'targetKg' => $targetKg,
+            'pencapaianTarget' => $targetKg > 0 ? round($totalDty / $targetKg * 100, 2) : null,
+            'selisihTargetKg' => round($totalDty - $targetKg, 2),
+            'surplus' => $totalDty > $totalPoy,
+            'perMerge' => collect(),
         ];
     }
 

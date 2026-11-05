@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
  * Endpoint export laporan milik panel Filament.
  *
  * Menyediakan unduhan Excel dan PDF untuk laporan keluar-masuk, kartu stok,
- * dan rendemen POY vs DTY. Filter dibaca dari query string lalu diteruskan
+ * dan rendemen POY masuk vs DTY keluar. Filter dibaca dari query string lalu diteruskan
  * ke LaporanService atau class export terkait.
  */
 class LaporanExportController extends Controller
@@ -132,7 +132,7 @@ class LaporanExportController extends Controller
      */
     private function filterRendemen(Request $request): array
     {
-        $default = LaporanService::defaultPeriode();
+        $default = LaporanService::defaultPeriodeRendemen();
 
         return [
             'dari' => $request->query('dari', $default['dari']),

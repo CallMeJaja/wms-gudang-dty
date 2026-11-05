@@ -1,26 +1,27 @@
 # Backup Database — WMS Gudang DTY
 
 `db_wms_gudang_dty.sql` adalah dump manual siap-impor untuk aplikasi WMS
-Gudang DTY. Dump memuat **26 tabel**: struktur lengkap, data master, data
-demo, dan 2 notifikasi nyata hasil pemeriksaan stok menipis. Dump **tidak**
+Gudang DTY. Dump memuat **27 tabel**: struktur lengkap, data master, data
+demo, 4 waste log, dan 2 notifikasi nyata hasil pemeriksaan stok menipis. Dump **tidak**
 menyertakan `CREATE DATABASE`/`USE` dan **tidak** memakai `DROP TABLE`,
 sehingga database tujuan harus dibuat terlebih dahulu dan dalam keadaan
 kosong.
 
 ## Isi dump
 
-- **26 tabel**: master, stok, transaksi, audit, autentikasi, dan tabel
+- **27 tabel**: master, stok, transaksi, audit, autentikasi, dan tabel
   bawaan Laravel (cache, jobs, sessions, migrations).
 - **Data demo**:
   - 3 user (Admin, Operator, Manajer)
   - 9 barang
-  - 64 transaksi masuk (65 baris detail)
-  - 42 transaksi keluar (42 baris detail)
-  - 160 mutasi stok
+  - 64 transaksi masuk
+  - 62 transaksi keluar
+  - 146 mutasi stok
   - 26 alokasi buffer
   - 3 stok opname
-  - 132 activity log
-  - 2 notifikasi nyata (DTY CONING OIL; Admin + Manajer)
+  - 4 waste log
+  - 133 activity log
+  - 2 notifikasi nyata (Coning Oil 195 kg < minimum 200 kg; Admin + Manajer)
 - Database tujuan: `db_wms_gudang_dty`
 - Character set: `utf8mb4`
 - Collation: `utf8mb4_general_ci`

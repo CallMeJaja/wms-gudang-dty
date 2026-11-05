@@ -68,8 +68,9 @@ Buffer Minggu mengikuti aturan berikut:
    dicatat dengan penanda `dilewati = true`.
 5. Bila pasokan mencapai ambang, sisihkan **1 pallet per hari kerja** ke
    buffer; sisanya tetap aktif.
-6. Total buffer gudang lintas semua merge dibatasi **6 pallet**. Bila sisa
-   kuota kurang dari satu pallet, hanya sebesar sisa kuota yang disisihkan.
+6. Total buffer gudang lintas semua merge dibatasi **1 pallet** (6 pallet aktif
+   + 1 pallet buffer = 7 pallet total). Bila sisa kuota kurang dari satu
+   pallet, hanya sebesar sisa kuota yang disisihkan.
 7. Satu kombinasi barang, merge, dan tanggal hanya boleh memiliki satu
    baris alokasi.
 8. Alokasi dan rilis buffer tidak mengubah total stok; hanya memindahkan
@@ -93,20 +94,37 @@ Rilis buffer:
 - Toleransi gross per grade adalah alat bantu, bukan gerbang pemblokir.
 - POY dan item pendukung tidak memerlukan gross.
 
-## 8. Rendemen POY vs DTY
+## 8. Rendemen POY Masuk vs DTY Keluar
 
-- Rendemen membandingkan **POY yang keluar ke produksi** dengan **DTY yang
-  masuk dari produksi** pada periode yang sama.
-- Hanya transaksi berstatus `POSTED` yang dihitung.
-- Pengelompokan memakai merge POY asal pada penerimaan DTY.
-- Rumus: `rendemen = DTY / POY x 100%`; `waste = 100% - rendemen`.
-- Bila POY nol, rendemen dan waste kosong.
-- Rendemen adalah indikator efisiensi massa, bukan konversi teknis.
-- WIP diabaikan dan denier POY dapat berbeda dari DTY, sehingga hasil bisa
-  sedikit di atas atau di bawah 100%.
+- **POY masuk** = total `berat_kg` dari `transaksi_masuk` jenis `POY_IPCI`
+  berstatus `POSTED` pada periode.
+- **DTY keluar** = total `berat_netto_kg` dari `transaksi_keluar` jenis
+  `DTY_SURAT_JALAN` berstatus `ISSUED` pada periode.
+- Rumus: `rendemen = DTY keluar / POY masuk x 100%`.
+- `waste/selisih kg = POY masuk - DTY keluar`; `waste % = waste kg / POY masuk x 100%`.
+- Bila POY masuk nol, rendemen dan waste persen kosong.
+- Target normal: **100 ton per bulan**; pencapaian dihitung dari DTY keluar
+  terhadap target tersebut.
+- Default tampilan rendemen adalah 30 hari terakhir termasuk hari ini.
+- Bila DTY keluar > POY masuk, tandai **surplus/data tidak valid**.
+- Per-merge POY asal tidak dipakai untuk formula ini.
+- Waste mencakup area, WIP, dan kehilangan proses; ini indikator efisiensi
+  massa, bukan konversi teknis denier.
 - Disclaimer wajib tampil pada halaman dan ekspor rendemen.
 
-## 9. Void transaksi
+## 9. Waste / Scrap log
+
+- Waste/reject yarn dicatat sebagai log berat (kg) tanpa grade, merge, kode
+  barang, atau kemasan.
+- Input: tanggal, jenis (`WASTE`, `REJECT`, `SCRAP_PACKAGING`), tujuan
+  (`RCL`, `EYD`, `Pengepul`, `Lainnya`), berat kg, dan keterangan opsional.
+- Waste log **tidak mengurangi stok DTY** dan tidak membuat mutasi stok.
+- Admin dan Operator boleh membuat catatan; Admin boleh mengubah/menghapus;
+  Manajer hanya dapat melihat.
+- Resource lama Pengeluaran Scrap dipertahankan sebagai legacy dan
+  disembunyikan dari navigasi.
+
+## 10. Void transaksi
 
 - Hanya Admin yang boleh melakukan void.
 - Alasan void wajib diisi, minimal 10 karakter.
@@ -121,10 +139,12 @@ Rilis buffer:
 - Baris alokasi buffer tidak dihapus; hanya diberi penanda pembatalan.
 - Void ganda dicegah dengan lock dan pemeriksaan status di dalam transaksi.
 
-## 10. Stok opname
+## 11. Stok opname
 
 - Hanya Admin.
+- Opname hanya boleh dilakukan pada hari terakhir bulan.
 - Stok sistem = stok aktif + stok buffer.
+- POY/DTY wajib memakai merge dan grade; item pendukung memakai merge `-` dan grade `STD` secara otomatis.
 - Stok fisik tidak boleh negatif.
 - Satu posisi barang, merge, dan grade hanya boleh diopname sekali per
   tanggal.
@@ -135,7 +155,7 @@ Rilis buffer:
   penyesuaian.
 - Kolom selisih dihitung oleh database (generated stored).
 
-## 11. Penomoran dokumen atomik
+## 12. Penomoran dokumen atomik
 
 - Setiap jenis dokumen memiliki counter per periode di `nomor_dokumen`.
 - Unique `(jenis, periode)` mencegah baris ganda.
@@ -146,7 +166,7 @@ Rilis buffer:
 - Baris counter harus tersedia untuk setiap jenis dokumen; seeder
   menyiapkan periode berjalan.
 
-## 12. Stok tidak boleh negatif
+## 13. Stok tidak boleh negatif
 
 - Service menolak pengurangan melebihi saldo pos.
 - Database juga memiliki `CHECK` yang memastikan `stok_aktif` dan
@@ -156,7 +176,7 @@ Rilis buffer:
 - Buffer tidak boleh dipakai sebagai jalan keluar untuk menutupi
   kekurangan stok aktif pada hari kerja.
 
-## 13. Konsistensi kategori, grade, dan merge
+## 14. Konsistensi kategori, grade, dan merge
 
 - Jenis transaksi menentukan kategori barang yang boleh dipakai:
   - Penerimaan/pengeluaran POY hanya untuk barang POY.
@@ -166,8 +186,10 @@ Rilis buffer:
 - Merge wajib diisi untuk setiap mutasi stok.
 - Barang nonaktif tidak boleh dipakai pada transaksi baru.
 - Satu baris detail mewakili satu kombinasi barang, merge, dan grade.
+- Item pendukung tidak memakai merge sebagai identitas stok: `merge = -`,
+  grade `STD`, sedangkan batch hanya metadata di kolom `batch`.
 
-## 14. Status dan pengaruhnya terhadap stok
+## 15. Status dan pengaruhnya terhadap stok
 
 - `DRAFT` belum mengubah stok dan belum menulis mutasi.
 - `POSTED` dan `ISSUED` sudah mengubah stok dan menulis mutasi.
@@ -178,7 +200,7 @@ Rilis buffer:
 - Dokumen yang sudah diterbitkan tidak boleh diedit; gunakan void atau
   pembatalan.
 
-## 15. Aturan role
+## 16. Aturan role
 
 - Admin memiliki akses penuh, termasuk master data, void, opname, pengguna,
   dan riwayat aktivitas.
@@ -188,7 +210,7 @@ Rilis buffer:
 - Hanya user aktif yang dapat mengakses panel.
 - Pengguna tidak dihapus; gunakan status nonaktif.
 
-## 16. Audit trail
+## 17. Audit trail
 
 - `activity_logs` bersifat append-only.
 - Login dan logout dicatat otomatis.

@@ -8,7 +8,7 @@ laporan operasional dalam satu panel admin.
 ![PHP](https://img.shields.io/badge/PHP-8.3%2B-777BB4?logo=php&logoColor=white)
 ![Laravel](https://img.shields.io/badge/Laravel-13-red?logo=laravel&logoColor=white)
 ![Filament](https://img.shields.io/badge/Filament-5-FDAE4B)
-![Tests](https://img.shields.io/badge/tests-222%20lulus-brightgreen)
+![Tests](https://img.shields.io/badge/tests-236%20lulus-brightgreen)
 ![Status](https://img.shields.io/badge/status-finalisasi%20%26%20QA-blue)
 
 ![Beranda WMS Gudang DTY](docs/assets/beranda.png)
@@ -19,10 +19,10 @@ laporan operasional dalam satu panel admin.
   draf yang menunggu posting, grafik 30 hari, dan daftar perhatian.
 - **Data Induk** — Barang, Mitra, Grade, Kategori, Satuan, dan Konversi.
 - **Penerimaan** — POY, Gate Pass item pendukung, dan DTY hasil produksi.
-- **Pengeluaran** — POY ke produksi, Surat Jalan DTY, dan Scrap/Reject.
-- **Persediaan** — Stok Barang dan Stok Opname.
-- **Laporan** — Keluar-Masuk, Kartu Stok, dan Rendemen dengan ekspor
-  Excel/PDF serta cetak.
+- **Pengeluaran** — POY ke produksi dan Surat Jalan DTY.
+- **Persediaan** — Stok Barang, Stok Opname, dan log Waste / Scrap (kg, tanpa mutasi stok).
+- **Laporan** — Keluar-Masuk, Kartu Stok, dan Rendemen POY masuk vs DTY
+  keluar dengan ekspor Excel/PDF serta cetak.
 - **Notifikasi database** di sidebar untuk peringatan stok menipis setelah
   mutasi stok; status buffer Minggu tampil di Beranda.
 - **Global search** dengan shortcut **Ctrl+K** atau **⌘K**.
@@ -108,8 +108,8 @@ Dokumentasi lengkap berada di [`docs/`](docs/README.md).
 | [Architecture](docs/architecture.md) | Stack, layer, alur request, otorisasi, scheduler |
 | [Features](docs/features.md) | Modul, URL, role matrix, lifecycle, screenshot |
 | [Business Rules](docs/business-rules.md) | KG, buffer Minggu, rendemen, void, opname |
-| [Database](docs/database.md) | 26 tabel, relasi, enum, ERD, data demo |
-| [Testing](docs/testing.md) | 222 test, struktur, perintah, menambah test |
+| [Database](docs/database.md) | 27 tabel, relasi, enum, ERD, data demo |
+| [Testing](docs/testing.md) | 236 test, struktur, perintah, menambah test |
 | [Deployment](docs/deployment.md) | Checklist produksi, scheduler, queue, backup |
 | [Troubleshooting](docs/troubleshooting.md) | Masalah umum dan langkah diagnosis |
 | [Contributing](docs/contributing.md) | Conventional Commits, branch, kualitas kode |
@@ -138,7 +138,7 @@ tests/              # PHPUnit feature dan unit test
 ## Testing
 
 ```bash
-php artisan test       # 222 test lulus, 1173 assertions
+php artisan test       # 236 test lulus, 1343 assertions
 vendor/bin/pint        # format kode PHP
 npm run build          # build aset frontend
 ```

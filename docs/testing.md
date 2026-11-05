@@ -1,7 +1,7 @@
 # Testing
 
-Proyek memakai **PHPUnit 12.5.42**. Suite saat ini berisi **222 test** dengan
-**1173 assertions** dan seluruhnya lulus.
+Proyek memakai **PHPUnit 12.5.42**. Suite saat ini berisi **236 test** dengan
+**1343 assertions** dan seluruhnya lulus.
 
 ## Konfigurasi test
 
@@ -63,10 +63,11 @@ Kelompok cakupan:
 | Domain stok | Tambah, kurang, alokasi, rilis, saldo non-negatif |
 | Buffer Minggu | Ambang pasokan, kuota total, hari kerja, rilis |
 | Penerimaan | Posting, issue, validasi kategori/grade, double-posting |
-| Pengeluaran | Stok aktif, scrap, surat jalan, nomor atomik |
+| Pengeluaran | Stok aktif, surat jalan, nomor atomik |
+| Waste / Scrap | Log kg, tujuan, tanpa mutasi stok, RBAC |
 | Void | Pembalikan mutasi, alasan wajib, role Admin |
 | Opname | Selisih, transaksi penyesuaian, duplikat harian |
-| Laporan | Agregasi, rendemen, ekspor Excel/PDF |
+| Laporan | Agregasi, rendemen POY masuk vs DTY keluar, target 100 ton, ekspor Excel/PDF |
 | Notifikasi stok | Event after commit, dedup, penerima Admin/Manajer, ambang POY, command manual |
 | Filament | Akses panel, resource, widget, cetak, pengguna |
 | Seeder | Konsistensi data demo |

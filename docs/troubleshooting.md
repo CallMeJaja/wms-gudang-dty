@@ -138,7 +138,7 @@ Periksa:
 2. Tanggal transaksi adalah Senin–Sabtu.
 3. Transaksi sudah `POSTED`, bukan `DRAFT`.
 4. Pasokan hari itu minimal 7 pallet.
-5. Total buffer gudang belum mencapai 6 pallet.
+5. Total buffer gudang belum mencapai 1 pallet.
 6. Kombinasi barang, merge, dan tanggal belum pernah dialokasikan.
 
 Bila pasokan kurang dari 7 pallet, buffer memang sengaja dilewati dan

@@ -1,6 +1,6 @@
 # Database
 
-Database aplikasi berisi **26 tabel** yang terbagi menjadi master,
+Database aplikasi berisi **27 tabel** yang terbagi menjadi master,
 penomoran, stok, transaksi, audit/autentikasi, dan tabel framework Laravel.
 Nama database default adalah `db_wms_gudang_dty` dengan collation
 `utf8mb4_general_ci`.
@@ -31,6 +31,7 @@ Nama database default adalah `db_wms_gudang_dty` dengan collation
 | `stok_barang` | Saldo aktif dan buffer per barang, merge, grade |
 | `mutasi_stok` | Ledger masuk/keluar beserta snapshot saldo |
 | `alokasi_buffer` | Jejak kebijakan alokasi buffer harian |
+| `waste_logs` | Log waste/scrap kg tanpa mutasi stok |
 
 ### Transaksi
 
@@ -206,16 +207,18 @@ Dump dan seeder lokal menyiapkan:
 | User | 3 |
 | Barang | 9 |
 | Transaksi masuk | 64 |
-| Transaksi keluar | 42 |
-| Mutasi stok | 160 |
+| Transaksi keluar | 62 |
+| Mutasi stok | 146 |
 | Alokasi buffer | 26 |
 | Stok opname | 3 |
-| Activity log | 132 |
-| Notifikasi | 2 (notifikasi stok menipis nyata) |
+| Waste log | 4 |
+| Activity log | 133 |
+| Notifikasi | 2 (Coning Oil 195 kg < minimum 200 kg) |
 
 Data transaksi demo hanya dibuat saat `APP_ENV=local`. `NotifikasiDemoSeeder`
 menjalankan pemeriksaan stok menipis yang sebenarnya, sehingga dump dan
-seeder demo menghasilkan 2 notifikasi nyata untuk Admin dan Manajer.
+seeder demo menghasilkan 2 notifikasi nyata untuk Admin dan Manajer:
+Coning Oil 195 kg di bawah minimum 200 kg.
 
 ## Migrasi dan seeder
 
@@ -223,7 +226,8 @@ seeder demo menghasilkan 2 notifikasi nyata untuk Admin dan Manajer.
 - Seeder utama: `DatabaseSeeder`.
 - Seeder master: user, kategori/satuan, grade, barang, partner, konversi,
   nomor dokumen.
-- Seeder demo lokal: `DemoTransaksiSeeder`, `NotifikasiDemoSeeder`.
+- Seeder demo lokal: `DemoTransaksiSeeder`, `WasteLogSeeder`, `NotifikasiDemoSeeder`.
+- Total migrasi saat ini: 19.
 - Urutan seeder mengikuti ketergantungan foreign key.
 
 ## Dump dan impor
@@ -239,8 +243,8 @@ seeder demo menghasilkan 2 notifikasi nyata untuk Admin dan Manajer.
 
 - Jika database sudah memiliki tabel, kosongkan atau buat ulang terlebih
   dahulu.
-- Dump memuat 26 tabel dan data demo (3 user, 9 barang, 64 masuk, 42 keluar,
-  160 mutasi, 26 alokasi buffer, 3 opname, 132 log, 2 notifikasi).
+- Dump memuat 27 tabel dan data demo (3 user, 9 barang, 64 masuk, 62 keluar,
+  146 mutasi, 26 alokasi buffer, 3 opname, 4 waste log, 133 log, 2 notifikasi).
 - Dump dibuat dengan `mariadb-dump` (MariaDB); kompatibel dengan MySQL 8 dan
   MariaDB, collation `utf8mb4_general_ci`.
 - Alternatif tanpa dump:

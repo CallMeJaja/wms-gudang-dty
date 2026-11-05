@@ -138,11 +138,12 @@ pertama.
 4. Buka **Persediaan → Stok Barang** dan **Laporan → Kartu Stok** untuk
    memeriksa jejak mutasi.
 5. Coba **Pengeluaran POY** untuk melihat validasi stok aktif dan buffer.
-6. Buka **Laporan → Rendemen** untuk melihat rekonsiliasi POY vs DTY.
+6. Buka **Laporan → Rendemen** untuk melihat POY masuk vs DTY keluar.
 7. Gunakan **Ctrl/⌘+K** untuk mencari data melalui global search.
 8. Buka ikon notifikasi di sidebar. Demo sudah berisi 2 notifikasi stok
-   menipis; notifikasi baru juga muncul setelah mutasi stok atau setelah
-   menjalankan `php artisan wms:notifikasi-stok-menipis`.
+   menipis, termasuk Coning Oil 195 kg di bawah minimum 200 kg; notifikasi
+   baru juga muncul setelah mutasi stok atau setelah menjalankan
+   `php artisan wms:notifikasi-stok-menipis`.
 
 ## 9. Perintah penting
 

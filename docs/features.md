@@ -14,19 +14,19 @@ Seluruh antarmuka aplikasi berada di panel `/admin`. Root `/` redirect ke
 | Data Induk | Mitra | `/admin/partners` | Supplier, customer, dan partner internal |
 | Data Induk | Grade | `/admin/grades` | Grade per kategori |
 | Data Induk | Kategori | `/admin/kategori-barangs` | Kategori POY, DTY, PENDUKUNG |
-| Data Induk | Satuan | `/admin/satuans` | KG, BOX, PALLET, PCS, ROLL, BOBBIN |
+| Data Induk | Satuan | `/admin/satuans` | KG, BOX, PALLET, PCS, BOBBIN |
 | Data Induk | Konversi | `/admin/konversi-satuans` | Faktor konversi satuan |
 | Penerimaan | POY | `/admin/penerimaan-poy` | Penerimaan bahan baku POY |
 | Penerimaan | Gate Pass | `/admin/penerimaan-pendukung` | Item pendukung dengan dokumen resmi |
 | Penerimaan | DTY | `/admin/penerimaan-dty` | Produk jadi dari area produksi |
 | Pengeluaran | POY | `/admin/pengeluaran-poy` | Pengeluaran POY ke produksi |
 | Pengeluaran | Surat Jalan | `/admin/surat-jalan-dty` | Pengiriman DTY |
-| Pengeluaran | Scrap / Reject | `/admin/pengeluaran-scrap` | Scrap dan reject DTY |
+| Persediaan | Waste / Scrap | `/admin/waste-logs` | Log waste/reject kg tanpa mutasi stok |
 | Persediaan | Stok Barang | `/admin/stok-barangs` | Posisi stok aktif dan buffer |
 | Persediaan | Stok Opname | `/admin/stok-opnames` | Penyesuaian hasil hitung fisik |
 | Laporan | Keluar-Masuk | `/admin/laporan/keluar-masuk` | Arus mutasi per periode |
 | Laporan | Kartu Stok | `/admin/laporan/kartu-stok` | Saldo berjalan per posisi |
-| Laporan | Rendemen | `/admin/laporan/rendemen` | Rekonsiliasi POY vs DTY |
+| Laporan | Rendemen | `/admin/laporan/rendemen` | POY masuk vs DTY keluar |
 | Pengaturan | Pengguna | `/admin/users` | Manajemen akun |
 | Pengaturan | Riwayat Aktivitas | `/admin/activity-logs` | Audit trail |
 
@@ -116,15 +116,18 @@ melihat data.
 
 - Untuk paper tube, carton box, oli, pallet, dan item pendukung lain.
 - Memakai lifecycle dokumen resmi sampai `ISSUED`.
-- Dapat dicetak sebagai Gate Pass setelah diterbitkan.
+- Batch hanya metadata informasi (mis. warna paper tube / kode oli); stok item pendukung selalu memakai identitas `merge = -` dan grade `STD`.
+- Catatan baris disimpan terpisah dari batch.
+- Dapat dicetak sebagai Gate Pass setelah diterbitkan; kolom Batch memakai metadata batch.
 - Draf tidak dapat dicetak.
 
 ### Penerimaan DTY
 
 - Berat berasal dari hasil produksi.
-- Jumlah box dapat mengisi bobbin, netto, dan gross secara otomatis.
-- Nilai otomatis tetap dapat diubah manual.
-- Merge POY asal wajib diisi untuk laporan rendemen.
+- Jumlah box hanya mengisi bobbin otomatis.
+- Netto dan gross ditimbang manual.
+- Merge/batch opsional; kosong disimpan sebagai `-`.
+- Merge POY asal wajib diisi untuk identitas produksi.
 - Gross dipakai untuk validasi dan toleransi per grade.
 
 ## Pengeluaran
@@ -142,11 +145,13 @@ melihat data.
 - Dapat dicetak sebagai Surat Jalan.
 - Data pengiriman seperti kendaraan dan sopir diisi pada header dokumen.
 
-### Scrap / Reject DTY
+### Waste / Scrap
 
-- Wajib disertai catatan alasan scrap.
-- Memotong stok aktif DTY.
-- Dapat di-void oleh Admin dengan alasan.
+- Mencatat waste/reject yarn dalam kg saja: tanpa grade, merge, kode barang, atau kemasan.
+- Field: tanggal, jenis (Waste/Reject/Scrap Packaging), tujuan (RCL/EYD/Pengepul/Lainnya), berat kg, dan keterangan opsional.
+- Tidak mengurangi stok DTY dan tidak membuat mutasi stok.
+- Admin dan Operator dapat membuat catatan; Admin dapat mengubah/menghapus; Manajer read-only.
+- Resource lama `Pengeluaran Scrap` tetap ada sebagai legacy tetapi disembunyikan dari navigasi.
 
 ## Persediaan
 
@@ -161,7 +166,9 @@ melihat data.
 ### Stok Opname
 
 - Hanya Admin.
+- Hanya boleh pada hari terakhir bulan.
 - Membandingkan stok sistem (aktif + buffer) dengan stok fisik.
+- POY/DTY memakai merge dan grade; item pendukung otomatis memakai `-` dan grade `STD`.
 - Selisih positif membuat transaksi penyesuaian masuk.
 - Selisih negatif membuat transaksi penyesuaian keluar.
 - Satu posisi hanya boleh diopname sekali per tanggal.
@@ -186,11 +193,12 @@ melihat data.
 
 ![Laporan Rendemen](assets/rendemen.png)
 
-- Membandingkan POY keluar produksi dengan DTY masuk produksi.
-- Dikelompokkan per merge POY asal.
-- Menampilkan rendemen dan waste dalam persen.
-- Menyertakan disclaimer bahwa rendemen adalah indikator efisiensi massa,
-  bukan konversi teknis.
+- Membandingkan POY masuk dari IPCI dengan DTY keluar lewat Surat Jalan.
+- Default periode: 30 hari terakhir termasuk hari ini.
+- Menampilkan POY masuk, DTY keluar, rendemen, waste/selisih kg dan %.
+- Target bulanan 100 ton beserta pencapaian dan selisih target.
+- Memberi peringatan bila DTY keluar lebih besar dari POY masuk (surplus/data tidak valid).
+- Menyertakan disclaimer bahwa waste mencakup area, WIP, dan kehilangan proses.
 - Ekspor Excel, PDF, dan cetak.
 
 ## Pengguna dan riwayat aktivitas

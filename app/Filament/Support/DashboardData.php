@@ -152,7 +152,7 @@ final class DashboardData
                         'level' => 'warning',
                         'pesan' => sprintf(
                             'Stok %s (%s kg) di bawah minimum %s kg.',
-                            $barang->kode_barang,
+                            $barang->nama_barang,
                             number_format($total, 2, ',', '.'),
                             number_format((float) $barang->stok_minimum, 2, ',', '.')
                         ),

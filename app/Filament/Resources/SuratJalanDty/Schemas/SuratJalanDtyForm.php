@@ -4,6 +4,7 @@ namespace App\Filament\Resources\SuratJalanDty\Schemas;
 
 use App\Enums\JenisKeluar;
 use App\Filament\Support\PengeluaranForm;
+use App\Models\TransaksiKeluar;
 use App\Services\NomorDokumenService;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Placeholder;
@@ -40,7 +41,10 @@ class SuratJalanDtyForm
                                     ->label('Nomor Transaksi')
                                     ->disabled()
                                     ->dehydrated(false)
-                                    ->placeholder(fn () => app(NomorDokumenService::class)->peek('TRX_KELUAR'))
+                                    ->placeholder(fn () => app(NomorDokumenService::class)->peekUnik(
+                                        'TRX_KELUAR',
+                                        fn (string $n): bool => TransaksiKeluar::query()->where('nomor_transaksi', $n)->exists(),
+                                    ))
                                     ->helperText('Digenerate otomatis saat disimpan.'),
 
                                 TextInput::make('nomor_surat_jalan')
@@ -48,7 +52,10 @@ class SuratJalanDtyForm
                                     ->maxLength(50)
                                     ->disabled()
                                     ->dehydrated(false)
-                                    ->placeholder(fn () => app(NomorDokumenService::class)->peek('SURAT_JALAN_DTY'))
+                                    ->placeholder(fn () => app(NomorDokumenService::class)->peekUnik(
+                                        'SURAT_JALAN_DTY',
+                                        fn (string $n): bool => TransaksiKeluar::query()->where('nomor_surat_jalan', $n)->exists(),
+                                    ))
                                     ->helperText('Digenerate otomatis saat Terbitkan.'),
 
                                 DatePicker::make('tanggal')

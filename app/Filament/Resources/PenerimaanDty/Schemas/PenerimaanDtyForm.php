@@ -8,6 +8,7 @@ use App\Filament\Support\PenerimaanForm;
 use App\Models\Barang;
 use App\Models\Grade;
 use App\Models\KategoriBarang;
+use App\Models\TransaksiMasuk;
 use App\Models\TransaksiMasukDetail;
 use App\Services\KonversiSatuanService;
 use App\Services\NomorDokumenService;
@@ -53,7 +54,10 @@ class PenerimaanDtyForm
                                     ->label('Nomor Transaksi')
                                     ->disabled()
                                     ->dehydrated(false)
-                                    ->placeholder(fn () => app(NomorDokumenService::class)->peek('TRX_MASUK'))
+                                    ->placeholder(fn () => app(NomorDokumenService::class)->peekUnik(
+                                        'TRX_MASUK',
+                                        fn (string $n): bool => TransaksiMasuk::query()->where('nomor_transaksi', $n)->exists(),
+                                    ))
                                     ->helperText('Digenerate otomatis saat disimpan.'),
 
                                 DatePicker::make('tanggal')

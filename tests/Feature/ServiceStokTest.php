@@ -238,6 +238,24 @@ class ServiceStokTest extends TestCase
     }
 
     #[Test]
+    public function peek_unik_melewati_nomor_yang_sudah_dipakai_tanpa_menaikkan_counter(): void
+    {
+        $service = $this->app->make(NomorDokumenService::class);
+        $tanggal = Carbon::parse('2026-10-13');
+        $nomorSatu = $service->format(NomorDokumen::SURAT_JALAN_DTY, 1, $tanggal);
+        $nomorDua = $service->format(NomorDokumen::SURAT_JALAN_DTY, 2, $tanggal);
+
+        $nomor = $service->peekUnik(
+            NomorDokumen::SURAT_JALAN_DTY,
+            fn (string $n): bool => $n === $nomorSatu,
+            $tanggal,
+        );
+
+        $this->assertSame($nomorDua, $nomor);
+        $this->assertSame($nomorSatu, $service->peek(NomorDokumen::SURAT_JALAN_DTY, $tanggal));
+    }
+
+    #[Test]
     public function nomor_dokumen_peek_dan_format_memakai_tanggal_opsional(): void
     {
         $service = $this->app->make(NomorDokumenService::class);

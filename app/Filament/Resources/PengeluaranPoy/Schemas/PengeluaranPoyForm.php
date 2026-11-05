@@ -4,6 +4,7 @@ namespace App\Filament\Resources\PengeluaranPoy\Schemas;
 
 use App\Enums\JenisKeluar;
 use App\Filament\Support\PengeluaranForm;
+use App\Models\TransaksiKeluar;
 use App\Services\NomorDokumenService;
 use App\Services\ShiftService;
 use Filament\Forms\Components\DatePicker;
@@ -41,7 +42,10 @@ class PengeluaranPoyForm
                                     ->label('Nomor Transaksi')
                                     ->disabled()
                                     ->dehydrated(false)
-                                    ->placeholder(fn () => app(NomorDokumenService::class)->peek('TRX_KELUAR'))
+                                    ->placeholder(fn () => app(NomorDokumenService::class)->peekUnik(
+                                        'TRX_KELUAR',
+                                        fn (string $n): bool => TransaksiKeluar::query()->where('nomor_transaksi', $n)->exists(),
+                                    ))
                                     ->helperText('Digenerate otomatis saat disimpan.'),
 
                                 DatePicker::make('tanggal')

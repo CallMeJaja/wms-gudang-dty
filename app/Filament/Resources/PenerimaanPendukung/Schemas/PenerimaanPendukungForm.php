@@ -8,6 +8,7 @@ use App\Filament\Support\PenerimaanForm;
 use App\Models\Barang;
 use App\Models\KategoriBarang;
 use App\Models\Satuan;
+use App\Models\TransaksiMasuk;
 use App\Services\NomorDokumenService;
 use App\Services\ShiftService;
 use Filament\Forms\Components\DatePicker;
@@ -50,14 +51,20 @@ class PenerimaanPendukungForm
                                     ->maxLength(50)
                                     ->disabled()
                                     ->dehydrated(false)
-                                    ->placeholder(fn () => app(NomorDokumenService::class)->peek('GATE_PASS'))
+                                    ->placeholder(fn () => app(NomorDokumenService::class)->peekUnik(
+                                        'GATE_PASS',
+                                        fn (string $n): bool => TransaksiMasuk::query()->where('nomor_gate_pass', $n)->exists(),
+                                    ))
                                     ->helperText('Digenerate otomatis saat disimpan.'),
 
                                 TextInput::make('nomor_transaksi')
                                     ->label('Nomor Transaksi')
                                     ->disabled()
                                     ->dehydrated(false)
-                                    ->placeholder(fn () => app(NomorDokumenService::class)->peek('TRX_MASUK'))
+                                    ->placeholder(fn () => app(NomorDokumenService::class)->peekUnik(
+                                        'TRX_MASUK',
+                                        fn (string $n): bool => TransaksiMasuk::query()->where('nomor_transaksi', $n)->exists(),
+                                    ))
                                     ->helperText('Digenerate otomatis saat disimpan.'),
 
                                 DatePicker::make('tanggal')

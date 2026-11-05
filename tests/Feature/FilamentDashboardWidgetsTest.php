@@ -101,6 +101,37 @@ class FilamentDashboardWidgetsTest extends TestCase
     }
 
     #[Test]
+    public function alert_stok_menipis_memakai_nama_barang(): void
+    {
+        $this->kunciHariKerja();
+
+        $barang = Barang::create([
+            'kategori_id' => $this->kategoriPendukung->id,
+            'kode_barang' => 'KODE-ALERT',
+            'nama_barang' => 'Nama Tampil Alert',
+            'satuan_dasar_id' => $this->satuanBox->id,
+            'stok_minimum' => 100,
+            'is_merge_minggu' => false,
+            'is_active' => true,
+        ]);
+
+        StokBarang::create([
+            'barang_id' => $barang->id,
+            'merge' => '-',
+            'grade_id' => $this->gradePendukungStd->id,
+            'stok_aktif' => 50,
+            'stok_buffer' => 0,
+        ]);
+
+        $pesan = collect(DashboardData::alerts())
+            ->pluck('pesan')
+            ->first(fn (string $p): bool => str_contains($p, 'Nama Tampil Alert'));
+
+        $this->assertNotNull($pesan);
+        $this->assertStringNotContainsString('KODE-ALERT', $pesan);
+    }
+
+    #[Test]
     public function draf_menunggu_posting_menghitung_draf_penerimaan_dan_pengeluaran(): void
     {
         $this->kunciHariKerja();

@@ -84,6 +84,28 @@ class NomorDokumenService
     }
 
     /**
+     * Pratinjau nomor berikutnya yang belum dipakai, tanpa mengubah counter.
+     */
+    public function peekUnik(string $jenis, callable $sudahDipakai, ?DateTimeInterface $tanggal = null): string
+    {
+        $this->pastikanJenisValid($jenis);
+
+        $periode = NomorDokumen::periodeUntuk($jenis, $tanggal);
+
+        $nomor = (int) (NomorDokumen::query()
+            ->where('jenis', $jenis)
+            ->where('periode', $periode)
+            ->value('last_number') ?? 0);
+
+        do {
+            $nomor++;
+            $kandidat = $this->format($jenis, $nomor, $tanggal);
+        } while ($sudahDipakai($kandidat));
+
+        return $kandidat;
+    }
+
+    /**
      * Format nomor sesuai config/wms.php (SSOT, tanpa angka hardcode).
      */
     public function format(string $jenis, int $nomor, ?DateTimeInterface $tanggal = null): string

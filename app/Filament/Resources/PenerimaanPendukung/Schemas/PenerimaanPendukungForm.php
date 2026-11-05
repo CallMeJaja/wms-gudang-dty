@@ -41,16 +41,17 @@ class PenerimaanPendukungForm
                     ->columnSpanFull()
                     ->schema([
                         Section::make('Identitas Dokumen')
-                            ->description('Dokumen resmi Gate Pass. Nomor dapat diisi manual sesuai dokumen fisik IPCI.')
+                            ->description('Dokumen resmi Gate Pass. Nomor Gate Pass dan nomor transaksi digenerate otomatis.')
                             ->columnSpan(2)
                             ->columns(2)
                             ->schema([
                                 TextInput::make('nomor_gate_pass')
                                     ->label('Nomor Gate Pass')
                                     ->maxLength(50)
-                                    ->unique(ignoreRecord: true)
+                                    ->disabled()
+                                    ->dehydrated(false)
                                     ->placeholder(fn () => app(NomorDokumenService::class)->peek('GATE_PASS'))
-                                    ->helperText('Kosongkan untuk otomatis; isi hanya jika ingin menimpa nomor.'),
+                                    ->helperText('Digenerate otomatis saat disimpan.'),
 
                                 TextInput::make('nomor_transaksi')
                                     ->label('Nomor Transaksi')

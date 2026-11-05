@@ -10,10 +10,12 @@ use App\Exceptions\AturanBisnisException;
 use App\Models\Barang;
 use App\Models\Grade;
 use App\Models\MutasiStok;
+use App\Models\NomorDokumen;
 use App\Models\StokBarang;
 use App\Models\SupplierCustomer;
 use App\Models\TransaksiKeluar;
 use App\Models\User;
+use App\Services\NomorDokumenService;
 use App\Services\PengeluaranService;
 use App\Services\StokService;
 use App\Services\VoidTransaksiService;
@@ -140,6 +142,35 @@ class OutboundTest extends TestCase
         $this->assertMatchesRegularExpression(
             '#^\d+/DTY/PEI/[IVX]+/\d{4}$#',
             (string) $transaksi->nomor_surat_jalan,
+        );
+    }
+
+    #[Test]
+    public function issue_surat_jalan_melewati_nomor_yang_sudah_dipakai(): void
+    {
+        $this->isiStok($this->dty, '4D9160', $this->gradeDtyA->id, 1000);
+
+        $tanggal = Carbon::parse('2026-10-13');
+        $nomorService = $this->app->make(NomorDokumenService::class);
+        $bentrok = $nomorService->format(NomorDokumen::SURAT_JALAN_DTY, 1, $tanggal);
+
+        TransaksiKeluar::create([
+            'nomor_transaksi' => 'OUT-SJ-BENTROK',
+            'jenis_keluar' => JenisKeluar::DtySuratJalan,
+            'nomor_surat_jalan' => $bentrok,
+            'tanggal' => '2026-10-13',
+            'status' => StatusDokumen::Draft,
+            'created_by' => $this->operator->id,
+        ]);
+
+        $transaksi = $this->buatDrafSj();
+
+        $this->app->make(PengeluaranService::class)->issue($transaksi, $this->operator->id);
+
+        $this->assertNotSame($bentrok, $transaksi->fresh()->nomor_surat_jalan);
+        $this->assertSame(
+            $nomorService->format(NomorDokumen::SURAT_JALAN_DTY, 2, $tanggal),
+            $transaksi->fresh()->nomor_surat_jalan,
         );
     }
 

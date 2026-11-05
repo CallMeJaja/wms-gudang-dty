@@ -26,9 +26,10 @@ class CreatePenerimaanPendukung extends CreateRecord
         $preview = app(NomorDokumenService::class)->peek('GATE_PASS');
 
         if ($nomor === '' || $nomor === $preview) {
-            do {
-                $nomor = app(NomorDokumenService::class)->generate('GATE_PASS');
-            } while (TransaksiMasuk::query()->where('nomor_gate_pass', $nomor)->exists());
+            $nomor = app(NomorDokumenService::class)->generateUnik(
+                'GATE_PASS',
+                fn (string $n): bool => TransaksiMasuk::query()->where('nomor_gate_pass', $n)->exists(),
+            );
         }
 
         $data['nomor_gate_pass'] = $nomor;

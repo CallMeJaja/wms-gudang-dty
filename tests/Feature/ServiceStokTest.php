@@ -215,6 +215,29 @@ class ServiceStokTest extends TestCase
     }
 
     #[Test]
+    public function generate_unik_melewati_nomor_yang_sudah_dipakai(): void
+    {
+        $service = $this->app->make(NomorDokumenService::class);
+        $tanggal = Carbon::parse('2026-10-13');
+        $dipanggil = 0;
+
+        $nomor = $service->generateUnik(
+            NomorDokumen::SURAT_JALAN_DTY,
+            function (string $n) use (&$dipanggil): bool {
+                $dipanggil++;
+
+                return $dipanggil === 1;
+            },
+            $tanggal,
+        );
+
+        $bulan = config('wms.bulan_romawi.10');
+
+        $this->assertSame(2, $dipanggil);
+        $this->assertSame("2/DTY/PEI/{$bulan}/2026", $nomor);
+    }
+
+    #[Test]
     public function nomor_dokumen_peek_dan_format_memakai_tanggal_opsional(): void
     {
         $service = $this->app->make(NomorDokumenService::class);

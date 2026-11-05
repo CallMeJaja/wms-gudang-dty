@@ -20,7 +20,10 @@ trait CreatesPengeluaranRecord
 {
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        $data['nomor_transaksi'] = app(NomorDokumenService::class)->generate('TRX_KELUAR');
+        $data['nomor_transaksi'] = app(NomorDokumenService::class)->generateUnik(
+            'TRX_KELUAR',
+            fn (string $nomor): bool => TransaksiKeluar::query()->where('nomor_transaksi', $nomor)->exists(),
+        );
         $data['jenis_keluar'] = static::getResource()::jenisKeluar();
         $data['status'] = StatusDokumen::Draft;
         $data['created_by'] = Auth::id();

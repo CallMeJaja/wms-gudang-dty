@@ -117,7 +117,10 @@ class StokOpnameService
             }
 
             if ($selisih > 0) {
-                $nomorTrx = $this->nomor->generate(NomorDokumen::TRX_MASUK);
+                $nomorTrx = $this->nomor->generateUnik(
+                    NomorDokumen::TRX_MASUK,
+                    fn (string $nomor): bool => TransaksiMasuk::query()->where('nomor_transaksi', $nomor)->exists(),
+                );
                 $opname = $this->simpanOpname($barang, $merge, $gradeId, $sistem, $stokFisik, $tgl, $userId, $keterangan, 'OPN-'.$nomorTrx);
 
                 $trx = TransaksiMasuk::create([
@@ -153,7 +156,10 @@ class StokOpnameService
                 $opname->save();
             } elseif ($selisih < 0) {
                 $kurang = abs($selisih);
-                $nomorTrx = $this->nomor->generate(NomorDokumen::TRX_KELUAR);
+                $nomorTrx = $this->nomor->generateUnik(
+                    NomorDokumen::TRX_KELUAR,
+                    fn (string $nomor): bool => TransaksiKeluar::query()->where('nomor_transaksi', $nomor)->exists(),
+                );
                 $opname = $this->simpanOpname($barang, $merge, $gradeId, $sistem, $stokFisik, $tgl, $userId, $keterangan, 'OPN-'.$nomorTrx);
 
                 $trx = TransaksiKeluar::create([

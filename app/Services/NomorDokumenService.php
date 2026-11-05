@@ -52,6 +52,18 @@ class NomorDokumenService
     }
 
     /**
+     * Generate nomor berikutnya, lewati nomor yang sudah dipakai.
+     */
+    public function generateUnik(string $jenis, callable $sudahDipakai, ?DateTimeInterface $tanggal = null): string
+    {
+        do {
+            $nomor = $this->generate($jenis, $tanggal);
+        } while ($sudahDipakai($nomor));
+
+        return $nomor;
+    }
+
+    /**
      * Pratinjau nomor berikutnya TANPA menaikkan counter.
      *
      * Dipakai form untuk menampilkan nomor yang akan dipakai.

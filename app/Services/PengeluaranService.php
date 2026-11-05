@@ -151,7 +151,11 @@ class PengeluaranService
             $userId ??= $terkunci->created_by !== null ? (int) $terkunci->created_by : null;
 
             if ($generateNomorSj && trim((string) $terkunci->nomor_surat_jalan) === '') {
-                $terkunci->nomor_surat_jalan = $this->nomorService->generate('SURAT_JALAN_DTY', $terkunci->tanggal);
+                $terkunci->nomor_surat_jalan = $this->nomorService->generateUnik(
+                    'SURAT_JALAN_DTY',
+                    fn (string $nomor): bool => TransaksiKeluar::query()->where('nomor_surat_jalan', $nomor)->exists(),
+                    $terkunci->tanggal,
+                );
                 $terkunci->save();
             }
 

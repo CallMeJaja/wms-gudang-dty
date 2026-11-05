@@ -32,19 +32,19 @@ laporan operasional dalam satu panel admin.
 
 ## Tech stack
 
-| Lapisan | Teknologi | Versi |
-| --- | --- | --- |
-| Bahasa | PHP | 8.3+ |
-| Framework | Laravel | 13.39 |
-| Panel admin | Filament | 5.11 |
-| Reaktivitas | Livewire | 4.4.8 |
-| Database | MySQL 8 / MariaDB | — |
-| Test | PHPUnit | 12.5.42 |
-| Formatter | Laravel Pint | 1.32 |
-| Export PDF | `barryvdh/laravel-dompdf` | 3.1.2 |
-| Export Excel | `maatwebsite/excel` | 4.0.6 |
-| Build | Vite | 8.3.5 |
-| Vite plugin | `laravel-vite-plugin` | 3.2.0 |
+| Lapisan      | Teknologi                 | Versi   |
+| ------------ | ------------------------- | ------- |
+| Bahasa       | PHP                       | 8.3+    |
+| Framework    | Laravel                   | 13.39   |
+| Panel admin  | Filament                  | 5.11    |
+| Reaktivitas  | Livewire                  | 4.4.8   |
+| Database     | MySQL 8 / MariaDB         | —       |
+| Test         | PHPUnit                   | 12.5.42 |
+| Formatter    | Laravel Pint              | 1.32    |
+| Export PDF   | `barryvdh/laravel-dompdf` | 3.1.2   |
+| Export Excel | `maatwebsite/excel`       | 4.0.6   |
+| Build        | Vite                      | 8.3.5   |
+| Vite plugin  | `laravel-vite-plugin`     | 3.2.0   |
 
 ## Quick start
 
@@ -89,11 +89,11 @@ memakai **email**.
 
 ## Akun default
 
-| Role | Email | Password |
-| --- | --- | --- |
-| Admin Gudang | `admin@wms.local` | `password` |
-| Operator Gudang | `operator@wms.local` | `password` |
-| Manajer / Supervisor | `manajer@wms.local` | `password` |
+| Role                 | Email                | Password   |
+| -------------------- | -------------------- | ---------- |
+| Admin Gudang         | `admin@wms.local`    | `password` |
+| Operator Gudang      | `operator@wms.local` | `password` |
+| Manajer / Supervisor | `manajer@wms.local`  | `password` |
 
 Ganti password default melalui **Pengaturan → Pengguna** setelah login
 pertama.
@@ -102,17 +102,17 @@ pertama.
 
 Dokumentasi lengkap berada di [`docs/`](docs/README.md).
 
-| Dokumen | Isi |
-| --- | --- |
+| Dokumen                                    | Isi                                                |
+| ------------------------------------------ | -------------------------------------------------- |
 | [Getting Started](docs/getting-started.md) | Instalasi, database, build, login, langkah pertama |
-| [Architecture](docs/architecture.md) | Stack, layer, alur request, otorisasi, scheduler |
-| [Features](docs/features.md) | Modul, URL, role matrix, lifecycle, screenshot |
-| [Business Rules](docs/business-rules.md) | KG, buffer Minggu, rendemen, void, opname |
-| [Database](docs/database.md) | 26 tabel, relasi, enum, ERD, data demo |
-| [Testing](docs/testing.md) | 218 test, struktur, perintah, menambah test |
-| [Deployment](docs/deployment.md) | Checklist produksi, scheduler, queue, backup |
-| [Troubleshooting](docs/troubleshooting.md) | Masalah umum dan langkah diagnosis |
-| [Contributing](docs/contributing.md) | Conventional Commits, branch, kualitas kode |
+| [Architecture](docs/architecture.md)       | Stack, layer, alur request, otorisasi, scheduler   |
+| [Features](docs/features.md)               | Modul, URL, role matrix, lifecycle, screenshot     |
+| [Business Rules](docs/business-rules.md)   | KG, buffer Minggu, rendemen, void, opname          |
+| [Database](docs/database.md)               | 26 tabel, relasi, enum, ERD, data demo             |
+| [Testing](docs/testing.md)                 | 218 test, struktur, perintah, menambah test        |
+| [Deployment](docs/deployment.md)           | Checklist produksi, scheduler, queue, backup       |
+| [Troubleshooting](docs/troubleshooting.md) | Masalah umum dan langkah diagnosis                 |
+| [Contributing](docs/contributing.md)       | Conventional Commits, branch, kualitas kode        |
 
 ## Struktur repositori
 
@@ -156,7 +156,7 @@ operasional.
 
 - Muhammad Apiransyah Ramdhani
 - Reza Asriano Maulana
-- Dhafi Ebsan Yurizal
+- Dhafi Ebsan Yurizal - 202404018
 
 ## Lisensi
 

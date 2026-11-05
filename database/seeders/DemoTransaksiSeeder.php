@@ -41,8 +41,6 @@ class DemoTransaksiSeeder extends Seeder
 
     private const GRADE_DTY_SIKLUS = ['AX', 'A', 'AX', 'B', 'AX'];
 
-    private const BOX_SJ = [25, 30, 20, 28, 22, 30, 25, 20];
-
     private const SOPIR = ['Joko Demo', 'Slamet Kirim', 'Andi Antar', 'Budi Angkut'];
 
     private const KENDARAAN = ['B 1234 DEMO', 'B 5678 KIRIM', 'B 9012 ANTAR', 'B 3456 ANGKUT'];
@@ -75,33 +73,14 @@ class DemoTransaksiSeeder extends Seeder
             $gradeC[] = $d->toDateString();
         }
 
-        $scrapMap = [];
-        foreach ($gradeC as $i => $tglStr) {
-            $scrapMap[Carbon::parse($tglStr)->addDays(3)->toDateString()] = $i;
-        }
-
         $kamis = array_values(array_filter($tanggalList, fn (Carbon $d): bool => (int) $d->format('N') === 4));
         $gpDates = array_slice($kamis, 0, 4);
-
-        $kandidatSj = [];
-        foreach ($tanggalList as $i => $d) {
-            if (in_array((int) $d->format('N'), [3, 6], true) && $i >= 3) {
-                $kandidatSj[] = $d;
-            }
-        }
-        $sjDates = array_slice($kandidatSj, 0, 7);
-        $sabtu = array_values(array_filter($sjDates, fn (Carbon $d): bool => (int) $d->format('N') === 6));
-        if ($sabtu !== []) {
-            $sjDates[] = $sabtu[0]->copy();
-        }
-        usort($sjDates, fn (Carbon $a, Carbon $b): int => $a->timestamp <=> $b->timestamp);
 
         $noPoyIn = 1;
         $noPoyOut = 1;
         $noDtyIn = 1;
         $noSj = 0;
         $noGp = 0;
-        $noScrap = 0;
 
         foreach ($tanggalList as $i => $tgl) {
             $tglStr = $tgl->toDateString();
@@ -126,16 +105,7 @@ class DemoTransaksiSeeder extends Seeder
 
             $this->pengeluaranPoyHarian($poy, $tgl, $noPoyOut++, in_array($tglStr, $pendek, true), $kerja, $shift, $userId);
 
-            foreach ($sjDates as $sjTgl) {
-                if ($sjTgl->toDateString() === $tglStr) {
-                    $this->suratJalanHarian($tgl, $noSj, $userId);
-                    $noSj++;
-                }
-            }
-
-            if (isset($scrapMap[$tglStr])) {
-                $this->scrapHarian($tgl, $noScrap++, $scrapMap[$tglStr], $userId);
-            }
+            $this->suratJalanHarian($tgl, $noSj++, $userId);
         }
 
         $this->penerimaanPoyHarian($poy, $akhir, $noPoyIn++, false, 1, $userId);
@@ -278,18 +248,28 @@ class DemoTransaksiSeeder extends Seeder
         );
 
         if ($trx->detail()->count() === 0) {
-            $netto = round($jumlahBox * (float) config('wms.satuan.dty_box_netto_kg'), 2);
-            $gross = round($jumlahBox * (float) config('wms.satuan.dty_box_gross_kg'), 2);
-            $trx->detail()->create([
-                'barang_id' => $dty->id,
-                'merge' => $merge,
-                'grade_id' => $grade->id,
-                'jumlah_kemasan' => $jumlahBox,
-                'satuan_kemasan_id' => $box->id,
-                'jumlah_bobbin' => (int) ($jumlahBox * (float) config('wms.satuan.dty_box_bobbin')),
-                'berat_kg' => $netto,
-                'keterangan' => TransaksiMasukDetail::penandaGross($gross),
-            ]);
+            $daftarDetail = $isGradeC
+                ? [
+                    [$grade->id, 10],
+                    [$this->grade(KategoriBarang::DTY, self::GRADE_DTY_SIKLUS[$indeks % count(self::GRADE_DTY_SIKLUS)])->id, 90 + ($indeks % 3)],
+                ]
+                : [[$grade->id, $jumlahBox]];
+
+            foreach ($daftarDetail as [$gradeId, $boxQty]) {
+                $netto = round($boxQty * (float) config('wms.satuan.dty_box_netto_kg'), 2);
+                $gross = round($boxQty * (float) config('wms.satuan.dty_box_gross_kg'), 2);
+
+                $trx->detail()->create([
+                    'barang_id' => $dty->id,
+                    'merge' => $merge,
+                    'grade_id' => $gradeId,
+                    'jumlah_kemasan' => $boxQty,
+                    'satuan_kemasan_id' => $box->id,
+                    'jumlah_bobbin' => (int) ($boxQty * (float) config('wms.satuan.dty_box_bobbin')),
+                    'berat_kg' => $netto,
+                    'keterangan' => TransaksiMasukDetail::penandaGross($gross),
+                ]);
+            }
         }
 
         if ($trx->fresh()->status === StatusDokumen::Draft) {
@@ -305,19 +285,7 @@ class DemoTransaksiSeeder extends Seeder
         $grossPerBox = (float) config('wms.satuan.dty_box_gross_kg');
         $bobbinPerBox = (float) config('wms.satuan.dty_box_bobbin');
 
-        $jumlahBox = self::BOX_SJ[$indeks % count(self::BOX_SJ)];
-        $posisi = StokBarang::query()
-            ->whereHas('barang', fn ($q) => $q->whereHas('kategori', fn ($k) => $k->where('kode', KategoriBarang::DTY)))
-            ->where('stok_aktif', '>', 0)
-            ->orderByDesc('stok_aktif')
-            ->first();
-
-        if ($posisi !== null && (float) $posisi->stok_aktif < $jumlahBox * $nettoPerBox) {
-            $jumlahBox = max(5, (int) floor((float) $posisi->stok_aktif / $nettoPerBox));
-        }
-
-        $merge = $posisi === null ? $this->mergeDtyMingguan($tgl) : $posisi->merge;
-        $gradeId = $posisi === null ? $this->grade(KategoriBarang::DTY, 'AX')->id : (int) $posisi->grade_id;
+        $jumlahBox = 100;
 
         $trx = TransaksiKeluar::query()->firstOrCreate(
             ['nomor_transaksi' => sprintf('DEMO-DTY-SJ-%02d', $indeks + 1)],
@@ -335,15 +303,38 @@ class DemoTransaksiSeeder extends Seeder
         );
 
         if ($trx->detail()->count() === 0) {
-            $trx->detail()->create([
-                'barang_id' => $dty->id,
-                'merge' => $merge,
-                'grade_id' => $gradeId,
-                'jumlah_kemasan' => $jumlahBox,
-                'jumlah_bobbin' => (int) ($jumlahBox * $bobbinPerBox),
-                'berat_netto_kg' => round($jumlahBox * $nettoPerBox, 2),
-                'berat_gross_kg' => round($jumlahBox * $grossPerBox, 2),
-            ]);
+            $sisaBox = $jumlahBox;
+
+            $posisiList = StokBarang::query()
+                ->whereHas('barang', fn ($q) => $q->whereHas('kategori', fn ($k) => $k->where('kode', KategoriBarang::DTY)))
+                ->where('stok_aktif', '>', 0)
+                ->orderByDesc('stok_aktif')
+                ->get();
+
+            foreach ($posisiList as $posisi) {
+                if ($sisaBox <= 0) {
+                    break;
+                }
+
+                $maksBox = (int) floor((float) $posisi->stok_aktif / $nettoPerBox);
+                $ambilBox = min($maksBox, $sisaBox);
+
+                if ($ambilBox <= 0) {
+                    continue;
+                }
+
+                $trx->detail()->create([
+                    'barang_id' => $dty->id,
+                    'merge' => $posisi->merge,
+                    'grade_id' => $posisi->grade_id,
+                    'jumlah_kemasan' => $ambilBox,
+                    'jumlah_bobbin' => (int) ($ambilBox * $bobbinPerBox),
+                    'berat_netto_kg' => round($ambilBox * $nettoPerBox, 2),
+                    'berat_gross_kg' => round($ambilBox * $grossPerBox, 2),
+                ]);
+
+                $sisaBox -= $ambilBox;
+            }
         }
 
         if ($trx->fresh()->status === StatusDokumen::Draft) {
@@ -357,9 +348,9 @@ class DemoTransaksiSeeder extends Seeder
         $pcs = Satuan::query()->where('kode', 'PCS')->firstOrFail();
         $kg = Satuan::query()->where('kode', 'KG')->firstOrFail();
         $store = SupplierCustomer::query()->where('kode', 'STORE-IPCI')->firstOrFail();
-        $tube = Barang::query()->where('kode_barang', 'PPR TUB DTY, BULLNOSE')->firstOrFail();
-        $karton = Barang::query()->where('kode_barang', 'CARTON BOX DTY 675x444x278MM, KRAFT 200')->firstOrFail();
-        $oil = Barang::query()->where('kode_barang', 'DTY CONING OIL, TM368 BN')->firstOrFail();
+        $tube = Barang::query()->where('kode_barang', '5003301227')->firstOrFail();
+        $karton = Barang::query()->where('kode_barang', '5000002512')->firstOrFail();
+        $oil = Barang::query()->where('kode_barang', '1003000201')->firstOrFail();
 
         $paket = match ($indeks % 4) {
             0 => [[$tube->id, 3456, $pcs->id], [$karton->id, 400, $pcs->id]],
@@ -386,62 +377,19 @@ class DemoTransaksiSeeder extends Seeder
             if ($trx->detail()->where('barang_id', $barangId)->count() === 0) {
                 $trx->detail()->create([
                     'barang_id' => $barangId,
-                    'merge' => $batch,
+                    'merge' => '-',
+                    'batch' => $batch,
                     'grade_id' => $grade->id,
                     'jumlah_kemasan' => $qty,
                     'satuan_kemasan_id' => $satuanId,
                     'berat_kg' => $qty,
-                    'keterangan' => $batch,
+                    'keterangan' => null,
                 ]);
             }
         }
 
         if ($trx->fresh()->status === StatusDokumen::Draft) {
             app(PenerimaanService::class)->posting($trx->fresh(), $userId);
-        }
-    }
-
-    private function scrapHarian(Carbon $tgl, int $nomor, int $urutanC, int $userId): void
-    {
-        $dty = Barang::query()->where('kode_barang', 'DTY-150-48-1')->firstOrFail();
-        $grade = $this->grade(KategoriBarang::DTY, 'C');
-        $posisi = StokBarang::query()
-            ->where('barang_id', $dty->id)
-            ->where('grade_id', $grade->id)
-            ->where('stok_aktif', '>', 0)
-            ->orderByDesc('stok_aktif')
-            ->first();
-
-        if ($posisi === null || (float) $posisi->stok_aktif < 1) {
-            return;
-        }
-
-        $merge = $posisi->merge;
-        $berat = (float) min(round(5 * (float) config('wms.satuan.dty_box_netto_kg'), 2), (float) $posisi->stok_aktif);
-
-        $trx = TransaksiKeluar::query()->firstOrCreate(
-            ['nomor_transaksi' => sprintf('DEMO-DTY-SCRAP-%02d', $nomor + 1)],
-            [
-                'jenis_keluar' => JenisKeluar::DtyScrapReject,
-                'tanggal' => $tgl,
-                'operator_nama' => self::OPERATOR_NAMA,
-                'catatan' => sprintf('Scrap knitting grade C batch %s dijual ke pengepul.', $merge),
-                'status' => StatusDokumen::Draft,
-                'created_by' => $userId,
-            ]
-        );
-
-        if ($trx->detail()->count() === 0) {
-            $trx->detail()->create([
-                'barang_id' => $dty->id,
-                'merge' => $merge,
-                'grade_id' => $grade->id,
-                'berat_netto_kg' => $berat,
-            ]);
-        }
-
-        if ($trx->fresh()->status === StatusDokumen::Draft) {
-            app(PengeluaranService::class)->posting($trx->fresh(), $userId);
         }
     }
 
@@ -535,17 +483,23 @@ class DemoTransaksiSeeder extends Seeder
     private function opnameDemo(int $adminId, Carbon $akhir): void
     {
         $grade = $this->grade(KategoriBarang::PENDUKUNG, (string) config('wms.grade_pendukung_default'));
-        $tube = Barang::query()->where('kode_barang', 'PPR TUB DTY, BULLNOSE')->firstOrFail();
-        $karton = Barang::query()->where('kode_barang', 'CARTON BOX DTY 675x444x278MM, KRAFT 200')->firstOrFail();
-        $oil = Barang::query()->where('kode_barang', 'DTY CONING OIL, TM368 BN')->firstOrFail();
+        $tube = Barang::query()->where('kode_barang', '5003301227')->firstOrFail();
+        $karton = Barang::query()->where('kode_barang', '5000002512')->firstOrFail();
+        $oil = Barang::query()->where('kode_barang', '1003000201')->firstOrFail();
 
-        $this->opnameSatu($karton, self::MERGE_PENDUKUNG, $grade->id, 15, $akhir->copy()->subDays(2)->toDateString(), $adminId, 'Opname demo selisih positif.');
-        $this->opnameSatu($oil, 'GRN-PEI-01', $grade->id, -5, $akhir->copy()->subDay()->toDateString(), $adminId, 'Opname demo selisih negatif kecil.');
-        $this->opnameSatu($tube, self::MERGE_PENDUKUNG, $grade->id, 0, $akhir->toDateString(), $adminId, 'Opname demo selisih nol.');
+        $tanggalOpname = $akhir->copy()->endOfMonth()->toDateString();
+
+        $this->opnameSatu($karton, self::MERGE_PENDUKUNG, $grade->id, 15, $tanggalOpname, $adminId, 'Opname demo selisih positif.');
+        $this->opnameSatu($oil, 'GRN-PEI-01', $grade->id, -5, $tanggalOpname, $adminId, 'Opname demo selisih negatif kecil.');
+        $this->opnameSatu($tube, self::MERGE_PENDUKUNG, $grade->id, 0, $tanggalOpname, $adminId, 'Opname demo selisih nol.');
     }
 
     private function opnameSatu(Barang $barang, string $merge, int $gradeId, float $selisih, string $tgl, int $adminId, string $keterangan): void
     {
+        if ($barang->kategori?->kode === KategoriBarang::PENDUKUNG) {
+            $merge = '-';
+        }
+
         $sudah = StokOpname::query()
             ->where('barang_id', $barang->id)
             ->where('merge', $merge)

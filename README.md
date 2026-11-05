@@ -8,7 +8,7 @@ laporan operasional dalam satu panel admin.
 ![PHP](https://img.shields.io/badge/PHP-8.3%2B-777BB4?logo=php&logoColor=white)
 ![Laravel](https://img.shields.io/badge/Laravel-13-red?logo=laravel&logoColor=white)
 ![Filament](https://img.shields.io/badge/Filament-5-FDAE4B)
-![Tests](https://img.shields.io/badge/tests-242%20lulus-brightgreen)
+![Tests](https://img.shields.io/badge/tests-244%20lulus-brightgreen)
 ![Status](https://img.shields.io/badge/status-finalisasi%20%26%20QA-blue)
 
 ![Beranda WMS Gudang DTY](docs/assets/beranda.png)
@@ -109,7 +109,7 @@ Dokumentasi lengkap berada di [`docs/`](docs/README.md).
 | [Features](docs/features.md) | Modul, URL, role matrix, lifecycle, screenshot |
 | [Business Rules](docs/business-rules.md) | KG, buffer Minggu, rendemen, void, opname |
 | [Database](docs/database.md) | 27 tabel, relasi, enum, ERD, data demo |
-| [Testing](docs/testing.md) | 242 test, struktur, perintah, menambah test |
+| [Testing](docs/testing.md) | 244 test, struktur, perintah, menambah test |
 | [Deployment](docs/deployment.md) | Checklist produksi, scheduler, queue, backup |
 | [Troubleshooting](docs/troubleshooting.md) | Masalah umum dan langkah diagnosis |
 | [Contributing](docs/contributing.md) | Conventional Commits, branch, kualitas kode |
@@ -138,7 +138,7 @@ tests/              # PHPUnit feature dan unit test
 ## Testing
 
 ```bash
-php artisan test       # 242 test lulus, 1377 assertions
+php artisan test       # 244 test lulus, 1381 assertions
 vendor/bin/pint        # format kode PHP
 npm run build          # build aset frontend
 ```

@@ -197,7 +197,7 @@ class DemoTransaksiSeederTest extends TestCase
         $this->assertSame(1, DB::table('notifications')->where('notifiable_id', $manajer->id)->count());
         $this->assertSame(
             2,
-            DB::table('notifications')->where('data->title', 'Stok 1003000201 menipis')->count()
+            DB::table('notifications')->where('data->title', 'Stok DTY CONING OIL,TM368 BN menipis')->count()
         );
 
         $draf = TransaksiMasuk::where('nomor_transaksi', 'DEMO-POY-DRAFT-01')->firstOrFail();

@@ -194,8 +194,6 @@ trait InteractsWithPengeluaran
 
         return Action::make('void')
             ->label('Batalkan (Void)')
-            ->iconButton()
-            ->tooltip('Batalkan transaksi (Void)')
             ->icon('heroicon-o-x-circle')
             ->color('danger')
             ->requiresConfirmation()

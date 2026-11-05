@@ -10,6 +10,8 @@ class CreateWasteLog extends CreateRecord
 {
     protected static string $resource = WasteLogResource::class;
 
+    protected static bool $canCreateAnother = false;
+
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['created_by'] = Auth::id();

@@ -50,7 +50,7 @@ class StokMenipisService
             }
 
             $satuan = $barang->satuanDasar?->kode ?? 'unit';
-            $judul = "Stok {$barang->kode_barang} menipis";
+            $judul = "Stok {$barang->nama_barang} menipis";
 
             $notifikasi = Notification::make()
                 ->title($judul)

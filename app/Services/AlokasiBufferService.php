@@ -29,7 +29,7 @@ use Illuminate\Support\Facades\DB;
  *  5. Pasokan >= ambang -> sisihkan 1 pallet (`pallet.poy_kg`) ke BUFFER,
  *     sisanya AKTIF — tetapi hanya selama total buffer gudang lintas
  *     SEMUA merge Minggu masih < `ambang_poy.target_buffer_pallet`
- *     pallet (kapasitas TOTAL GUDANG, bukan per merge).
+ *     pallet. Target default 1 pallet: 6 aktif + 1 buffer = 7 total.
  *  6. Tidak pernah menyisihkan lebih dari sisa kuota. Bila sisa kuota
  *     lebih kecil dari satu pallet, hanya sebesar sisa kuota itulah
  *     yang disisihkan (bukan satu pallet penuh).

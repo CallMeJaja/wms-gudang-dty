@@ -97,8 +97,8 @@ return [
     |--------------------------------------------------------------------------
     |
     | Mesin beroperasi 24/7. POY masuk Senin–Sabtu (Minggu libur kirim).
-    | 7 pallet masuk - 6 pallet konsumsi = 1 pallet disisihkan/hari kerja
-    | -> akumulasi 6 pallet untuk hari Minggu.
+    | 7 pallet masuk = 6 pallet konsumsi + 1 pallet buffer Minggu.
+    | Buffer yang disisihkan hanya 1 pallet (target gudang), bukan 6.
     |
     */
     'operasional' => [
@@ -121,7 +121,7 @@ return [
     */
     'ambang_poy' => [
         'min_stok_aktif_pallet' => 6,   // 6 x 576 = 3.456 kg
-        'target_buffer_pallet' => 6,    // 6 x 576 = 3.456 kg
+        'target_buffer_pallet' => 1,    // 6 aktif + 1 buffer = 7 pallet total (576 kg buffer)
 
         // Buffer HANYA untuk merge bertanda 'is_merge_minggu' pada master barang.
         // Pasokan < 7 pallet -> buffer DILEWATI (tidak dipotong proporsional).
@@ -280,7 +280,6 @@ return [
         ['kode' => 'BOX', 'nama' => 'Box / Carton'],
         ['kode' => 'PALLET', 'nama' => 'Pallet'],
         ['kode' => 'PCS', 'nama' => 'Pieces'],
-        ['kode' => 'ROLL', 'nama' => 'Roll'],
         ['kode' => 'BOBBIN', 'nama' => 'Bobbin / Gulungan'],
     ],
 
@@ -289,13 +288,15 @@ return [
     | Rendemen — Disclaimer Otomatis
     |--------------------------------------------------------------------------
     |
-    | WIP diabaikan dan denier POY berbeda dari DTY, sehingga rendemen
-    | adalah indikator efisiensi massa, bukan konversi teknis.
+    | Perspektif gudang: POY yang masuk dari IPCI dibandingkan dengan DTY
+    | yang keluar lewat Surat Jalan. Waste mencakup area, WIP, dan kehilangan
+    | proses; ini indikator efisiensi massa, bukan konversi teknis.
     |
     */
     'rendemen' => [
-        'disclaimer_ringkas' => 'Rendemen adalah indikator efisiensi massa, bukan konversi teknis. WIP diabaikan sehingga hasil bisa sedikit di atas/bawah 100%.',
-        'disclaimer_lengkap' => 'Denier POY (mis. 250/48) berbeda dari DTY (mis. 150/48), sehingga perbandingan kg bersifat indikatif. Grade C/B berasal dari POY bermasalah (denier/filament tidak cocok) — bukan inefisiensi mesin.',
+        'target_bulanan_ton' => 100.0,
+        'disclaimer_ringkas' => 'Rendemen = (DTY keluar via Surat Jalan ÷ POY masuk dari IPCI) × 100%. Waste/selisih = POY masuk − DTY keluar.',
+        'disclaimer_lengkap' => 'Hanya POY masuk berstatus POSTED dan DTY keluar berstatus ISSUED yang dihitung. Waste mencakup area, WIP, dan kehilangan proses; angka ini bukan konversi teknis denier.',
     ],
 
 ];

@@ -4,6 +4,7 @@ namespace App\Filament\Resources\StokOpnames\Schemas;
 
 use App\Models\Barang;
 use App\Models\Grade;
+use App\Models\KategoriBarang;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -52,9 +53,11 @@ class StokOpnameForm
 
                                         TextInput::make('merge')
                                             ->label('Merge')
-                                            ->required()
+                                            ->visible(fn (Get $get): bool => ! self::isPendukung($get('barang_id')))
+                                            ->required(fn (Get $get): bool => ! self::isPendukung($get('barang_id')))
                                             ->maxLength(50)
-                                            ->placeholder('4P1044'),
+                                            ->placeholder('4P1044')
+                                            ->helperText('Wajib untuk POY/DTY; item pendukung memakai - otomatis.'),
 
                                         Select::make('grade_id')
                                             ->label('Grade')
@@ -71,7 +74,8 @@ class StokOpnameForm
                                                 ->pluck('kode', 'id')
                                                 ->all())
                                             ->searchable()
-                                            ->required(),
+                                            ->visible(fn (Get $get): bool => ! self::isPendukung($get('barang_id')))
+                                            ->required(fn (Get $get): bool => ! self::isPendukung($get('barang_id'))),
                                     ]),
 
                                 Section::make('Hasil Hitung')
@@ -89,9 +93,10 @@ class StokOpnameForm
                                         DatePicker::make('tanggal')
                                             ->label('Tanggal Opname')
                                             ->required()
-                                            ->default(now())
+                                            ->default(fn () => now()->endOfMonth())
                                             ->native(false)
-                                            ->displayFormat('d/m/Y'),
+                                            ->displayFormat('d/m/Y')
+                                            ->helperText('Hanya boleh tanggal terakhir bulan.'),
                                     ]),
                             ]),
 
@@ -106,5 +111,11 @@ class StokOpnameForm
                             ]),
                     ]),
             ]);
+    }
+
+    private static function isPendukung(?int $barangId): bool
+    {
+        return $barangId !== null
+            && Barang::query()->find($barangId)?->kategori?->kode === KategoriBarang::PENDUKUNG;
     }
 }

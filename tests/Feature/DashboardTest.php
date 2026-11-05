@@ -91,14 +91,14 @@ class DashboardTest extends TestCase
     public function status_buffer_belum_siap_saat_kurang(): void
     {
         $this->kunciTanggal('2026-10-13'); // Selasa: sisa 5 hari kerja
-        $this->isiBuffer($this->kgPerPallet());
+        $this->isiBuffer($this->kgPerPallet() / 2);
 
         $status = $this->app->make(AlokasiBufferService::class)->statusBuffer();
 
         $this->assertSame(StatusBufferMinggu::BELUM_SIAP, $status->level);
         $this->assertSame('Belum Siap', $status->label);
         $this->assertSame(5, $status->sisaHariKerja);
-        $this->assertSame(1.0, $status->bufferPallet);
+        $this->assertSame(0.5, $status->bufferPallet);
     }
 
     #[Test]

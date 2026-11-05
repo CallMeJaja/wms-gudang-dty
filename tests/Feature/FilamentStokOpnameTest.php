@@ -7,6 +7,7 @@ use App\Enums\JenisMasuk;
 use App\Enums\JenisMutasi;
 use App\Enums\PosStok;
 use App\Filament\Resources\StokOpnames\Pages\CreateStokOpname;
+use App\Models\Barang;
 use App\Models\StokOpname;
 use App\Models\User;
 use App\Services\StokOpnameService;
@@ -51,7 +52,7 @@ class FilamentStokOpnameTest extends TestCase
     private function payload(array $override = []): array
     {
         return array_merge([
-            'tanggal' => '2026-11-01',
+            'tanggal' => '2026-11-30',
             'merge' => 'M1',
             'stok_fisik_qty' => 100,
         ], $override);
@@ -190,6 +191,36 @@ class FilamentStokOpnameTest extends TestCase
     }
 
     #[Test]
+    public function opname_pendukung_tidak_menampilkan_merge_dan_grade(): void
+    {
+        $pendukung = Barang::create([
+            'kategori_id' => $this->kategoriPendukung->id,
+            'kode_barang' => 'SUP-OPN-FORM',
+            'nama_barang' => 'Support Form',
+            'satuan_dasar_id' => $this->satuanBox->id,
+            'is_active' => true,
+        ]);
+
+        $this->actingAs($this->admin);
+
+        Livewire::test(CreateStokOpname::class)
+            ->fillForm([
+                'barang_id' => $pendukung->id,
+                'stok_fisik_qty' => 10,
+                'tanggal' => '2026-11-30',
+            ])
+            ->assertFormFieldHidden('merge')
+            ->assertFormFieldHidden('grade_id')
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $opname = StokOpname::query()->latest('id')->firstOrFail();
+
+        $this->assertSame('-', $opname->merge);
+        $this->assertSame($this->gradePendukungStd->id, $opname->grade_id);
+    }
+
+    #[Test]
     public function grade_beda_kategori_ditolak_di_form(): void
     {
         $barang = $this->barangPoy(true, 'POY-OPN-2');
@@ -219,7 +250,7 @@ class FilamentStokOpnameTest extends TestCase
             'M1',
             $this->gradeDtyA->id,
             125,
-            '2026-11-01',
+            '2026-11-30',
             $this->admin->id,
             'Uji ringkasan',
         );

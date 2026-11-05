@@ -39,6 +39,8 @@ class PengeluaranScrapResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'nomor_transaksi';
 
+    protected static bool $shouldRegisterNavigation = false;
+
     public static function jenisKeluar(): JenisKeluar
     {
         return JenisKeluar::DtyScrapReject;

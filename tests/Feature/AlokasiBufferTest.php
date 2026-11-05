@@ -230,7 +230,7 @@ class AlokasiBufferTest extends TestCase
     }
 
     #[Test]
-    public function dua_merge_minggu_berbeda_tidak_melampaui_target_buffer(): void
+    public function merge_kedua_tidak_menambah_buffer_setelah_target_satu_pallet(): void
     {
         $this->kunciHariKerja();
 
@@ -242,28 +242,8 @@ class AlokasiBufferTest extends TestCase
         $trxB = $this->terima($barangB, 'M-B', $pasokanKg);
 
         $this->assertSame($this->kgPerPallet(), (float) AlokasiBuffer::query()->where('sumber_transaksi_masuk_id', $trxA->id)->value('jumlah_kg'));
-        $this->assertSame($this->kgPerPallet(), (float) AlokasiBuffer::query()->where('sumber_transaksi_masuk_id', $trxB->id)->value('jumlah_kg'));
-
-        $this->assertSame($this->kgPerPallet() * 2, $this->stok->totalBufferMinggu());
-
-        // Sisipkan buffer barang A secara langsung agar mendekati target.
-        $this->stok->tambahStok($barangA, 'M-A', $this->gradePoyAl->id, $this->targetBufferKg() * 2);
-        $this->stok->alokasiKeBuffer(
-            $barangA,
-            'M-A',
-            $this->gradePoyAl->id,
-            $this->targetBufferKg() - $this->stok->totalBufferMinggu(),
-            'MANUAL'
-        );
-
-        $this->assertSame($this->targetBufferKg(), $this->stok->totalBufferMinggu());
-
-        // Penerimaan ketiga (merge lain lagi) tidak boleh menambah buffer.
-        $trxC = $this->terima($barangB, 'M-C', $pasokanKg);
-        $this->assertSame($this->targetBufferKg(), $this->stok->totalBufferMinggu());
-
-        $catatanC = AlokasiBuffer::query()->where('sumber_transaksi_masuk_id', $trxC->id)->sole();
-        $this->assertSame(0.0, (float) $catatanC->jumlah_kg);
+        $this->assertSame(0.0, (float) AlokasiBuffer::query()->where('sumber_transaksi_masuk_id', $trxB->id)->value('jumlah_kg'));
+        $this->assertSame($this->kgPerPallet(), $this->stok->totalBufferMinggu());
     }
 
     #[Test]

@@ -11,6 +11,7 @@ use App\Exceptions\AturanBisnisException;
 use App\Models\ActivityLog;
 use App\Models\Barang;
 use App\Models\Grade;
+use App\Models\KategoriBarang;
 use App\Models\MutasiStok;
 use App\Models\NomorDokumen;
 use App\Models\StokBarang;
@@ -45,10 +46,15 @@ class StokOpnameService
         ): StokOpname {
             $this->validasiAdmin($userId);
 
-            $merge = trim($merge);
+            if ($barang->kategori?->kode === KategoriBarang::PENDUKUNG) {
+                $merge = '-';
+                $gradeId = $this->gradePendukungId($barang);
+            } else {
+                $merge = trim($merge);
 
-            if ($merge === '') {
-                throw new AturanBisnisException('Merge wajib diisi untuk setiap opname stok.');
+                if ($merge === '') {
+                    throw new AturanBisnisException('Merge wajib diisi untuk opname POY/DTY.');
+                }
             }
 
             if ($stokFisik < 0) {
@@ -59,6 +65,10 @@ class StokOpnameService
                 $tgl = Carbon::parse($tanggal)->toDateString();
             } catch (\Throwable) {
                 throw new AturanBisnisException('Tanggal opname tidak valid.');
+            }
+
+            if (Carbon::parse($tgl)->endOfMonth()->toDateString() !== $tgl) {
+                throw new AturanBisnisException('Opname stok hanya boleh dilakukan pada hari terakhir bulan.');
             }
 
             $sesuai = Grade::query()
@@ -254,6 +264,21 @@ class StokOpnameService
         } catch (QueryException $e) {
             throw new AturanBisnisException('Posisi ini sudah diopname pada tanggal tersebut.');
         }
+    }
+
+    private function gradePendukungId(Barang $barang): int
+    {
+        $kode = (string) config('wms.grade_pendukung_default', 'STD');
+        $gradeId = (int) Grade::query()
+            ->where('kategori_id', $barang->kategori_id)
+            ->where('kode', $kode)
+            ->value('id');
+
+        if ($gradeId === 0) {
+            throw new AturanBisnisException("Grade netral '{$kode}' untuk kategori PENDUKUNG belum ada.");
+        }
+
+        return $gradeId;
     }
 
     private function validasiAdmin(int $userId): void

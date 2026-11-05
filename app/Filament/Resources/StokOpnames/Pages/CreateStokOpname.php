@@ -31,8 +31,8 @@ class CreateStokOpname extends CreateRecord
         try {
             return app(StokOpnameService::class)->proses(
                 $barang,
-                (string) $data['merge'],
-                (int) $data['grade_id'],
+                (string) ($data['merge'] ?? ''),
+                (int) ($data['grade_id'] ?? 0),
                 (float) $data['stok_fisik_qty'],
                 (string) $data['tanggal'],
                 (int) Auth::id(),

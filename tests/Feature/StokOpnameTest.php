@@ -58,7 +58,7 @@ class StokOpnameTest extends TestCase
         );
     }
 
-    private function proses(float $stokFisik, string $tanggal = '2026-11-01', ?int $userId = null): StokOpname
+    private function proses(float $stokFisik, string $tanggal = '2026-11-30', ?int $userId = null): StokOpname
     {
         return $this->app->make(StokOpnameService::class)->proses(
             $this->barang,
@@ -145,7 +145,7 @@ class StokOpnameTest extends TestCase
             'M1',
             $this->gradePoyAl->id,
             100,
-            '2026-11-01',
+            '2026-11-30',
             $this->admin->id,
         );
     }
@@ -208,24 +208,71 @@ class StokOpnameTest extends TestCase
         $this->expectException(AturanBisnisException::class);
         $this->expectExceptionMessage('Opname tanggal mundur tidak diizinkan');
 
-        $this->proses(100, '2026-11-02');
+        $this->proses(100, '2026-10-31');
+    }
+
+    #[Test]
+    public function opname_bukan_hari_terakhir_bulan_ditolak(): void
+    {
+        $this->stokAwal(100);
+
+        $this->expectException(AturanBisnisException::class);
+        $this->expectExceptionMessage('hari terakhir bulan');
+
+        $this->proses(100, '2026-11-15');
+    }
+
+    #[Test]
+    public function opname_pendukung_memakai_merge_strip_dan_grade_std(): void
+    {
+        $pendukung = Barang::create([
+            'kategori_id' => $this->kategoriPendukung->id,
+            'kode_barang' => 'SUP-OPN-1',
+            'nama_barang' => 'Support Opname',
+            'satuan_dasar_id' => $this->satuanBox->id,
+            'is_active' => true,
+        ]);
+
+        $this->app->make(StokService::class)->tambahStok(
+            $pendukung,
+            '-',
+            $this->gradePendukungStd->id,
+            50,
+            tanggal: Carbon::parse('2026-10-31'),
+        );
+
+        $row = $this->app->make(StokOpnameService::class)->proses(
+            $pendukung,
+            '',
+            0,
+            40,
+            '2026-11-30',
+            $this->admin->id,
+        );
+
+        $this->assertSame('-', $row->merge);
+        $this->assertSame($this->gradePendukungStd->id, $row->grade_id);
+        $this->assertSame(
+            40.0,
+            (float) $this->app->make(StokService::class)->saldo($pendukung, '-', $this->gradePendukungStd->id)->stok_aktif
+        );
     }
 
     #[Test]
     public function tanggal_sama_ditolak_tanggal_beda_diizinkan(): void
     {
         $svc = $this->app->make(StokOpnameService::class);
-        $svc->proses($this->barang, 'M1', $this->gradeDtyA->id, 100, '2026-11-01', $this->admin->id);
+        $svc->proses($this->barang, 'M1', $this->gradeDtyA->id, 100, '2026-10-31', $this->admin->id);
 
         try {
-            $svc->proses($this->barang, 'M1', $this->gradeDtyA->id, 100, '2026-11-01', $this->admin->id);
+            $svc->proses($this->barang, 'M1', $this->gradeDtyA->id, 100, '2026-10-31', $this->admin->id);
             $this->fail('Opname duplikat tanggal sama harus ditolak.');
         } catch (AturanBisnisException) {
             $this->assertTrue(true);
         }
 
-        $kedua = $svc->proses($this->barang, 'M1', $this->gradeDtyA->id, 100, '2026-11-02', $this->admin->id);
-        $this->assertSame('2026-11-02', $kedua->tanggal->toDateString());
+        $kedua = $svc->proses($this->barang, 'M1', $this->gradeDtyA->id, 100, '2026-11-30', $this->admin->id);
+        $this->assertSame('2026-11-30', $kedua->tanggal->toDateString());
 
         $stok = StokBarang::query()->posisi($this->barang->id, 'M1', $this->gradeDtyA->id)->firstOrFail();
         $this->assertSame(100.0, (float) $stok->stok_aktif);

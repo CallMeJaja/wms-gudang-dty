@@ -312,11 +312,63 @@ class FilamentPenerimaanCreateTest extends TestCase
     {
         $this->actingAs($this->admin);
 
-        $peek = app(NomorDokumenService::class)->peek('GATE_PASS');
-
         Livewire::test(CreatePenerimaanPendukung::class)
             ->assertFormFieldDoesNotExist('ref_dokumen')
-            ->assertFormSet(['nomor_gate_pass' => $peek]);
+            ->assertFormSet(['nomor_gate_pass' => null]);
+    }
+
+    #[Test]
+    public function gate_pass_mengganti_preview_yang_sudah_dipakai(): void
+    {
+        $pcs = Satuan::create(['kode' => Satuan::PCS, 'nama' => 'Pieces']);
+        $barang = Barang::create([
+            'kategori_id' => $this->kategoriPendukung->id,
+            'kode_barang' => 'PPR TUB DTY',
+            'nama_barang' => 'Paper Tube DTY',
+            'satuan_dasar_id' => $pcs->id,
+            'is_active' => true,
+        ]);
+
+        $preview = app(NomorDokumenService::class)->peek('GATE_PASS');
+
+        $existing = TransaksiMasuk::create([
+            'nomor_transaksi' => 'GP-EXISTING-'.uniqid(),
+            'jenis_masuk' => JenisMasuk::PendukungGatepass,
+            'nomor_gate_pass' => $preview,
+            'tanggal' => now()->toDateString(),
+            'status' => StatusDokumen::Draft,
+            'created_by' => $this->admin->id,
+        ]);
+
+        $this->actingAs($this->admin);
+
+        Livewire::test(CreatePenerimaanPendukung::class)
+            ->fillForm([
+                'tanggal' => now()->toDateString(),
+                'partner_id' => $this->ipci->id,
+                'detail' => [
+                    [
+                        'barang_id' => $barang->id,
+                        'batch' => 'GRN-VELVET',
+                        'jumlah_kemasan' => 10,
+                        'satuan_kemasan_id' => $pcs->id,
+                        'keterangan' => 'Catatan baris',
+                    ],
+                ],
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $baru = TransaksiMasuk::query()
+            ->whereKeyNot($existing->getKey())
+            ->latest('id')
+            ->firstOrFail();
+
+        $this->assertNotSame($preview, $baru->nomor_gate_pass);
+        $this->assertDatabaseMissing('transaksi_masuk', [
+            'nomor_gate_pass' => $preview,
+            'nomor_transaksi' => $baru->nomor_transaksi,
+        ]);
     }
 
     #[Test]

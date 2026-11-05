@@ -49,9 +49,8 @@ class PenerimaanPendukungForm
                                     ->label('Nomor Gate Pass')
                                     ->maxLength(50)
                                     ->unique(ignoreRecord: true)
-                                    ->default(fn () => app(NomorDokumenService::class)->peek('GATE_PASS'))
                                     ->placeholder(fn () => app(NomorDokumenService::class)->peek('GATE_PASS'))
-                                    ->helperText('Otomatis; boleh disesuaikan dengan dokumen fisik.'),
+                                    ->helperText('Kosongkan untuk otomatis; isi hanya jika ingin menimpa nomor.'),
 
                                 TextInput::make('nomor_transaksi')
                                     ->label('Nomor Transaksi')

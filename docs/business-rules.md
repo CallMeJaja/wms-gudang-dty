@@ -13,15 +13,17 @@ di kode atau dokumentasi lain tanpa memperbarui konfigurasi.
 - Konversi kemasan hanya membantu pengisian atau validasi silang.
 - Tidak ada saldo yang dihitung dari perkalian jumlah kemasan.
 
-## 2. POY tidak dikonversi dari bobbin
+## 2. POY: auto-fill kemasan, KG tetap acuan timbangan
 
-- Berat netto POY wajib diisi manual.
-- Bila berat KG kosong atau nol, transaksi ditolak meskipun bobbin diisi.
-- Tidak ada konversi otomatis bobbin ke KG untuk POY.
-- Bobbin pada POY hanya atribut pelengkap.
+- Form POY mengisi otomatis Box/Pallet ⇄ Bobbin ⇄ KG sebagai bantuan:
+  1 box/pallet = 36 bobbin = 576 kg; 1 bobbin = 16 kg.
+- Semua nilai tetap dapat diedit; berat aktual hasil timbangan menimpa
+  hasil hitungan.
+- Bila berat KG kosong atau nol, transaksi tetap ditolak.
+- KG adalah dasar saldo; box/bobbin hanya atribut input dan tampilan.
 
-Alasan: berat per bobbin dapat berbeda menurut denier dan kondisi aktual,
-sehingga saldo harus mengikuti timbangan.
+Alasan: auto-fill mempercepat input, tetapi berat per bobbin dapat berbeda
+menurut denier dan kondisi aktual.
 
 ## 3. DTY: box, bobbin, dan KG
 
@@ -51,7 +53,7 @@ Setiap posisi stok memiliki dua saldo:
 - Pemisahan pos hanya berlaku untuk **POY**.
 - DTY dan item pendukung selalu masuk `AKTIF`; saldo buffer tetap nol.
 - Total stok = `stok_aktif` + `stok_buffer`.
-- Pengeluaran POY hanya memotong `stok_aktif`.
+- Transaksi POY ke Produksi hanya memotong `stok_aktif`.
 - Buffer tidak boleh dipakai untuk pengeluaran pada hari kerja.
 
 ## 6. Buffer Minggu
@@ -89,8 +91,8 @@ Rilis buffer:
 
 - Netto adalah dasar pengurangan dan penambahan stok.
 - Gross dipakai untuk pemeriksaan fisik dan toleransi kemasan DTY.
-- Pada penerimaan DTY, gross disimpan bersama keterangan batch agar tetap
-  dapat diperiksa tanpa mengubah skema.
+- Pada penerimaan DTY, gross disimpan sebagai penanda pada `keterangan`
+  agar tetap dapat diperiksa tanpa mengubah skema.
 - Toleransi gross per grade adalah alat bantu, bukan gerbang pemblokir.
 - POY dan item pendukung tidak memerlukan gross.
 
@@ -162,9 +164,12 @@ Rilis buffer:
 - Nomor dibuat di dalam transaksi dengan `lockForUpdate()`, sehingga dua
   request paralel tidak mendapat nomor yang sama.
 - Format nomor berasal dari konfigurasi, bukan string hardcode.
-- Pratinjau nomor tidak menaikkan counter.
-- Baris counter harus tersedia untuk setiap jenis dokumen; seeder
-  menyiapkan periode berjalan.
+- Preview nomor memakai `peek()`/`peekUnik()` dan tidak menaikkan counter.
+- `generateUnik()` melewati nomor yang sudah dipakai record lama/manual,
+  sehingga counter yang tertinggal tidak menyebabkan duplikasi.
+- Nomor transaksi, Gate Pass, Surat Jalan, dan penyesuaian opname memakai
+  generator unik ini.
+- Nomor Gate Pass dan Surat Jalan ditampilkan read-only di form.
 
 ## 13. Stok tidak boleh negatif
 
@@ -183,11 +188,12 @@ Rilis buffer:
   - Penerimaan/pengeluaran DTY hanya untuk barang DTY.
   - Gate Pass hanya untuk item pendukung.
 - Grade wajib berasal dari kategori yang sama dengan barang.
-- Merge wajib diisi untuk setiap mutasi stok.
+- Merge transaksi internal wajib diisi; item pendukung memakai `-`.
 - Barang nonaktif tidak boleh dipakai pada transaksi baru.
 - Satu baris detail mewakili satu kombinasi barang, merge, dan grade.
 - Item pendukung tidak memakai merge sebagai identitas stok: `merge = -`,
   grade `STD`, sedangkan batch hanya metadata di kolom `batch`.
+- Ref. Dokumen hanya relevan untuk POY dan bersifat opsional.
 
 ## 15. Status dan pengaruhnya terhadap stok
 

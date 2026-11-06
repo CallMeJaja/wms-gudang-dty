@@ -44,11 +44,26 @@ Konstanta bisnis tidak ditulis di kode. Nilai seperti berat per pallet,
 jumlah bobbin per box, ambang buffer, dan format nomor berada di
 `config/wms.php`.
 
+Service domain utama: `StokService`, `PenerimaanService`,
+`PengeluaranService`, `AlokasiBufferService`, `RilisBufferService`,
+`StokOpnameService`, `LaporanService` (rendemen), `StokMenipisService`,
+`VoidTransaksiService`, `KonversiSatuanService`, dan `NomorDokumenService`
+(termasuk `generateUnik`/`peekUnik`).
+
+## Grup menu
+
+- **Penerimaan:** POY, Gate Pass.
+- **Produksi:** POY ke Produksi, DTY dari Produksi.
+- **Pengeluaran:** DTY (Surat Jalan).
+- **Persediaan:** Stok Barang, Stok Opname, Waste / Scrap.
+- **Pengaturan:** Pengguna, Riwayat Aktivitas.
+- Selain itu: Beranda, Data Induk, dan Laporan.
+
 ## Struktur folder
 
 ```text
 app/
-├── Console/Commands/       # wms:rilis-buffer-minggu, wms:recalculate-stock
+├── Console/Commands/       # buffer, rekalkulasi stok, notifikasi stok menipis
 ├── Enums/                  # Role, status, jenis transaksi, pos stok
 ├── Exceptions/             # AturanBisnisException, StokTidakCukupException
 ├── Exports/                # Export Excel laporan
@@ -119,6 +134,10 @@ Poin penting:
 5. Untuk Surat Jalan DTY, nomor surat jalan dibuat atomik bila belum ada.
 6. Status berubah menjadi `POSTED` atau `ISSUED`, lalu audit dicatat.
 
+Penomoran transaksi, Gate Pass, Surat Jalan, dan penyesuaian opname memakai
+generator unik yang aman terhadap counter lama. Waste/Scrap dicatat sebagai
+log kg terpisah dan tidak menyentuh stok/mutasi.
+
 Buffer tidak boleh dipakai untuk pengeluaran pada hari kerja. Bila stok
 aktif tidak cukup, transaksi ditolak dan seluruh perubahan dibatalkan.
 
@@ -159,8 +178,8 @@ aktif tidak cukup, transaksi ditolak dan seluruh perubahan dibatalkan.
   dan Manajer aktif.
 - Pemeriksaan yang sama dijadwalkan setiap jam sebagai fallback lewat
   command `wms:notifikasi-stok-menipis`.
-- Notifikasi dikirim langsung (sinkron) sehingga tidak memerlukan queue
-  worker.
+- Notifikasi memakai nama barang pada judul, dikirim langsung (sinkron)
+  sehingga tidak memerlukan queue worker, dengan dedup 24 jam per penerima.
 
 ## Global search
 
@@ -177,7 +196,7 @@ Dashboard memakai `DashboardData` sebagai sumber data baca-saja:
 | Widget | Isi |
 | --- | --- |
 | `RingkasanOperasionalWidget` | Stok aktif POY, status buffer Minggu, draf menunggu posting |
-| `GrafikStokWidget` | Grafik garis 30 hari untuk POY dan DTY masuk/keluar |
+| `GrafikStokWidget` | Grafik garis 30 hari yang hanya menghitung mutasi `MASUK`/`KELUAR` |
 | `AlertStokWidget` | Peringatan stok minimum, stok aktif kritis, dan buffer terlambat |
 
 Widget tidak menduplikasi logika mutasi; agregasi diambil dari service dan
@@ -189,16 +208,18 @@ model.
 | --- | --- |
 | `wms:rilis-buffer-minggu` | Rilis seluruh buffer Minggu ke stok aktif |
 | `wms:recalculate-stock` | Hitung ulang snapshot saldo pada ledger mutasi |
+| `wms:notifikasi-stok-menipis` | Pemeriksaan fallback stok menipis |
 
-Scheduler di `routes/console.php` menjalankan
-`wms:rilis-buffer-minggu` setiap **Minggu pukul 05:45** pada zona waktu
-aplikasi (`Asia/Jakarta`). Rilis juga dapat dipicu manual dari Beranda
-ketika hari Minggu dan masih ada buffer.
+Scheduler di `routes/console.php` menjalankan `wms:rilis-buffer-minggu`
+setiap **Minggu pukul 05:45** dan `wms:notifikasi-stok-menipis` setiap jam.
+Rilis buffer juga dapat dipicu manual dari Beranda ketika hari Minggu dan
+masih ada buffer.
 
 ## Konkurensi dan integritas
 
-- `nomor_dokumen` memakai unique `(jenis, periode)` dan `lockForUpdate()`
-  agar nomor tidak duplikat.
+- `nomor_dokumen` memakai unique `(jenis, periode)` dan `lockForUpdate()`.
+- `generateUnik()` melewati nomor yang sudah dipakai record lama/manual;
+  preview memakai `peekUnik()` tanpa mengubah counter.
 - `stok_barang` memakai unique `(barang_id, merge, grade_id)` dan
   `CHECK` non-negatif.
 - `alokasi_buffer` memakai unique `(barang_id, merge, tanggal)` agar satu

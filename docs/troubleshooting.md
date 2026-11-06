@@ -91,6 +91,35 @@ mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS db_wms_gudang_dty CHARACTER S
 mysql -u root -p db_wms_gudang_dty < database_backup/db_wms_gudang_dty.sql
 ```
 
+## Nomor dokumen duplikat atau tidak sesuai preview
+
+- Nomor baru memakai `generateUnik()` sehingga melewati nomor yang sudah
+  dipakai record lama/manual.
+- Preview memakai `peekUnik()` dan tidak menaikkan counter.
+- Nomor Gate Pass dan Surat Jalan read-only di form; jangan mengubahnya
+  langsung dari database.
+- Bila counter terlihat tertinggal, biarkan generator melewati nomor yang
+  sudah ada; jangan menurunkan `last_number` secara manual tanpa backup.
+
+## Nomor Gate Pass / Surat Jalan tidak bisa diedit
+
+- Keduanya memang read-only dan dibuat otomatis di server.
+- Untuk koreksi dokumen fisik, gunakan alur pembatalan/void yang berlaku,
+  bukan mengedit nomor langsung.
+
+## Waste / Scrap tidak mengurangi stok
+
+- Ini perilaku yang benar. Waste/Scrap adalah log kg tanpa grade, merge,
+  item, atau packing.
+- Waste log tidak membuat mutasi stok DTY.
+
+## Opname ditolak
+
+- Opname hanya boleh pada hari terakhir bulan.
+- Untuk item pendukung, merge otomatis `-` dan grade `STD`; tidak perlu
+  memilih merge/grade.
+- Backdated opname ditolak bila sudah ada mutasi setelah tanggal tersebut.
+
 ## Tabel notifikasi tidak ditemukan
 
 Gejala: drawer notifikasi error atau badge tidak muncul.

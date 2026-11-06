@@ -70,7 +70,8 @@ Nama database default adalah `db_wms_gudang_dty` dengan collation
 
 - `kategori_id` → `kategori_barang.id`
 - `satuan_dasar_id` → `satuan.id`
-- `kode_barang` unik
+- `kode_barang` unik; POY `POY-250-48`, DTY `DTY-150-48-1`; 7 item pendukung memakai kode IPCI numerik: `5003301227`, `5000002512`, `5003301241`, `5003301180`, `5000001861`, `5003301185`, `1003000201`
+- Satuan seeded: KG, BOX, PALLET, PCS, BOBBIN; tidak ada ROLL
 - `stok_minimum` dipakai untuk peringatan dashboard
 - `is_merge_minggu` menentukan kelayakan alokasi buffer
 - `is_active` dan soft delete mencegah pemakaian barang lama
@@ -119,6 +120,7 @@ Nama database default adalah `db_wms_gudang_dty` dengan collation
 - Penerimaan memakai `berat_kg`.
 - Pengeluaran memakai `berat_netto_kg` dan `berat_gross_kg` opsional.
 - Detail masuk dapat menyimpan penanda gross pada `keterangan` untuk DTY.
+- `batch` menyimpan metadata batch item pendukung; identitas stok tetap `merge = '-'`.
 - Foreign key detail memakai cascade delete terhadap header.
 
 ### `alokasi_buffer`
@@ -140,7 +142,7 @@ Nama database default adalah `db_wms_gudang_dty` dengan collation
 
 - Append-only; hanya memiliki `created_at`.
 - `event` berisi `LOGIN`, `LOGOUT`, `CREATE`, `UPDATE`, `DELETE`, `VOID`,
-  atau `RELEASE_BUFFER`.
+  `ALOKASI_BUFFER`, atau `RELEASE_BUFFER`.
 - `modul` dan `ref_id` menghubungkan log dengan objek terkait.
 - `user_id` memakai `SET NULL` bila user dihapus secara database.
 
@@ -155,7 +157,7 @@ Nama database default adalah `db_wms_gudang_dty` dengan collation
 | `mutasi_stok.jenis_transaksi` | `MASUK`, `KELUAR`, `ADJUSTMENT_IN`, `ADJUSTMENT_OUT`, `ALOKASI_BUFFER`, `RILIS_BUFFER`, `VOID` |
 | `mutasi_stok.pos` | `AKTIF`, `BUFFER` |
 | Status dokumen | `DRAFT`, `POSTED`, `ISSUED`, `VOID`, `CANCELLED` |
-| `activity_logs.event` | `LOGIN`, `LOGOUT`, `CREATE`, `UPDATE`, `DELETE`, `VOID`, `RELEASE_BUFFER` |
+| `activity_logs.event` | `LOGIN`, `LOGOUT`, `CREATE`, `UPDATE`, `DELETE`, `VOID`, `ALOKASI_BUFFER`, `RELEASE_BUFFER` |
 | `nomor_dokumen.jenis` | `SURAT_JALAN_DTY`, `GATE_PASS`, `TRX_MASUK`, `TRX_KELUAR` |
 
 ## Constraint penting
@@ -212,7 +214,7 @@ Dump dan seeder lokal menyiapkan:
 | Alokasi buffer | 26 |
 | Stok opname | 3 |
 | Waste log | 4 |
-| Activity log | 133 |
+| Activity log | 134 |
 | Notifikasi | 2 (Coning Oil 195 kg < minimum 200 kg) |
 
 Data transaksi demo hanya dibuat saat `APP_ENV=local`. `NotifikasiDemoSeeder`
@@ -232,7 +234,6 @@ Coning Oil 195 kg di bawah minimum 200 kg.
 
 ## Dump dan impor
 
-- Dump: `database_backup/db_wms_gudang_dty.sql`.
 - Dump manual ini **tidak** membuat database dan **tidak** memakai `DROP TABLE`.
 - Import (database tujuan **wajib kosong**):
 
@@ -243,8 +244,9 @@ Coning Oil 195 kg di bawah minimum 200 kg.
 
 - Jika database sudah memiliki tabel, kosongkan atau buat ulang terlebih
   dahulu.
-- Dump memuat 27 tabel dan data demo (3 user, 9 barang, 64 masuk, 62 keluar,
-  146 mutasi, 26 alokasi buffer, 3 opname, 4 waste log, 133 log, 2 notifikasi).
+- Dump: `database_backup/db_wms_gudang_dty.sql`, **128 KB**, 27 tabel.
+- Dump memuat data demo (3 user, 9 barang, 64 masuk, 62 keluar, 146 mutasi,
+  26 alokasi buffer, 3 opname, 4 waste log, 134 log, 2 notifikasi).
 - Dump dibuat dengan `mariadb-dump` (MariaDB); kompatibel dengan MySQL 8 dan
   MariaDB, collation `utf8mb4_general_ci`.
 - Alternatif tanpa dump:

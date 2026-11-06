@@ -18,8 +18,9 @@ laporan operasional dalam satu panel admin.
 - **Beranda** — stok aktif POY, status buffer Minggu beserta aksi rilis,
   draf yang menunggu posting, grafik 30 hari, dan daftar perhatian.
 - **Data Induk** — Barang, Mitra, Grade, Kategori, Satuan, dan Konversi.
-- **Penerimaan** — POY, Gate Pass item pendukung, dan DTY hasil produksi.
-- **Pengeluaran** — POY ke produksi dan Surat Jalan DTY.
+- **Penerimaan** — POY dan Gate Pass item pendukung.
+- **Produksi** — POY ke Produksi dan DTY dari Produksi.
+- **Pengeluaran** — Surat Jalan DTY.
 - **Persediaan** — Stok Barang, Stok Opname, dan log Waste / Scrap (kg, tanpa mutasi stok).
 - **Laporan** — Keluar-Masuk, Kartu Stok, dan Rendemen POY masuk vs DTY
   keluar dengan ekspor Excel/PDF serta cetak.

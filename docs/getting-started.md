@@ -58,7 +58,7 @@ Pilih salah satu jalur berikut.
 
 ### Opsi A — impor dump (paling cepat, termasuk data demo)
 
-Dump manual ini **tidak** membuat database dan **tidak** memakai `DROP TABLE`:
+Dump 27 tabel (~128 KB) ini **tidak** membuat database dan **tidak** memakai `DROP TABLE`:
 
 ```bash
 mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS db_wms_gudang_dty CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;"
@@ -68,7 +68,9 @@ mysql -u root -p db_wms_gudang_dty < database_backup/db_wms_gudang_dty.sql
 > Database tujuan **wajib kosong**. Jika sudah memiliki tabel, kosongkan atau
 > buat ulang database terlebih dahulu.
 
-Detail isi dump dan alternatif impor ada di
+Dump berisi 3 user, 9 barang, 64 transaksi masuk, 62 transaksi keluar,
+146 mutasi, 26 alokasi buffer, 3 opname, 4 waste log, 134 activity log, dan
+2 notifikasi. Detail isi dump dan alternatif impor ada di
 [`database_backup/README.md`](../database_backup/README.md).
 
 ### Opsi B — migrasi dan seeder
@@ -137,11 +139,11 @@ pertama.
    stok aktif dan mutasi bertambah.
 4. Buka **Persediaan → Stok Barang** dan **Laporan → Kartu Stok** untuk
    memeriksa jejak mutasi.
-5. Coba **Pengeluaran POY** untuk melihat validasi stok aktif dan buffer.
+5. Buka **Produksi → POY ke Produksi** untuk melihat validasi stok aktif dan buffer.
 6. Buka **Laporan → Rendemen** untuk melihat POY masuk vs DTY keluar.
 7. Gunakan **Ctrl/⌘+K** untuk mencari data melalui global search.
-8. Buka ikon notifikasi di sidebar. Demo sudah berisi 2 notifikasi stok
-   menipis, termasuk Coning Oil 195 kg di bawah minimum 200 kg; notifikasi
+8. Buka ikon notifikasi di sidebar. Demo berisi 2 notifikasi Admin/Manajer
+   untuk Coning Oil 195 kg di bawah minimum 200 kg; notifikasi
    baru juga muncul setelah mutasi stok atau setelah menjalankan
    `php artisan wms:notifikasi-stok-menipis`.
 

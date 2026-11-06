@@ -20,8 +20,9 @@ kosong.
   - 26 alokasi buffer
   - 3 stok opname
   - 4 waste log
-  - 133 activity log
+  - 134 activity log
   - 2 notifikasi nyata (Coning Oil 195 kg < minimum 200 kg; Admin + Manajer)
+- Ukuran dump: **128 KB**
 - Database tujuan: `db_wms_gudang_dty`
 - Character set: `utf8mb4`
 - Collation: `utf8mb4_general_ci`
@@ -62,7 +63,7 @@ Gunakan migrasi dan seeder Laravel:
 php artisan migrate --seed
 ```
 
-Data transaksi demo hanya dijalankan ketika `APP_ENV=local`.
+Dump memuat 19 migrasi dan 27 tabel. Data transaksi demo hanya dijalankan ketika `APP_ENV=local`.
 `NotifikasiDemoSeeder` ikut berjalan di lokal dan menjalankan pemeriksaan
 stok menipis yang sebenarnya, sehingga dump dan seeder demo berisi 2
 notifikasi nyata. Pada environment lain, seeder tetap membuat master data

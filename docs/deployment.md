@@ -120,6 +120,7 @@ Tambahkan cron agar scheduler Laravel berjalan setiap menit:
 Jadwal aplikasi:
 
 - `wms:rilis-buffer-minggu` setiap Minggu pukul 05:45 waktu aplikasi.
+- `wms:notifikasi-stok-menipis` setiap jam sebagai fallback notifikasi.
 - Command rilis bersifat idempoten; buffer nol tidak menghasilkan error.
 
 Verifikasi:
@@ -163,9 +164,11 @@ Backup rutin:
 mysqldump -u <user> -p --single-transaction --routines --triggers db_wms_gudang_dty > backup-$(date +%F).sql
 ```
 
-Simpan backup di lokasi terpisah dari server aplikasi. Uji proses restore
-secara berkala. Ingat bahwa dump aplikasi memakai `DROP TABLE`, jadi
-restore harus ke database yang benar.
+Dump demo canonical di repo berisi 27 tabel (~128 KB). Simpan backup di
+lokasi terpisah dari server aplikasi. Uji proses restore
+secara berkala. Dump canonical di repo **tidak** memakai `DROP TABLE`, jadi
+impor ke database kosong; backup produksi tetap perlu diverifikasi sebelum
+restore.
 
 ## 11. Notifikasi
 

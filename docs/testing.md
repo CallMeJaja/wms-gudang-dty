@@ -29,6 +29,7 @@ tests/
 │   ├── ServiceStokTest.php
 │   ├── StokBerubahEventTest.php
 │   ├── StokMenipisServiceTest.php
+│   ├── ShiftServiceTest.php
 │   ├── AlokasiBufferTest.php
 │   ├── StokOpnameTest.php
 │   ├── VoidTransaksiTest.php
@@ -50,6 +51,8 @@ tests/
 │   ├── FilamentLaporanTest.php
 │   ├── FilamentActivityLogTest.php
 │   ├── FilamentUserTest.php
+│   ├── FilamentWasteLogTest.php
+│   ├── FilamentLoginTest.php
 │   └── ExampleTest.php
 ├── Unit/
 │   └── ExampleTest.php
@@ -65,6 +68,9 @@ Kelompok cakupan:
 | Penerimaan | Posting, issue, validasi kategori/grade, double-posting |
 | Pengeluaran | Stok aktif, surat jalan, nomor atomik |
 | Waste / Scrap | Log kg, tujuan, tanpa mutasi stok, RBAC |
+| Penomoran | generate/peekUnik, collision safety, Gate Pass/Surat Jalan |
+| Shift | Batas shift 1/2/3 termasuk lintas tengah malam |
+| Auto-fill form | POY box/bobbin/kg, DTY box netto/gross, Surat Jalan bobbin |
 | Void | Pembalikan mutasi, alasan wajib, role Admin |
 | Opname | Selisih, transaksi penyesuaian, duplikat harian |
 | Laporan | Agregasi, rendemen POY masuk vs DTY keluar, target 100 ton, ekspor Excel/PDF |

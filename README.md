@@ -152,9 +152,3 @@ Implementasi panel Filament dan aturan bisnis inti sudah selesai dan berada
 pada tahap **finalisasi dan QA**. Fokus berikutnya adalah hardening
 produksi, backup rutin, pemantauan scheduler/queue, dan dokumentasi
 operasional.
-
-## Anggota kelompok
-
-- Muhammad Apiransyah Ramdhani - 202404012
-- Reza Asriano Maulana - 202404021
-- Dhafi Ebsan Yurizal - 202404018

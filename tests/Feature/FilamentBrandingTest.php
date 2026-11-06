@@ -53,18 +53,18 @@ class FilamentBrandingTest extends TestCase
         $this->assertCount(7, $groups);
         $this->assertSame(
             ['Data Induk', 'Penerimaan', 'Produksi', 'Pengeluaran', 'Persediaan', 'Laporan', 'Pengaturan'],
-            array_map(fn ($group): string|Htmlable => $group->getLabel(), $groups),
+            array_map(fn($group): string|Htmlable => $group->getLabel(), $groups),
         );
         $this->assertSame(
             [null, null, null, null, null, null, null],
-            array_map(fn ($group) => $group->getIcon(), $groups),
+            array_map(fn($group) => $group->getIcon(), $groups),
         );
     }
 
     #[Test]
     public function label_navigasi_memakai_istilah_yang_ringkas(): void
     {
-        $this->assertSame('POY (IPCI)', PenerimaanPoyResource::getNavigationLabel());
+        $this->assertSame('POY', PenerimaanPoyResource::getNavigationLabel());
         $this->assertSame('DTY dari Produksi', PenerimaanDtyResource::getNavigationLabel());
         $this->assertSame('POY ke Produksi', PengeluaranPoyResource::getNavigationLabel());
         $this->assertSame('DTY (Surat Jalan)', SuratJalanDtyResource::getNavigationLabel());
@@ -208,7 +208,7 @@ class FilamentBrandingTest extends TestCase
         $url = BarangResource::getGlobalSearchResultUrl($barang);
 
         $this->assertNotNull($url);
-        $this->assertStringContainsString('tableSearch='.$barang->kode_barang, $url);
+        $this->assertStringContainsString('tableSearch=' . $barang->kode_barang, $url);
     }
 
     #[Test]
@@ -236,7 +236,7 @@ class FilamentBrandingTest extends TestCase
     private function buatDrafPenerimaan(): TransaksiMasuk
     {
         return $this->buatTransaksiMasuk([
-            'nomor_transaksi' => 'UJI-DRAF-'.uniqid(),
+            'nomor_transaksi' => 'UJI-DRAF-' . uniqid(),
         ]);
     }
 
@@ -251,7 +251,7 @@ class FilamentBrandingTest extends TestCase
         );
 
         return TransaksiMasuk::create(array_merge([
-            'nomor_transaksi' => 'UJI-'.uniqid(),
+            'nomor_transaksi' => 'UJI-' . uniqid(),
             'jenis_masuk' => JenisMasuk::PoyIpci,
             'tanggal' => now()->toDateString(),
             'partner_id' => $partner->id,
@@ -271,7 +271,7 @@ class FilamentBrandingTest extends TestCase
         );
 
         return TransaksiKeluar::create(array_merge([
-            'nomor_transaksi' => 'UJI-OUT-'.uniqid(),
+            'nomor_transaksi' => 'UJI-OUT-' . uniqid(),
             'jenis_keluar' => JenisKeluar::PoyProduksi,
             'tanggal' => now()->toDateString(),
             'partner_id' => $partner->id,

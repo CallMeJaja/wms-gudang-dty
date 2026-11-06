@@ -39,7 +39,7 @@ laporan operasional dalam satu panel admin.
 | Framework | Laravel | 13.39 |
 | Panel admin | Filament | 5.11 |
 | Reaktivitas | Livewire | 4.4.8 |
-| Database | MySQL 8 / MariaDB | — |
+| Database | MySQL 8.0+ / MariaDB | 10.6+ (diuji MariaDB 13.0.2) |
 | Test | PHPUnit | 12.5.42 |
 | Formatter | Laravel Pint | 1.32 |
 | Export PDF | `barryvdh/laravel-dompdf` | 3.1.2 |
